@@ -11,6 +11,7 @@
         }
     },
     "require": {
+        "php": ">=7.1.0",
         "zendframework/zendframework": "3.0.0",
         "php-di/php-di": "^5.4",
         "matthiasmullie/minify": "^1.3"
