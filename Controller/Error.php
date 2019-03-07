@@ -32,7 +32,7 @@ class Error {
 		}
 
 		header("HTTP/1.0 " . $code . " " . $title);
-		$sysDir = ROOT.DS.'vendor'.DS.'Opoink'.DS.'Framework'.DS.'View'.DS.'Sys'.DS;
+		$sysDir = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS;
 
 		$layoutFile = $sysDir.'Layout'.DS.'error.phtml';
 		$tplFile = $sysDir.'Templates'.DS.'error'.DS.'error'.$code.'.phtml';

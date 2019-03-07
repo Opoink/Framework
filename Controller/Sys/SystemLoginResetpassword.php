@@ -61,7 +61,7 @@ class SystemLoginResetpassword extends Sys {
 					$this->_mailer->addAddress($user->getData('email'), $user->getData('firstname'), 'To')
 					->setFrom('support@opoink.com', 'support')
 					->setSubject('Opoink system admin password retrieved')
-					->setTemplatePath(ROOT.'/vendor/Opoink/Framework/View/Sys/Templates/mail/default.phtml')
+					->setTemplatePath(ROOT.'/vendor/opoink/framework/View/Sys/Templates/mail/default.phtml')
 					->setMessage($messageTemplate)
 					->send();
 
