@@ -95,7 +95,7 @@ class Sys implements SysInterface {
 	}
 	
 	protected function addInlineJs($templateFile=null){
-		$systemTemplate = ROOT.DS.'vendor'.DS.'Opoink'.DS.'Framework'.DS.'View'.DS.'Sys'.DS.'Js';
+		$systemTemplate = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Js';
 		
 		$jsTemplate = '';
 		if($templateFile){
@@ -116,12 +116,12 @@ class Sys implements SysInterface {
 	}
 	
 	protected function renderHtml($templateFile=null, $layout='default.phtml'){
-		$systemLayout = ROOT.DS.'vendor'.DS.'Opoink'.DS.'Framework'.DS.'View'.DS.'Sys'.DS.'Layout';
+		$systemLayout = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Layout';
 		
 		$layout = $systemLayout.DS.$layout;
 		$template = '';
 		
-		$systemTemplate = ROOT.DS.'vendor'.DS.'Opoink'.DS.'Framework'.DS.'View'.DS.'Sys'.DS.'Templates';
+		$systemTemplate = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Templates';
 		if($templateFile){
 			$tpl = $systemTemplate.DS.$templateFile;
 		} else {

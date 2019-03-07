@@ -20,7 +20,7 @@ class Xmltohtml {
 	const XML_LINK = 'link';
 	
 	/*
-	*	route info create by \Opoink\App\Opoinkframework\Route\Route
+	*	route info create by \Of\Route\Route
 	*	this already created and just pass it in here
 	*/
 	protected $routeInfo;
