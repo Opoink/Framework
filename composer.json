@@ -7,7 +7,7 @@
     "type": "library",
     "autoload": {
         "psr-4": {
-           "Of\\": "vendor/"
+           "Of\\": ""
         }
     },
     "require": {
