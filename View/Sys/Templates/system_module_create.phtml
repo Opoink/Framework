@@ -1,0 +1,55 @@
+<?php
+/**
+* Copyright 2018 Opoink Framework (http://opoink.com/)
+* Licensed under MIT, see LICENSE.md
+*/
+
+
+$cardTitle1 = 'Create New Module';
+$vendorName = '';
+$moduleName = '';
+$moduleVer = '';
+?>
+
+<?php require_once(__DIR__ . '/container_top.phtml') ?>
+	<div class="row">
+		<form class="w-100" action="<?= $this->getUrl('/system/module/save') ?>" method="POST">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-body">
+						<h5 class="card-title m-b-15"><?= $cardTitle1; ?></h5>
+
+						<div class="form-group row">
+                            <label for="vendor-name" class="col-sm-3 text-right control-label col-form-label">Vendor Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="vendor-name" name="vendor_name" value="<?= $vendorName ?>" required>
+                            </div>
+                        </div>
+
+						<div class="form-group row">
+                            <label for="module-name" class="col-sm-3 text-right control-label col-form-label">Module Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="module-name" name="module_name" value="<?= $moduleName ?>" required>
+                            </div>
+                        </div>
+
+						<div class="form-group row">
+                            <label for="module-ver" class="col-sm-3 text-right control-label col-form-label">
+                            	Module version
+                            </label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="module-ver" name="module_ver" value="<?= $moduleVer ?>" required>
+                                <p><small class="text-muted">1.0.0</small></p>
+                            </div>
+                        </div>
+					</div>
+                    <div class="border-top">
+                        <div class="card-body">
+                            <button class="btn btn-primary" name="save" value="save">Save</button>
+                        </div>
+                    </div>
+				</div>
+			</div>
+		</form>
+	</div>
+<?php require_once(__DIR__ . '/container_bottom.phtml') ?>
