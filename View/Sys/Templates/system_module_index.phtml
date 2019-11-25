@@ -29,7 +29,7 @@
 									<th scope="col">Config Version</th>
 									<th scope="col">Routes</th>
 									<th scope="col">Controllers</th>
-									<th scope="col"></th>
+									<th scope="col">Action</th>
 								</tr>
 							</thead>
 
@@ -54,7 +54,7 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
 													<?= strtolower($conKey) ?>
 												</p>
 												<?php $controller_count++ ?>
@@ -64,16 +64,21 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+												<p class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
 													<?= '\\' . ltrim($conVal, '\\') ?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
 										</td>
 										<td>
-											<a href="javascript:void(0)" onclick="opoink.module.modCollaps('module-count-<?= $modCount ?>')">
-												<i class="fas fa-angle-right"></i>
-											</a>
+											<div class="text-right w80">
+												<a href="<?= $this->getUrl('/system/module/edit/mod/'.$modKey); ?>">
+													<i class="far fa-edit"></i><span class="m-l-5 m-r-20">Edit</span>
+												</a>
+												<a href="javascript:void(0)" onclick="opoink.module.modCollaps('module-count-<?= $modCount ?>')">
+													<i class="fas fa-angle-right"></i>
+												</a>
+											</div>
 										</td>
 									</tr>
 									<?php $modCount++ ?>
@@ -137,7 +142,7 @@
 									<th scope="col">Version</th>
 									<th scope="col">Routes</th>
 									<th scope="col">Controllers</th>
-									<th scope="col"></th>
+									<th scope="col">Action</th>
 								</tr>
 							</thead>
 
@@ -161,7 +166,7 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
 													<?= strtolower($conKey) ?>
 												</p>
 												<?php $controller_count++ ?>
@@ -170,16 +175,21 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
 													<?= '\\' . ltrim($conVal, '\\') ?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
 										</td>
 										<td>
-											<a href="javascript:void(0)" onclick="opoink.module.modCollaps('avai-module-count-<?= $modCount ?>')">
-												<i class="fas fa-angle-right"></i>
-											</a>
+											<div class="text-right w80">
+												<a href="<?= $this->getUrl('/system/module/edit/mod/'.$modKey); ?>">
+													<i class="far fa-edit"></i><span class="m-l-5 m-r-20">Edit</span>
+												</a>
+												<a href="javascript:void(0)" onclick="opoink.module.modCollaps('avai-module-count-<?= $modCount ?>')">
+													<i class="fas fa-angle-right"></i>
+												</a>
+											</div>
 										</td>
 									</tr>
 								<?php endforeach ?>

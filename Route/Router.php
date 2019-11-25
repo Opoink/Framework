@@ -109,6 +109,7 @@ class Router {
 			$sysRoute.'_settings_index' => 'Of\\Controller\\Sys\\SystemSettingsIndex',
 			$sysRoute.'_module_action' => 'Of\\Controller\\Sys\\SystemModuleAction',
 			$sysRoute.'_module_create' => 'Of\\Controller\\Sys\\SystemModuleCreate',
+			$sysRoute.'_module_edit' => 'Of\\Controller\\Sys\\SystemModuleEdit',
 			$sysRoute.'_module_index' => 'Of\\Controller\\Sys\\SystemModuleIndex',
 			$sysRoute.'_module_install' => 'Of\\Controller\\Sys\\SystemModuleInstall',
 			$sysRoute.'_module_save' => 'Of\\Controller\\Sys\\SystemModuleSave',

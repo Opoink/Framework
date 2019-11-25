@@ -14,7 +14,7 @@ class Validator {
 	/**
 	 *	will check if the module was already existing
 	 *	and already available for module installation
-	 *	return boolean true if exist or false if not
+	 *	return boolean false if !exist or config value if exist
 	 */
 	public function checkExist($vendor, $module){
 		$target = ROOT.DS.'App'.DS.'Ext'.DS.$vendor.DS.$module;
@@ -25,7 +25,7 @@ class Validator {
 				$cfg = include($config);
 
 				if(is_array($cfg) && isset($cfg['version'])){
-					return true;
+					return $cfg;
 				}
 			}
 		}
