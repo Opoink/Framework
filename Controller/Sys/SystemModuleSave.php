@@ -14,6 +14,7 @@ class SystemModuleSave extends Sys {
 	protected $_configManager;
 	protected $_validator;
 	protected $_schema;
+	protected $_xml;
 
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,
@@ -24,13 +25,15 @@ class SystemModuleSave extends Sys {
 		\Of\Std\Versionvalidator $Versionvalidator,
 		\Of\ModManager\Config $_Config,
 		\Of\ModManager\Validator $Validator,
-		\Of\ModManager\Schema $Schema
+		\Of\ModManager\Schema $Schema,
+		\Of\ModManager\Xml $Xml
 	){
 		parent::__construct($SystemSession,$FormSession,$Request,$Url,$Message);
 		$this->_versionvalidator = $Versionvalidator;
 		$this->_configManager = $_Config;
 		$this->_validator = $Validator;
 		$this->_schema = $Schema;
+		$this->_xml = $Xml;
 	}
 
 	
@@ -59,7 +62,6 @@ class SystemModuleSave extends Sys {
 					$this->_schema->create($vendor_name, $module_name);
 
 					/* this part is the creation of other directory */
-
 					$target = ROOT.DS.'App'.DS.'Ext'.DS.$vendor_name.DS.$module_name;
 
 					$dirMan = new \Of\File\Dirmanager();
@@ -67,6 +69,11 @@ class SystemModuleSave extends Sys {
 					$dirMan->createDir($target.DS.'Entity');
 					$dirMan->createDir($target.DS.'View'.DS.'Layout'.DS.'Admin');
 					$dirMan->createDir($target.DS.'View'.DS.'Template');
+
+					$this->_xml->setVendor($vendor_name)
+					->setModule($module_name)
+					->setFileName('default')
+					->create();
 					
 					$this->_message->setMessage('New module successfully created.', 'success');
 					$redirectUrl = '/system/module';
