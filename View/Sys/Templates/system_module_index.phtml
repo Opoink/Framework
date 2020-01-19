@@ -4,6 +4,7 @@
 * Licensed under MIT, see LICENSE.md
 */
 ?>
+
 <?php require_once(__DIR__ . '/container_top.phtml') ?>
 	<div class="row">
 		<div class="col-md-12">
@@ -11,6 +12,7 @@
 				<div class="card-body">
 					<h5 class="card-title m-b-0">Installed Modules</h5>
 				</div>
+
 				<div class="table-responsive">
 					<form id="installedModules" action="<?= $this->getUrl('/system/module/action'); ?>" method="POST">
 						<table class="table">
@@ -27,11 +29,14 @@
 									<th scope="col">Config Version</th>
 									<th scope="col">Routes</th>
 									<th scope="col">Controllers</th>
+									<th scope="col">Action</th>
 								</tr>
 							</thead>
+
 							<tbody class="customtable">
+								<?php $modCount = 1; ?>
 								<?php foreach($this->modules['installed'] as $modKey => $module): ?>
-									<tr>
+									<tr id="module-count-<?= $modCount ?>">
 										<td>
 											<label class="customcheckbox">
 												<input 
@@ -46,20 +51,53 @@
 										<td><?= $modKey  ?></td>
 										<td><?= $module['installed_version']  ?></td>
 										<td><?= $module['version'] ?></td>
+										<td>
+											<?php $controller_count = 0 ?>
+											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
+												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?php
+														if(is_array($conVal)){
+															echo $conVal['route']." ".$conVal['controller']." ".$conVal['action'];
+														} else {
+															echo strtolower($conKey);
+														}
+													?>
+												</p>
+												<?php $controller_count++ ?>
+											<?php endforeach ?>
+										</td>
 
 										<td>
+											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="m-b-0"><?= strtolower($conKey) ?></p>
+												<?php
+													if(is_array($conVal)){
+														$_cClass = $conVal['class'];
+													} else {
+														$_cClass = '\\' . ltrim($conVal, '\\');
+													}
+												?>
+												<p title="<?= $_cClass ?>" class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?= $_cClass ?>
+												</p>
+												<?php $controller_count++ ?>
 											<?php endforeach ?>
 										</td>
 										<td>
-											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="m-b-0"><?= '\\' . ltrim($conVal, '\\') ?></p>
-											<?php endforeach ?>
+											<div class="text-right w80">
+												<a href="<?= $this->getUrl('/system/module/edit/mod/'.$modKey); ?>">
+													<i class="far fa-edit"></i><span class="m-l-5 m-r-20">Edit</span>
+												</a>
+												<a href="javascript:void(0)" onclick="opoink.module.modCollaps('module-count-<?= $modCount ?>')">
+													<i class="fas fa-angle-right"></i>
+												</a>
+											</div>
 										</td>
 									</tr>
+									<?php $modCount++ ?>
 								<?php endforeach ?>
 							</tbody>
+
 							<tfoot>
 								<tr>
 									<td colspan="6">
@@ -75,6 +113,7 @@
 											name="upgrade"
 											value="1"
 										>Upgrade</button>
+
 										<button 
 											type="button" 
 											class="btn btn-outline-primary modalDialodConfirm"
@@ -96,11 +135,11 @@
 				</div>
 			</div>
 
-
 			<div class="card">
 				<div class="card-body">
 					<h5 class="card-title m-b-0">Available Modules</h5>
 				</div>
+
 				<div class="table-responsive">
 					<form id="availableModules" action="<?= $this->getUrl('/system/module/install'); ?>" method="POST">
 						<table class="table">
@@ -116,11 +155,14 @@
 									<th scope="col">Version</th>
 									<th scope="col">Routes</th>
 									<th scope="col">Controllers</th>
+									<th scope="col">Action</th>
 								</tr>
 							</thead>
+
 							<tbody class="customtable">
+								<?php $modCount = 1; ?>
 								<?php foreach($this->modules['uninstalled'] as $modKey => $module): ?>
-									<tr>
+									<tr id="avai-module-count-<?= $modCount ?>">
 										<td>
 											<label class="customcheckbox">
 												<input 
@@ -135,18 +177,50 @@
 										<td><?= $modKey  ?></td>
 										<td><?= $module['version'] ?></td>
 										<td>
+											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="m-b-0"><?= strtolower($conKey) ?></p>
+												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?php
+														if(is_array($conVal)){
+															echo $conVal['route']." ".$conVal['controller']." ".$conVal['action'];
+														} else {
+															echo strtolower($conKey);
+														}
+													?>
+												</p>
+												<?php $controller_count++ ?>
 											<?php endforeach ?>
 										</td>
 										<td>
+											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="m-b-0"><?= '\\' . ltrim($conVal, '\\') ?></p>
+												<?php
+													if(is_array($conVal)){
+														$_cClass = $conVal['class'];
+													} else {
+														$_cClass = '\\' . ltrim($conVal, '\\');
+													}
+												?>
+												<p title="<?= $_cClass ?>" class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?= $_cClass ?>
+												</p>
+												<?php $controller_count++ ?>
 											<?php endforeach ?>
+										</td>
+										<td>
+											<div class="text-right w80">
+												<a href="<?= $this->getUrl('/system/module/edit/mod/'.$modKey); ?>">
+													<i class="far fa-edit"></i><span class="m-l-5 m-r-20">Edit</span>
+												</a>
+												<a href="javascript:void(0)" onclick="opoink.module.modCollaps('avai-module-count-<?= $modCount ?>')">
+													<i class="fas fa-angle-right"></i>
+												</a>
+											</div>
 										</td>
 									</tr>
 								<?php endforeach ?>
 							</tbody>
+
 							<tfoot>
 								<tr>
 									<td colspan="5">

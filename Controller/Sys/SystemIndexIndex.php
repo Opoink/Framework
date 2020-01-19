@@ -6,13 +6,11 @@
 namespace Of\Controller\Sys;
 
 class SystemIndexIndex extends Sys {
-	
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-		
+
 		$this->addInlineJs();
 		return $this->renderHtml();
 	}
-	
 }
