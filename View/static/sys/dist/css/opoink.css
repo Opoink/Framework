@@ -83,6 +83,16 @@ body {
 .w40{width: 40px;}
 .w45{width: 45px;}
 .w50{width: 50px;}
+.w55{width: 55px;}
+.w60{width: 60px;}
+.w65{width: 65px;}
+.w70{width: 70px;}
+.w75{width: 75px;}
+.w80{width: 80px;}
+.w85{width: 85px;}
+.w90{width: 90px;}
+.w95{width: 95px;}
+.w100{width: 100px;}
 
 .h5{height: 5px;}
 .h10{height: 10px;}
@@ -94,6 +104,16 @@ body {
 .h40{height: 40px;}
 .h45{height: 45px;}
 .h50{height: 50px;}
+.h55{height: 55px;}
+.h60{height: 60px;}
+.h65{height: 65px;}
+.h70{height: 70px;}
+.h75{height: 75px;}
+.h80{height: 80px;}
+.h85{height: 85px;}
+.h90{height: 90px;}
+.h95{height: 95px;}
+.h100{height: 100px;}
 
 .mTB-5{margin-top: 5px; margin-bottom: 5px;}
 .mTB-10{margin-top: 10px; margin-bottom: 10px;}
@@ -116,3 +136,12 @@ body {
 .mTB-40{margin-left: 40px; margin-right: 40px;}
 .mTB-45{margin-left: 45px; margin-right: 45px;}
 .mTB-50{margin-left: 50px; margin-right: 50px;}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.controllersVal {
+    max-width: 250px;
+}

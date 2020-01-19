@@ -16,6 +16,14 @@ class Router {
 	protected $config;
 	protected $_url;
 	
+	/*
+	 *	determine whether the path is a regex or not
+	 */
+	protected $route_regex = false;
+	protected $controller_regex = false;
+	protected $action_regex = false;
+	protected $matchedRoute = null;
+
 	public function __construct($config=null){
 		if($config){
 			$this->setConfig($config);
@@ -78,11 +86,60 @@ class Router {
 		
 		$key = $this->getPageName(false);
 
+		$controllerClass = null;
 		foreach($controllers as $_key => $_val){
 			if(isset($_val[$key])){
-				return $_val[$key];
+				$this->matchedRoute = $_val;
+				$controllerClass = $_val[$key];
+			} else {
+				foreach ($_val as $routKey => $routValue) {
+					if(is_array($routValue)){
+						/** 
+						 * in this part the router is using a regular expresion
+						 * on either route or controller or action
+						 */
+						$requestRoute = $this->getRoute(false);
+						$requestController = $this->getController(false);
+						$requestAction = $this->getAction(false);
+
+						$r = $this->doCompare($requestRoute, $routValue['route'], $routValue['route_regex']);
+						$c = $this->doCompare($requestController, $routValue['controller'], $routValue['controller_regex']);
+						$a = $this->doCompare($requestAction, $routValue['action'], $routValue['action_regex']);
+
+						$this->route_regex = $r;
+						$this->controller_regex = $c;
+						$this->action_regex = $a;
+
+						if($r && $c && $a) {
+							$this->matchedRoute = $routValue;
+							$controllerClass = $routValue['class'];
+							break;
+						}
+					}
+				}
+			}
+			if($controllerClass){
+				break;
 			}
 		}
+		return $controllerClass;
+	}
+
+	/**
+	 * do the comparison using regular expression or simply ==
+	 * return boolean
+	 * @param $requestValue string, camefrom the request url
+	 * @param $configValue regex or a string value that came from the saved config file
+	 */
+	protected function doCompare($requestValue, $configValue, $isRegex){
+		if(strtolower($requestValue) == strtolower($configValue)){
+			return true;
+		}
+		if($isRegex){
+			$match = (bool)preg_match($configValue, $requestValue);
+			return $match;
+		}
+		return false;
 	}
 	
 	/*
@@ -132,7 +189,18 @@ class Router {
 		return $key;
 	}
 
+	/*
+	 * check if the route is regex or not
+	 * if it is regex route will be converted as sha1 to become string
+	 * return the route from the url
+	 */
 	public function getRoute($ucfirst=true){
+		if(is_array($this->matchedRoute) && isset($this->matchedRoute['route_regex'])){
+			if($this->matchedRoute['route_regex'] == true){
+				$this->route = 'Reg'.sha1($this->matchedRoute['route']);
+			}
+		}
+
 		if($ucfirst){
 			$o = ucfirst($this->route);
 		} else {
@@ -141,7 +209,18 @@ class Router {
 		return $o;
 	}
 	
+	/*
+	 * check if the controller is regex or not
+	 * if it is regex controller will be converted as sha1 to become string
+	 * return the controller from the url
+	 */
 	public function getController($ucfirst=true){
+		if(is_array($this->matchedRoute) && isset($this->matchedRoute['controller_regex'])){
+			if($this->matchedRoute['controller_regex'] == true){
+				$this->controller = 'Reg'.sha1($this->matchedRoute['controller']);
+			}
+		}
+
 		if($ucfirst){
 			$o = ucfirst($this->controller);
 		} else {
@@ -149,7 +228,19 @@ class Router {
 		}
 		return $o;
 	}
+	
+	/*
+	 * check if the action is regex or not
+	 * if it is regex action will be converted as sha1 to become string
+	 * return the action from the url
+	 */
 	public function getAction($ucfirst=true){
+		if(is_array($this->matchedRoute) && isset($this->matchedRoute['action_regex'])){
+			if($this->matchedRoute['action_regex'] == true){
+				$this->action = 'Reg'.sha1($this->matchedRoute['action']);
+			}
+		}
+
 		if($ucfirst){
 			$o = ucfirst($this->action);
 		} else {

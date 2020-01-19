@@ -55,7 +55,13 @@
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
 												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
-													<?= strtolower($conKey) ?>
+													<?php
+														if(is_array($conVal)){
+															echo $conVal['route']." ".$conVal['controller']." ".$conVal['action'];
+														} else {
+															echo strtolower($conKey);
+														}
+													?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
@@ -64,8 +70,15 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
-													<?= '\\' . ltrim($conVal, '\\') ?>
+												<?php
+													if(is_array($conVal)){
+														$_cClass = $conVal['class'];
+													} else {
+														$_cClass = '\\' . ltrim($conVal, '\\');
+													}
+												?>
+												<p title="<?= $_cClass ?>" class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?= $_cClass ?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
@@ -167,7 +180,13 @@
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
 												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
-													<?= strtolower($conKey) ?>
+													<?php
+														if(is_array($conVal)){
+															echo $conVal['route']." ".$conVal['controller']." ".$conVal['action'];
+														} else {
+															echo strtolower($conKey);
+														}
+													?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
@@ -175,8 +194,15 @@
 										<td>
 											<?php $controller_count = 0 ?>
 											<?php foreach($module['controllers'] as $conKey => $conVal): ?>
-												<p class="ellipsis controllersKey m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
-													<?= '\\' . ltrim($conVal, '\\') ?>
+												<?php
+													if(is_array($conVal)){
+														$_cClass = $conVal['class'];
+													} else {
+														$_cClass = '\\' . ltrim($conVal, '\\');
+													}
+												?>
+												<p title="<?= $_cClass ?>" class="ellipsis controllersVal m-b-0 <?= $controller_count > 0 ? 'hidden' : '' ?>">
+													<?= $_cClass ?>
 												</p>
 												<?php $controller_count++ ?>
 											<?php endforeach ?>
