@@ -41,6 +41,7 @@ class Application {
 		$this->_router = $Router;
 		$this->_request = $Request;
 		$this->config = $config;
+		$this->checkSystemStaticFile();
 		$this->init();
 	}
 	
@@ -54,6 +55,18 @@ class Application {
 		} else {
 			$this->error(404);
 		}
+	}
+
+	protected function checkSystemStaticFile(){
+		$target = ROOT.DS.'public'.DS.'sys';
+		$targetDir = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'static'.DS.'sys';
+
+		if(!is_dir($target)){
+			$this->_di->get('Of\File\Dirmanager')
+			->copyDir($targetDir, $target);
+		}
+		// var_dump(is_dir($target));
+		// die;
 	}
 	
 	/*
