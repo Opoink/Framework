@@ -58,6 +58,14 @@ class SystemModuleAddcontroller extends Sys {
 
 			$extends = $this->_request->getParam('extend_to_class');
 
+			$sampleTemplate = 'sample_template.phtml';
+			$isAdmin = false;
+
+			if($controller_type == 'admin'){
+				$sampleTemplate = 'admin/sample_template.phtml';
+				$isAdmin = true;
+			}
+
 			if(!strlen($route)){
 				$route = "Index";
 			}
@@ -165,18 +173,23 @@ class SystemModuleAddcontroller extends Sys {
 					/** end insert into installation config */
 
 					/** create controller xml layout here */
+
 					$body = "\t\t".'<container xml:id="main_container" htmlId="main_container" htmlClass="main_container" weight="1">' . PHP_EOL;
-						$body .= "\t\t\t".'<template xml:id="sample_template" vendor="'.$vendor_name.'" module="'.$module_name.'" template="sample_template.phtml" cacheable="1" max-age="604800"/>' . PHP_EOL;
+						$body .= "\t\t\t".'<template xml:id="sample_template" vendor="'.$vendor_name.'" module="'.$module_name.'" template="'.$sampleTemplate.'" cacheable="1" max-age="604800"/>' . PHP_EOL;
 					$body .= "\t\t".'</container>' . PHP_EOL;
 
 					$this->_xml->setVendor($vendor_name)
 					->setModule($module_name)
 					->setFileName($xmlFilename)
-					->create(true, false, 999, $body);
+					->create(true, $isAdmin, 999, $body);
 					/** end create controller xml layout here */
 
 					/** create the sample template here */
-					$target = $target = ROOT.DS.'App'.DS.'Ext'.DS.$vendor_name.DS.$module_name.DS.'View'.DS.'Template';
+					$target = ROOT.DS.'App'.DS.'Ext'.DS.$vendor_name.DS.$module_name.DS.'View'.DS.'Template';
+					if($controller_type == 'admin'){
+						$target .= DS.'admin';
+					}
+
 					$data = "<p>".$route." ".$conroller." ".$action." works</p>";
 					$_writer = new \Of\File\Writer();
 					$_writer->setDirPath($target)
