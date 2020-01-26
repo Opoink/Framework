@@ -53,7 +53,7 @@ function opoink_hasError(){
 
 function opoink_check_for_fatal() {
     $error = error_get_last();
-    if ( $error["line"] > 0 ) {
+    if (isset($error["line"]) && $error["line"] > 0) {
         opoink_log_error( $error["type"], $error["message"], $error["file"], $error["line"] );
     }
 }

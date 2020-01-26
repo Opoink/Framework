@@ -77,7 +77,7 @@ class Password {
 
 		for($i=0; $i<$length; $i++)
 		{
-			$key .= $inputs{mt_rand(0,61)};
+			$key .= $inputs[mt_rand(0,61)];
 		}
 		return $key;
 	}

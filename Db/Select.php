@@ -11,6 +11,9 @@ class Select extends \Zend\Db\Sql\Select {
 		return addcslashes((string) $string, "\x00\n\r\\'\"\x1a");
 	}
 
+	/*
+	 * set common column to be added into query
+	 */
 	public function setComlumn($value, $index=null, $prefixColumnsWithTable=true){
 		if(gettype($index) != 'NULL'){
 			$this->columns[$index] = $value;
