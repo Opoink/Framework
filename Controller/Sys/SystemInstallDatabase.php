@@ -30,7 +30,7 @@ class SystemInstallDatabase extends Sys {
 				$prefix = $this->getParam('prefix');
 				
 				if(strlen($prefix) <= 5) {
-					$adapter = new \Zend\Db\Adapter\Adapter(array(
+					$adapter = new \Laminas\Db\Adapter\Adapter(array(
 						'driver' => 'Pdo_Mysql',
 						'host' => $host,
 						'database' => $database,

@@ -5,11 +5,11 @@
 */
 namespace Of\Db;
 
-use Zend\Db\TableGateway\Feature\RowGatewayFeature;
+use Laminas\Db\TableGateway\Feature\RowGatewayFeature;
 use Of\Db\Select;
 use Of\Std\Pagination;
 
-class Entity extends \Zend\Db\TableGateway\TableGateway {
+class Entity extends \Laminas\Db\TableGateway\TableGateway {
 	
 	const COLUMNS = [];
 	
@@ -67,7 +67,7 @@ class Entity extends \Zend\Db\TableGateway\TableGateway {
 			return null;
 		}
 		$this->dbConfig = include($databaseConfig);
-		$this->_adapter = new \Zend\Db\Adapter\Adapter($this->dbConfig);
+		$this->_adapter = new \Laminas\Db\Adapter\Adapter($this->dbConfig);
 		
 		return true;
 	}
@@ -133,7 +133,7 @@ class Entity extends \Zend\Db\TableGateway\TableGateway {
 		if(!$datas){
 			$datas = $this->_adapter->query(
 				$qry,
-				\Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE
+				\Laminas\Db\Adapter\Adapter::QUERY_MODE_EXECUTE
 			);
 			$datas = $datas->toArray();
 			
