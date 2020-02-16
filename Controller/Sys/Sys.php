@@ -5,7 +5,7 @@
 */
 namespace Of\Controller\Sys;
 
-use Zend\Json\Json;
+use Laminas\Json\Json;
 
 class Sys implements SysInterface {
 	

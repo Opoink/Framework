@@ -5,7 +5,7 @@
 */
 namespace Of\Db;
 
-class Select extends \Zend\Db\Sql\Select {
+class Select extends \Laminas\Db\Sql\Select {
 
 	protected function escape($string){
 		return addcslashes((string) $string, "\x00\n\r\\'\"\x1a");
@@ -35,7 +35,7 @@ class Select extends \Zend\Db\Sql\Select {
 	}
 
 	public function count($col='*'){
-		$this->setComlumn(new \Zend\Db\Sql\Expression('COUNT('.$col.')'), 'count');
+		$this->setComlumn(new \Laminas\Db\Sql\Expression('COUNT('.$col.')'), 'count');
 	}
 
 	public function like($table, $comlumns = [], $queryString='', $isNeedEachWord=false){

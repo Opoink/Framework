@@ -325,7 +325,7 @@ class Createtable {
 		}
 		$save = $this->_adapter->query(
 			$qry,
-			\Zend\Db\Adapter\Adapter::QUERY_MODE_EXECUTE
+			\Laminas\Db\Adapter\Adapter::QUERY_MODE_EXECUTE
 		);
 		$this->tablename = null;
 		$this->primarykey = null;
@@ -349,7 +349,7 @@ class Createtable {
 	
 	public function setAdapter($adapter=null){
 		if(!$adapter){
-			$adapter = new \Zend\Db\Adapter\Adapter($this->db);
+			$adapter = new \Laminas\Db\Adapter\Adapter($this->db);
 		}
 		$this->_adapter = $adapter;
 		return $this;
