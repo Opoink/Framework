@@ -17,7 +17,12 @@ $moduleVer = $this->config['version'];
 
 <?php require_once(__DIR__ . '/container_top.phtml') ?>
     <div class="row">
-        <?php require_once(__DIR__ . '/moduleform/module.phtml') ?>
-        <?php require_once(__DIR__ . '/moduleform/controller.phtml') ?>
+    	<div class="col-md-6">
+	        <?php require_once(__DIR__ . '/moduleform/module.phtml') ?>
+       		<?php require_once(__DIR__ . '/moduleform/schema.phtml') ?>
+	    </div>
+        <div class="col-md-6">
+	        <?php require_once(__DIR__ . '/moduleform/controller.phtml') ?>
+	    </div>
     </div>
 <?php require_once(__DIR__ . '/container_bottom.phtml') ?>

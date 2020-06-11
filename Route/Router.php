@@ -176,6 +176,7 @@ class Router {
 			$sysRoute.'_user_save' => 'Of\\Controller\\Sys\\SystemUserSave',
 			$sysRoute.'_cache_index' => 'Of\\Controller\\Sys\\SystemCacheIndex',
 			$sysRoute.'_cache_action' => 'Of\\Controller\\Sys\\SystemCacheAction',
+			$sysRoute.'_js_vue' => 'Of\\Controller\\Sys\\SystemJsVue',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

@@ -39,77 +39,81 @@
 </head>
 
 <body>
-    <!-- Preloader - style you can find in spinners.css -->
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
-        </div>
-    </div>
-	
-    <!-- Main wrapper - style you can find in pages.scss -->
-    <div id="main-wrapper">
-		<?= $template ?>
-    </div>
-
-    <div class="modal fade" id="mainModalDialog" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-callback="">Save changes</button>
-                </div>
+    <div id="root">
+        <!-- Preloader - style you can find in spinners.css -->
+        <div class="preloader">
+            <div class="lds-ripple">
+                <div class="lds-pos"></div>
+                <div class="lds-pos"></div>
             </div>
         </div>
-    </div> 
-	
-	<?= $this->_message->toHtml(); ?>
-    <!-- End Wrapper -->
-	
-	
-	<script>
-		var sysRoute = '<?= isset($this->_config['system_url']) ? $this->_config['system_url'] : '' ?>'
-	</script>
-	
-    <!-- ============================================================== -->
-    <!-- All Jquery -->
-    <!-- ============================================================== -->
-    <script src="/public/sys/assets/libs/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="/public/sys/assets/libs/popper.js/dist/umd/popper.min.js"></script>
-    <script src="/public/sys/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/public/sys/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
-    <script src="/public/sys/assets/extra-libs/sparkline/sparkline.js"></script>
-    
-	<!--Wave Effects -->
-    <script src="/public/sys/dist/js/waves.js"></script>
-    <!--Menu sidebar -->
-    <script src="/public/sys/dist/js/sidebarmenu.js"></script>
-    <!--Custom JavaScript -->
-    <script src="/public/sys/dist/js/custom.min.js"></script>
-	
-    <!--This page JavaScript -->
-    <!-- <script src="/public/sys/dist/js/pages/dashboards/dashboard1.js"></script> -->
-    <!-- Charts js Files -->
-    <script src="/public/sys/assets/libs/flot/excanvas.js"></script>
-    <script src="/public/sys/assets/libs/flot/jquery.flot.js"></script>
-    <script src="/public/sys/assets/libs/flot/jquery.flot.pie.js"></script>
-    <script src="/public/sys/assets/libs/flot/jquery.flot.time.js"></script>
-    <script src="/public/sys/assets/libs/flot/jquery.flot.stack.js"></script>
-    <script src="/public/sys/assets/libs/flot/jquery.flot.crosshair.js"></script>
-    <script src="/public/sys/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
-    <script src="/public/sys/dist/js/pages/chart/chart-page-init.js"></script>
-    <script src="/public/sys/dist/js/main.js"></script>
-	<?= $this->inlineJs; ?>
+    	
+        <!-- Main wrapper - style you can find in pages.scss -->
+        <div id="main-wrapper">
+    		<?= $template ?>
+        </div>
+
+        <div class="modal fade" id="mainModalDialog" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-callback="">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    	
+    	<?= $this->_message->toHtml(); ?>
+        <!-- End Wrapper -->
+    	
+    	
+    	<script>
+    		var sysRoute = '<?= isset($this->_config['system_url']) ? $this->_config['system_url'] : '' ?>'
+    	</script>
+    	
+        <!-- ============================================================== -->
+        <!-- All Jquery -->
+        <!-- ============================================================== -->
+        <script src="/public/sys/assets/libs/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap tether Core JavaScript -->
+        <script src="/public/sys/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+        <script src="/public/sys/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/public/sys/assets/libs/perfect-scrollbar/dist/perfect-scrollbar.jquery.min.js"></script>
+        <script src="/public/sys/assets/extra-libs/sparkline/sparkline.js"></script>
+        
+    	<!--Wave Effects -->
+        <script src="/public/sys/dist/js/waves.js"></script>
+        <!--Menu sidebar -->
+        <script src="/public/sys/dist/js/sidebarmenu.js"></script>
+        <!--Custom JavaScript -->
+        <script src="/public/sys/dist/js/custom.min.js"></script>
+    	
+        <!--This page JavaScript -->
+        <!-- <script src="/public/sys/dist/js/pages/dashboards/dashboard1.js"></script> -->
+        <!-- Charts js Files -->
+        <script src="/public/sys/assets/libs/flot/excanvas.js"></script>
+        <script src="/public/sys/assets/libs/flot/jquery.flot.js"></script>
+        <script src="/public/sys/assets/libs/flot/jquery.flot.pie.js"></script>
+        <script src="/public/sys/assets/libs/flot/jquery.flot.time.js"></script>
+        <script src="/public/sys/assets/libs/flot/jquery.flot.stack.js"></script>
+        <script src="/public/sys/assets/libs/flot/jquery.flot.crosshair.js"></script>
+        <script src="/public/sys/assets/libs/flot.tooltip/js/jquery.flot.tooltip.min.js"></script>
+        <script src="/public/sys/dist/js/pages/chart/chart-page-init.js"></script>
+        <script src="/public/sys/dist/js/main.js"></script>
+        <script src="/public/sys/dist/js/vue.js"></script>
+        <script src="/system_ron/js/vue/vue.main.js"></script>
+    	<?= $this->inlineJs; ?>
+    </div>
 </body>
 
 </html>
