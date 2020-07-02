@@ -130,7 +130,6 @@ class Sys implements SysInterface {
 			$currentRoute .=  '_'.$this->_router->getAction(false);
 			
 			$tpl = $systemTemplate.DS.$currentRoute.'.phtml';
-			
 		}
 		if(file_exists($tpl)){
 			ob_start();
@@ -225,12 +224,17 @@ class Sys implements SysInterface {
 	}
 	
 	protected function getUrl($path='', $param=array()){
+		$currentRoute = $this->getSystemRoute();
+		$path = str_replace('/system', $currentRoute ,$path);
+		return $this->_url->getUrl($path, $param);
+	}
+
+	protected function getSystemRoute(){
 		$currentRoute = '/system';
 		if(isset($this->_config['system_url'])){
 			$currentRoute .= $this->_config['system_url'];
 		}
-		$path = str_replace('/system', $currentRoute ,$path);
-		return $this->_url->getUrl($path, $param);
+		return $currentRoute;
 	}
 	
 	protected function validateGRecaptcha(){

@@ -111,7 +111,7 @@ class SysVueRenderer {
 		$data = implode(',', $data);
 
 		$Vue = "new Vue({
-			el: '#main-wrapper',
+			el: '#root',
 			data: {
 				".$data."
 			}

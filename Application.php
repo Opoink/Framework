@@ -122,12 +122,13 @@ class Application {
 			$route = $this->_router->getRoute(false);
 			$controller = $this->_router->getController(false);
 			
-			$goToInstallation = false;
+			$goToInstallation = true;
 			
-			if($route != 'system' && $controller != 'install'){
-				$goToInstallation = true;
-			} elseif($route == 'system' && $controller != 'install'){
-				$goToInstallation = true;
+			if($route == 'system' && $controller == 'install'){
+				$goToInstallation = false;
+			}
+			elseif($route == 'system' && $controller == 'js'){
+				$goToInstallation = false;
 			}
 			
 			if($goToInstallation){

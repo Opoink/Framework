@@ -1,0 +1,27 @@
+<div class="install">
+	<div class="card">
+		<div class="card-header">
+			<img src="/public/sys/assets/images/logo_and_text.png">
+		</div>
+		<div class="card-body">
+			<div v-if="opoinkinstall.currentStep == 1">
+				<p>Welcome to Opoink Framework installation</p>
+				<p>By clicking the Agree and Continue button, you agree to our terms and conditions.</p>
+			</div>
+			<div v-if="opoinkinstall.currentStep == 2">
+				<p>Server Requirement:</p>
+				<p>Php Version</p>
+				<p>Memory limit</p>
+				<p>Maria Database</p>
+				<p>Writable Directory</p>
+			</div>
+		</div>
+		<div class="card-footer">
+			<div class="text-right">
+				<button type="button" class="btn btn-primary" v-on:click="opoinkinstall.goTo(opoinkinstall.currentStep)">
+					{{opoinkinstall.buttonName['step' + opoinkinstall.currentStep]}}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
