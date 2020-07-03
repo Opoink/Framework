@@ -127,7 +127,7 @@ class Application {
 			if($route == 'system' && $controller == 'install'){
 				$goToInstallation = false;
 			}
-			elseif($route == 'system' && $controller == 'js'){
+			elseif($route == 'system' && $controller == 'static'){
 				$goToInstallation = false;
 			}
 			

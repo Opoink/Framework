@@ -6,14 +6,41 @@
 		<div class="card-body">
 			<div v-if="opoinkinstall.currentStep == 1">
 				<p>Welcome to Opoink Framework installation</p>
-				<p>By clicking the Agree and Continue button, you agree to our terms and conditions.</p>
+				<p>By clicking the Agree and Continue button, you agree to our <a href="https://www.opoink.com/termsandconditions" target="_blank">terms and conditions</a>.</p>
 			</div>
 			<div v-if="opoinkinstall.currentStep == 2">
-				<p>Server Requirement:</p>
-				<p>Php Version</p>
-				<p>Memory limit</p>
-				<p>Maria Database</p>
-				<p>Writable Directory</p>
+				<p class="mB-5 fs-18 fw-800">Server Requirement:</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.phpver.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.phpver.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.phpver.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.phpver.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.phpver.message}}
+				</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.memlimit.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.memlimit.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.memlimit.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.memlimit.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.memlimit.message}}
+				</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.writabledir.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.writabledir.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.writabledir.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.writabledir.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.writabledir.message}}
+				</p>
+				<p class="mB-0 mT-30">We highly recommend to use Maria Database server version: ^10.2.x</p>
+			</div>
+			<div v-if="opoinkinstall.currentStep == 3">
+				<p class="mB-5 fs-18 fw-800">Database: <span class="fs-16 fw-400">we will create a database table if it does not exist, else existing database table will be used.</span></p>
 			</div>
 		</div>
 		<div class="card-footer">
