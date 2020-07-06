@@ -37,6 +37,27 @@ class SystemInstallDatabase extends Sys {
 						'username' => $username,
 						'password' => $password
 					));
+
+					try {
+						$currentSchema = $adapter->getCurrentSchema();
+					} catch (\Exception $e) {
+						$code = $e->getCode();
+						if($code == 1049){
+							try {
+								$link = mysqli_connect($host, $username, $password);
+								mysqli_query($link, 'CREATE DATABASE ' . $database . ' COLLATE utf8_general_ci');
+							} catch (\Exception $e) {
+								header("HTTP/1.0 400 Bad Request");
+								echo $e->getMessage();
+								die;
+							}
+						} else {
+							header("HTTP/1.0 400 Bad Request");
+							echo $e->getMessage();
+							die;
+						}
+					}
+
 					try {
 						$currentSchema = $adapter->getCurrentSchema();
 						if($currentSchema){
@@ -52,16 +73,24 @@ class SystemInstallDatabase extends Sys {
 							}
 						}
 					} catch (\Exception $e) {
-						$response['message'] = 'Caught exception: ' . $e->getMessage();
+						header("HTTP/1.0 400 Bad Request");
+						echo $e->getMessage();
+						die;
 					}
 				} else {
-					$response['message'] = 'Table prefix should be 5 characters long only';
+					header("HTTP/1.0 400 Bad Request");
+					echo 'Table prefix should be up to 5 characters long only';
+					die;
 				}
 			} else {
-				$response['message'] = $validateFields['message'] . ' field is required.';
+				header("HTTP/1.0 400 Bad Request");
+				echo 'Database ' . $validateFields['message'] . ' field is required.';
+				die;
 			}
 		} else {
-			$response['message'] = 'Invalid request';
+			header("HTTP/1.0 400 Bad Request");
+			echo "Invalid formkey request";
+			die;
 		}
 		$this->jsonEncode($response);
 	}

@@ -18,6 +18,17 @@
 			passed: null
 		}
 	},
+	form: {
+		database: {
+			host: 'localhost',
+			user: 'root',
+			name: '',
+			password: '',
+			prefix: '',
+			error: '',
+			form_key: ''
+		}
+	},
 	currentStep: 1,
 	goTo: function(step){
 		if(this.currentStep == 1){
@@ -38,6 +49,20 @@
 				}
 			});
 		}
+		else if(this.currentStep == 3){
+			this.makeRequest('/system/install/formkey', '').then(formkey => {
+				if(!formkey.error && formkey.result){
+					this.form.database.form_key = formkey.result.formKey;
+					this.makeRequest('/system/install/database', this.form.database).then(database => {
+						if(!database.error && database.result){
+							console.log('database database database', database.result);
+						} else {
+							this.form.database.error = database.error.responseText;
+						}
+					});
+				}
+			});
+		}
 	},
 	checkRequirements(type){
 		return new Promise(req => {
@@ -46,10 +71,12 @@
 			}
 			this.requirement[type].passed = 'checking';
 			this.makeRequest('/system/install/requirement', jsonData).then(resolve => {
-				if(resolve){
-					this.requirement[type] = resolve;
+				if(!resolve.error && resolve.result){
+					this.requirement[type] = resolve.result;
+					req(resolve.result);
+				} else {
+					req(resolve.error);
 				}
-				req(resolve);
 			});
 		});
 	},
@@ -64,10 +91,11 @@
 				beforeSend: f => {
 				},
 				success: f => {
-					request(f);
+					request({error: null,result: f});
 				},
 				error: error => {
-					request(null);
+					console.log('error error', error);
+					request({error: error,result: null});
 				}
 			}
 

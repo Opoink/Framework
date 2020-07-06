@@ -388,3 +388,7 @@ body {
 .install .card {
 	margin: 10% 0;
 }
+
+.fc-red {
+  color: #d44950;
+}

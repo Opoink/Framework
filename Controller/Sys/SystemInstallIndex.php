@@ -15,11 +15,11 @@ class SystemInstallIndex extends Sys {
 		\Of\Session\FormSession $FormSession,
 		\Of\Http\Request $Request,
 		\Of\Http\Url $Url,
-		\Of\Std\Message $Message,
-		\Of\Db\Entity\SystemAdmin $SystemAdmin
+		\Of\Std\Message $Message
+		/*\Of\Db\Entity\SystemAdmin $SystemAdmin*/
 	){
 		parent::__construct($SystemSession,$FormSession,$Request,$Url,$Message);
-		$this->_systemAdmin = $SystemAdmin;
+		/*$this->_systemAdmin = $SystemAdmin;*/
 	}	
 	
 	public function run(){
@@ -27,7 +27,7 @@ class SystemInstallIndex extends Sys {
 		return $this->renderHtml();
 	}
 	
-	protected function getSystemAdminAccount(){
+	/*protected function getSystemAdminAccount(){
 		$systemAdmin = null;
 
 		if($this->getDbInfo()){
@@ -45,5 +45,5 @@ class SystemInstallIndex extends Sys {
 		if(file_exists($target)){
 			return include($target);
 		}
-	}
+	}*/
 }
