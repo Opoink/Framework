@@ -38,12 +38,5 @@ class SystemInstallIndex extends Sys {
 			}
 		}
 		return $systemAdmin; 
-	}
-	
-	protected function getDbInfo(){
-		$target = ROOT . DS . 'etc' . DS . 'database.php';
-		if(file_exists($target)){
-			return include($target);
-		}
 	}*/
 }

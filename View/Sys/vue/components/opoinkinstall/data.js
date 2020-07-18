@@ -2,7 +2,8 @@
 	buttonName: {
 		'step1': 'Agree and Continue',
 		'step2': 'Check Now',
-		'step3': 'Save Database'
+		'step3': 'Save Database',
+		'step4': 'Save Account'
 	},
 	requirement: {
 		phpver: {
@@ -27,10 +28,19 @@
 			prefix: '',
 			error: '',
 			form_key: ''
+		},
+		sysuser: {
+			id: '',
+			firstname: 'asd',
+			lastname: 'cvb',
+			email: 'asd',
+			password: 'asd',
+			retypepassword: 'vxcv',
+			form_key: ''
 		}
 	},
 	currentStep: 1,
-	goTo: function(step){
+	goTo(step){
 		if(this.currentStep == 1){
 			this.currentStep = 2;
 		}
@@ -41,7 +51,24 @@
 						if(memlimit.passed){
 							this.checkRequirements('writabledir').then(writabledir => {
 								if(writabledir.passed){
-									this.currentStep = 3;
+									this.makeRequest('/system/install/formkey', '').then(formkey => {
+										if(!formkey.error && formkey.result){
+											let jsonData = {
+												form_key: formkey.result.formKey
+											}
+											this.makeRequest('/system/install/database/getdb/1', jsonData, 'POST')
+											.then(database => {
+												if(!database.error && database.result){
+													this.form.database.host = database.result.host;
+													this.form.database.user = database.result.username;
+													this.form.database.name = database.result.database;
+													this.form.database.password = database.result.password;
+													this.form.database.prefix = database.result.table_prefix;
+												}
+												this.currentStep = 3;
+											});
+										}
+									});
 								}
 							});
 						}
@@ -56,10 +83,27 @@
 					this.makeRequest('/system/install/database', this.form.database).then(database => {
 						if(!database.error && database.result){
 							console.log('database database database', database.result);
+							this.currentStep = 4;
 						} else {
 							this.form.database.error = database.error.responseText;
 						}
 					});
+				}
+			});
+		}
+		else if(this.currentStep == 4){
+			this.makeRequest('/system/install/formkey', '').then(formkey => {
+				if(!formkey.error && formkey.result){
+					this.form.sysuser.form_key = formkey.result.formKey;
+					this.makeRequest('/system/install/saveadmin', this.form.sysuser).then(sysuser => {
+						console.log('sysuser sysuser sysuser', sysuser);
+						// if(!database.error && database.result){
+						// 	this.currentStep = 4;
+						// } else {
+						// 	this.form.database.error = database.error.responseText;
+						// }
+					});
+					console.log(this.form.sysuser);
 				}
 			});
 		}
@@ -80,7 +124,7 @@
 			});
 		});
 	},
-	makeRequest: function(url, jsonData, type = 'POST'){
+	makeRequest(url, jsonData, type = 'POST'){
 		return new Promise(request => {
 			let ajaxData = {
 				url: url,
@@ -94,7 +138,6 @@
 					request({error: null,result: f});
 				},
 				error: error => {
-					console.log('error error', error);
 					request({error: error,result: null});
 				}
 			}
