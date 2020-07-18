@@ -21,8 +21,8 @@ class SystemInstallSaveadminurl extends Sys {
 		$validate = $this->validateFormKey();
 		
 		if($this->validateFormKey()){
-			$admin_url = $this->getParam('admin_url');
-			$system_url = $this->getParam('system_url');
+			$admin_url = strtolower($this->getParam('admin_url'));
+			$system_url = strtolower($this->getParam('system_url'));
 			$target = ROOT.DS.'etc'.DS.'Config.php';
 			
 			if(file_exists($target)){
@@ -76,7 +76,9 @@ class SystemInstallSaveadminurl extends Sys {
 			$response['error'] = 0;
 			$response['message'] = 'Url saved successfully';
 		} else {
-			$response['message'] = 'Invalid request';
+			header("HTTP/1.0 400 Bad Request");
+			echo 'Invalid request';
+			die;
 		}
 		$this->jsonEncode($response);
 	}

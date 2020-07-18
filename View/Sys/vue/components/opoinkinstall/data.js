@@ -3,7 +3,8 @@
 		'step1': 'Agree and Continue',
 		'step2': 'Check Now',
 		'step3': 'Save Database',
-		'step4': 'Save Account'
+		'step4': 'Save Account',
+		'step5': 'Save Link And Auth Key'
 	},
 	requirement: {
 		phpver: {
@@ -31,11 +32,20 @@
 		},
 		sysuser: {
 			id: '',
-			firstname: 'asd',
-			lastname: 'cvb',
-			email: 'asd',
-			password: 'asd',
-			retypepassword: 'vxcv',
+			firstname: '',
+			lastname: '',
+			email: '',
+			password: '',
+			retypepassword: '',
+			error: '',
+			form_key: ''
+		},
+		urls: {
+			admin_url: '',
+			system_url: '',
+			auth_key: '',
+			auth_secret: '',
+			error: '',
 			form_key: ''
 		}
 	},
@@ -82,8 +92,15 @@
 					this.form.database.form_key = formkey.result.formKey;
 					this.makeRequest('/system/install/database', this.form.database).then(database => {
 						if(!database.error && database.result){
-							console.log('database database database', database.result);
-							this.currentStep = 4;
+							this.makeRequest('/system/install/saveadmin/getadmin/1/form_key/'+formkey.result.formKey, '', 'GET').then(sysuser => {
+								if(!sysuser.error && sysuser.result){
+									this.form.sysuser.id = sysuser.result.id
+									this.form.sysuser.firstname = sysuser.result.firstname
+									this.form.sysuser.lastname = sysuser.result.lastname
+									this.form.sysuser.email = sysuser.result.email
+								}
+								this.currentStep = 4;
+							});
 						} else {
 							this.form.database.error = database.error.responseText;
 						}
@@ -95,15 +112,33 @@
 			this.makeRequest('/system/install/formkey', '').then(formkey => {
 				if(!formkey.error && formkey.result){
 					this.form.sysuser.form_key = formkey.result.formKey;
+					this.form.sysuser.error = '';
 					this.makeRequest('/system/install/saveadmin', this.form.sysuser).then(sysuser => {
-						console.log('sysuser sysuser sysuser', sysuser);
-						// if(!database.error && database.result){
-						// 	this.currentStep = 4;
-						// } else {
-						// 	this.form.database.error = database.error.responseText;
-						// }
+						if(!sysuser.error && sysuser.result){
+							this.currentStep = 5;
+							this.form.urls.admin_url = '_' + this.passwordGenerator(4, false);
+							this.form.urls.system_url = '_' + this.passwordGenerator(4, false);
+							this.form.urls.auth_key = '_' + this.passwordGenerator(150, true);
+							this.form.urls.auth_secret = '_' + this.passwordGenerator(150, true);
+						} else {
+							this.form.sysuser.error = sysuser.error.responseText;
+						}
 					});
-					console.log(this.form.sysuser);
+				}
+			});
+		}
+		else if(this.currentStep == 5){
+			this.makeRequest('/system/install/formkey', '').then(formkey => {
+				if(!formkey.error && formkey.result){
+					this.form.urls.form_key = formkey.result.formKey;
+					this.form.urls.error = '';
+					this.makeRequest('/system/install/saveadminurl', this.form.urls).then(saveadminurl => {
+						if(!saveadminurl.error && saveadminurl.result){
+							this.currentStep = 6;
+						} else {
+							this.form.urls.error = saveadminurl.error.responseText;
+						}
+					});
 				}
 			});
 		}
@@ -148,5 +183,34 @@
 
 			$.ajax(ajaxData);
 		});
+	},
+	getUrl(){
+		return window.location.protocol + "//" + window.location.host;
+	},
+	passwordGenerator( len, isPunctuation ) {
+		let length = (len)?(len):(10);
+		let string = "abcdefghijklmnopqrstuvwxyz"; //to upper 
+		let numeric = '0123456789';
+		let punctuation = '!@#$%^&*()_+~`|}{[]\:;?><,./-=';
+		let password = "";
+		let character = "";
+		let crunch = true;
+		while( password.length<length ) {
+			entity1 = Math.ceil(string.length * Math.random()*Math.random());
+			entity2 = Math.ceil(numeric.length * Math.random()*Math.random());
+			if(isPunctuation){
+				entity3 = Math.ceil(punctuation.length * Math.random()*Math.random());
+			}
+			hold = string.charAt( entity1 );
+			hold = (password.length%2==0)?(hold.toUpperCase()):(hold);
+			character += hold;
+			character += numeric.charAt( entity2 );
+			if(isPunctuation){
+				character += punctuation.charAt( entity3 );
+			}
+			password = character;
+		}
+		password=password.split('').sort(function(){return 0.5-Math.random()}).join('');
+		return password.substr(0,len);
 	}
 }
