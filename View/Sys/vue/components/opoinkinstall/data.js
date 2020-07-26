@@ -50,6 +50,9 @@
 		}
 	},
 	currentStep: 1,
+	getSystemUrl(){
+		return 'system' + this.form.urls.system_url;
+	},
 	goTo(step){
 		_vue.loader.isLoading = true;
 		if(this.currentStep == 1){
@@ -140,18 +143,43 @@
 					this.form.urls.form_key = formkey.result.formKey;
 					this.form.urls.error = '';
 					this.makeRequest('/system/install/saveadminurl', this.form.urls).then(saveadminurl => {
-
-						// if(!saveadminurl.error && saveadminurl.result){
-						// 	this.currentStep = 6;
-						// } else {
-						// 	this.form.urls.error = saveadminurl.error.responseText;
-						// }
-						_vue.loader.text = 'Downloading base extension.';
-						// _vue.loader.isLoading = false;
+						_vue.loader.text = 'Installing Opoink/Bmodule';
+						if(!saveadminurl.error && saveadminurl.result){
+							this.installBmodule().then(installbmodule => {
+								this.currentStep = 6;
+								_vue.loader.isLoading = false;
+							});
+						} else {
+							this.form.urls.error = saveadminurl.error.responseText;
+						}
 					});
 				}
 			});
 		}
+	},
+	installBmodule(){
+		return new Promise(bmod => {
+			this.makeRequest('/'+this.getSystemUrl()+'/install/formkey', '').then(formkey => {
+				if(!formkey.error && formkey.result){
+					let jsonData = {
+						form_key: formkey.result.formKey
+					};
+					this.makeRequest('/'+this.getSystemUrl()+'/install/opoinkbmodule', jsonData).then(installbmodule => {
+						if(!installbmodule.error && installbmodule.result){
+							_vue.loader.text = installbmodule.result.message;
+							setTimeout(f => {
+								bmod(installbmodule.result);
+							},5000);
+						} else {
+							_vue.loader.text = installbmodule.error.responseText;
+							setTimeout(f => {
+								bmod(null);
+							},5000);
+						}
+					});
+				}
+			});
+		});
 	},
 	checkRequirements(type){
 		return new Promise(req => {

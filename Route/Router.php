@@ -162,6 +162,7 @@ class Router {
 			$sysRoute.'_install_database' => 'Of\\Controller\\Sys\\SystemInstallDatabase',
 			$sysRoute.'_install_formkey' => 'Of\\Controller\\Sys\\SystemInstallFormkey',
 			$sysRoute.'_install_saveadmin' => 'Of\\Controller\\Sys\\SystemInstallSaveadmin',
+			$sysRoute.'_install_opoinkbmodule' => 'Of\\Controller\\Sys\\SystemInstallOpoinkbmodule',
 			$sysRoute.'_install_saveadminurl' => 'Of\\Controller\\Sys\\SystemInstallSaveadminurl',
 			$sysRoute.'_settings_index' => 'Of\\Controller\\Sys\\SystemSettingsIndex',
 			$sysRoute.'_module_action' => 'Of\\Controller\\Sys\\SystemModuleAction',
