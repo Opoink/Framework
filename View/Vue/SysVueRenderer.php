@@ -112,7 +112,7 @@ class SysVueRenderer {
 		}
 		$data = implode(',', $data);
 
-		$Vue = "new Vue({
+		$Vue = "var _vue = new Vue({
 			el: '#root',
 			data: {
 				".$data."

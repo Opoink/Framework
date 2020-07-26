@@ -51,8 +51,10 @@
 	},
 	currentStep: 1,
 	goTo(step){
+		_vue.loader.isLoading = true;
 		if(this.currentStep == 1){
 			this.currentStep = 2;
+			_vue.loader.isLoading = false;
 		}
 		else if(this.currentStep == 2){
 			this.checkRequirements('phpver').then(phpver => {
@@ -75,6 +77,8 @@
 													this.form.database.password = database.result.password;
 													this.form.database.prefix = database.result.table_prefix;
 												}
+
+												_vue.loader.isLoading = false;
 												this.currentStep = 3;
 											});
 										}
@@ -99,9 +103,11 @@
 									this.form.sysuser.lastname = sysuser.result.lastname
 									this.form.sysuser.email = sysuser.result.email
 								}
+								_vue.loader.isLoading = false;
 								this.currentStep = 4;
 							});
 						} else {
+							_vue.loader.isLoading = false;
 							this.form.database.error = database.error.responseText;
 						}
 					});
@@ -123,6 +129,7 @@
 						} else {
 							this.form.sysuser.error = sysuser.error.responseText;
 						}
+						_vue.loader.isLoading = false;
 					});
 				}
 			});
@@ -133,11 +140,14 @@
 					this.form.urls.form_key = formkey.result.formKey;
 					this.form.urls.error = '';
 					this.makeRequest('/system/install/saveadminurl', this.form.urls).then(saveadminurl => {
-						if(!saveadminurl.error && saveadminurl.result){
-							this.currentStep = 6;
-						} else {
-							this.form.urls.error = saveadminurl.error.responseText;
-						}
+
+						// if(!saveadminurl.error && saveadminurl.result){
+						// 	this.currentStep = 6;
+						// } else {
+						// 	this.form.urls.error = saveadminurl.error.responseText;
+						// }
+						_vue.loader.text = 'Downloading base extension.';
+						// _vue.loader.isLoading = false;
 					});
 				}
 			});

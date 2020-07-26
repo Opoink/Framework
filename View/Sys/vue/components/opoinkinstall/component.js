@@ -1,4 +1,4 @@
 Vue.component('opoinkinstall', {
-	props: ['opoinkinstall'],
+	props: ['opoinkinstall', 'loader'],
 	template: '{{template}}'
 });

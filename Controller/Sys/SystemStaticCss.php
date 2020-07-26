@@ -37,6 +37,9 @@ class SystemStaticCss extends Sys {
 		$this->loop(0, 200, 5, 'pL-', '', 'padding-left', 'px');
 		$this->loop(0, 200, 5, 'pB-', '', 'padding-bottom', 'px');
 
+		$this->loop(0, 500, 5, 'W-', '', 'width', 'px');
+		$this->loop(0, 500, 5, 'H-', '', 'height', 'px');
+
 		$this->loop(0, 30, 1, 'fs-', '', 'font-size', 'px');
 		$this->loop(0, 900, 100, 'fw-', '', 'font-weight', '');
 
