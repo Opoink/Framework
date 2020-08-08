@@ -385,6 +385,10 @@ body {
   font-size: 16px;
 }
 
+a {
+  text-decoration: none  !important;
+}
+
 .install .card {
 	margin: 10% 0;
 }
@@ -441,4 +445,53 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.toast-container {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
+.toast-container .toast {
+  opacity: 1;
+}
+.sidebar-nav {
+  position: fixed;
+  width: 250px;
+  height: 100%;
+  background: #1F262D;
+}
+/*.sidebar-nav .sbn .list {
+  height: 55px;
+  float: left;
+}*/
+.sidebar-nav .sbn:hover {
+  background: #343a40;
+}
+.sidebar-nav .sbn .list.left {
+  width: 55px;
+}
+.sidebar-nav .sbn .list.right {
+  width: 195px;
+}
+.c-pointer {
+  cursor: pointer;
+}
+
+.sidebar-nav .child-nav {
+    position: fixed;
+    left: 250px;
+    top: 0;
+    min-width: 300px;
+    background: #141619;
+    height: 100%;
+}
+
+.sidebar-nav .child-nav .childnavlink {
+  color: #ffffff;
+  padding: 0px 15px;
+}
+.sidebar-nav .child-nav .childnavlink:hover {
+  background: #343a40;
 }

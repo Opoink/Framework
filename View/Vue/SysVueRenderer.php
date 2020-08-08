@@ -11,7 +11,9 @@ class SysVueRenderer {
 
 
 	const COMPONENT_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'components';
+	const SERVICE_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'services';
 	protected $components = [];
+	protected $services = [];
 
 	/**
 	 * get all components for systems ui
@@ -20,6 +22,8 @@ class SysVueRenderer {
 	 * in systems UI
 	 */
 	public function getComponents(){
+		$this->getSirvices();
+
 		$components = scandir(self::COMPONENT_DIR);
 		foreach ($components as $key => $componentName) {
 			if($componentName == '.' || $componentName == '..'){
@@ -28,6 +32,28 @@ class SysVueRenderer {
 			$this->setComponent($componentName);
 		}
 		return $this;
+	}
+
+	/**
+	 * get all services that is used by the components
+	 */
+	public function getSirvices(){
+		$services = scandir(self::SERVICE_DIR);
+		foreach ($services as $key => $service) {
+			if($service == '.' || $service == '..'){
+				continue;
+			}
+			$s = explode('.', $service);
+			$lastKey = count($s) - 1;
+			if(isset($s[$lastKey])){
+				unset($s[$lastKey]);
+			}
+			$serviceName = implode('.', $s);
+
+			$target = self::SERVICE_DIR .'/' . $service;
+
+			$this->services[$serviceName] = $serviceName . ': ' .file_get_contents($target);
+		}
 	}
 
 	/**
@@ -106,6 +132,10 @@ class SysVueRenderer {
 		$minifier = new Minify\JS();
 
 		$data = [];
+		foreach ($this->services as $key => $service) {
+			$data[] = $service;
+		}
+
 		foreach ($this->components as $key => $component) {
 			$minifier->add($component['component']);
 			$data[] = $component['global_data'];

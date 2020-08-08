@@ -1,5 +1,5 @@
 <div class="v-height d-flex justify-content-center align-items-center">
-	<form v-on:submit.prevent="opoinkloginindex.onSubmit()">
+	<form v-on:submit.prevent="opoinkloginindex.onSubmit($event)">
 		<div class="card W-400">
 			<div class="card-header">
 				<img src="/public/sys/assets/images/logo_and_text.png">
@@ -18,28 +18,37 @@
 				</div>
 			</div>
 			<div class="card-footer">
-				<button 
+				<a 
 					v-if="opoinkloginindex.formView == 'login'" 
-					class="btn btn-info float-left" 
+					class="btn float-left" 
 					type="submit" 
 					v-on:click="opoinkloginindex.changeView('lost-password')"
 				>
 					Lost password?
-				</button>
-				<button 
-					v-if="opoinkloginindex.formView == 'lost-password'" 
-					class="btn btn-info float-left" 
-					type="submit" 
-					v-on:click="opoinkloginindex.changeView('login')"
-				>
-					Back to Login
-				</button>
+				</a>
 				<button 
 					v-if="opoinkloginindex.formView == 'login'" 
 					class="btn btn-success float-right" 
 					type="submit"
+					v-on:click="opoinkloginindex.login()"
 				>
 					Login
+				</button>
+				<a 
+					v-if="opoinkloginindex.formView == 'lost-password'" 
+					class="btn float-left" 
+					type="submit" 
+					v-on:click="opoinkloginindex.changeView('login')"
+				>
+					Back to Login
+				</a>
+				<button 
+					v-if="opoinkloginindex.formView == 'lost-password'" 
+					class="btn btn-success float-right" 
+					type="submit"
+					v-on:click="opoinkloginindex.lostPassword()"
+				>
+					Send Email
 				</button>
 			</div>
 		</div>
