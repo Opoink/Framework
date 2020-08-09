@@ -1,0 +1,139 @@
+<div class="p-15" v-if="systemsettingsindex.settings.admin">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="row">
+				<div class="col-lg-3 border-right pR-0">
+					<div class="card-body border-bottom c-pointer" data-toggle="collapse" data-target="#sys_general_settings" aria-expanded="true" aria-controls="sys_general_settings">
+						General Setting
+					</div>
+					<div class="card-body border-bottom c-pointer" data-toggle="collapse" data-target="#sys_cache" aria-expanded="false" aria-controls="sys_cache">
+						Cache
+					</div>
+					<div class="card-body c-pointer" data-toggle="collapse" data-target="#sys_file_stream" aria-expanded="false" aria-controls="sys_file_stream">
+						File Stream Settings
+					</div>
+				</div>
+
+				<div id="accordion" class="col-lg-9">
+					<form id="sys_settings_form_field" action="" method="POST">
+						<div id="sys_general_settings" class="collapse show" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-b-0">General Setting</h5>
+								<hr>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_accepted_domain_url">
+										Accepted Domains 
+										<small class="text-muted">
+											Separated by commas, leave it blank to accept all
+										</small>
+									</label>
+									<input 
+										class="form-control" id="sys_admin_url" 
+										name="domains" 
+										type="text" 
+										v-model="systemsettingsindex.settings.domains"
+									>
+								</div>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_admin_url">
+										Admin url 
+										<small class="text-muted">
+											{{_vue.url.getProtocol()}}//{{_vue.url.getHost()}}/admin{{systemsettingsindex.settings.admin}}
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_admin_url" 
+										name="admin" 
+										type="text" 
+										v-model="systemsettingsindex.settings.admin"
+									>
+								</div>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_system_url">
+										System url 
+										<small class="text-muted">
+											{{_vue.url.getProtocol()}}//{{_vue.url.getHost()}}/system{{systemsettingsindex.settings.system_url}}
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.system_url"
+									>
+								</div>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_mode">
+										Mode
+									</label>
+									<select 
+										id="sys_mode" 
+										class="select2 form-control custom-select" 
+										name="mode" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mode"
+									>
+										<option value="production">Production</option>
+										<option value="developer">Developer</option>
+									</select>
+								</div>
+							</div>
+						</div>
+							
+						<div id="sys_cache" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-b-0">Cache Settings</h5>
+								<hr>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_cache_lifetime">
+										Cache max life time 
+										<small class="text-muted">
+											can be overide via xml attribute
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_admin_url" 
+										name="cache[max-age]" 
+										type="text" 
+										v-model="systemsettingsindex.settings.cache['max-age']"
+									>
+								</div>
+							</div>
+						</div>
+							
+						<div id="sys_file_stream" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-b-0">File Stream Settings</h5>
+								<hr>
+								<div class="form-group m-t-20 col-md-12">
+									<p class="m-b-0">This will be the accepted file type, the controller can stream</p>
+									<p class="m-b-0">Example: {{_vue.url.getUrl('/images/your-image-name.', true)}}<span class="f-w-600">png</span></p>
+								</div>
+								<div class="form-group m-t-20 col-md-6">
+									<label for="sys_cache_lifetime">
+										Images 
+										<small class="text-muted">
+											Comma separated
+										</small>
+									</label>
+									<textarea class="form-control" name="images" v-model="systemsettingsindex.settings.images"></textarea>
+								</div>
+							</div>
+						</div>
+						<div>
+							<div class="card-body">
+								<hr>
+								<div class="form-group m-0 col-md-12">
+									<button type="button" class="save btn btn-primary" name="saveSetting">Save Changes</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

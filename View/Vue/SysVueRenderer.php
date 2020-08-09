@@ -153,10 +153,12 @@ class SysVueRenderer {
 		    	let vCheck = setInterval(f => {
 		    		if(_vue){
 						let page = this.router.init();
-						if(typeof this[page].init === 'function') {
-							this[page].init();
+						if(typeof this[page] != 'undefined'){
+							if(typeof this[page].init === 'function') {
+								this[page].init();
+							}
 						}
-		    			clearInterval(vCheck)
+	    				clearInterval(vCheck);
 		    		}
 	    		}, 100)
 		    }

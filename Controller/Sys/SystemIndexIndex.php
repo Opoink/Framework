@@ -13,7 +13,6 @@ class SystemIndexIndex extends Sys {
 		$this->requireInstalled();
 		$this->requireLogin();
 
-		// $this->addInlineJs();
 		return $this->renderHtml();
 	}
 }

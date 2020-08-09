@@ -27,9 +27,17 @@ class SystemSettingsIndex extends Sys {
 		if($this->_request->getParam('form_key')){
 			return $this->saveSetting();
 		}
-		
-		$this->addInlineJs();
+		if($this->_request->getParam('settings')){
+			return $this->getSettings();
+		}
 		return $this->renderHtml();
+	}
+
+	/**
+	 * return application/json with the list of settings value
+	 */
+	protected function getSettings(){
+		$this->jsonEncode($this->_config);
 	}
 	
 	protected function saveSetting(){

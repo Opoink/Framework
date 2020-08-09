@@ -20,6 +20,7 @@
 		this.sysControllers[sysRoute + '_index_index'] = 'systemindexindex';
 		this.sysControllers[sysRoute + '_login_index'] = 'opoinkloginindex';
 		this.sysControllers[sysRoute + '_install_index'] = 'opoinkinstall';
+		this.sysControllers[sysRoute + '_settings_index'] = 'systemsettingsindex';
 		return this;
 	},
 	getPageComponent(){

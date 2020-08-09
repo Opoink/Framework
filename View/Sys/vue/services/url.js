@@ -20,8 +20,12 @@
 			return '';
 		}
 	},
-	getUrl(path=""){
-		return "/" + this.getRoute() + path;
+	getUrl(path="", isFullUrl=false){
+		if(isFullUrl){
+			return this.getProtocol() + "//" + this.getHost() + '/' + this.getRoute() + path;
+		} else {
+			return "/" + this.getRoute() + path;
+		}
 	},
 	redirect(location){
 		window.location = location;
