@@ -1,4 +1,5 @@
 {
+	opoinkBaseUrl: 'https://www.opoink.com',
 	getProtocol(){
 		return window.location.protocol;
 	},

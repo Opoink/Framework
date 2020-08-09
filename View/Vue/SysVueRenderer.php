@@ -146,7 +146,20 @@ class SysVueRenderer {
 			el: '#root',
 			data: {
 				".$data."
-			}
+			},
+			beforeMount(){
+		    },
+		    mounted(){
+		    	let vCheck = setInterval(f => {
+		    		if(_vue){
+						let page = this.router.init();
+						if(typeof this[page].init === 'function') {
+							this[page].init();
+						}
+		    			clearInterval(vCheck)
+		    		}
+	    		}, 100)
+		    }
 		})";
 		$minifier->add($Vue);
 

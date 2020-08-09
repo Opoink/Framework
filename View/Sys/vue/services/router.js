@@ -1,0 +1,30 @@
+{
+	path: null,
+	sysControllers: [],
+	init(){
+		this.path = window.location.pathname;
+		return this.setSystemController().getPageComponent();
+	},
+	getPageName(){
+	},
+	getRoute(){
+		let pathArray = this.path.substring(1).split('/');
+		if(typeof pathArray[0] != 'undefined'){
+			return pathArray[0];
+		} else {
+			return 'system';
+		}
+	},
+	setSystemController(){
+		let sysRoute = this.getRoute();
+		this.sysControllers[sysRoute + '_index_index'] = 'systemindexindex';
+		return this;
+	},
+	getPageComponent(){
+		if(typeof this.sysControllers[pageConfig.name] != 'undefined'){
+			return this.sysControllers[pageConfig.name];
+		} else {
+			return null;
+		}
+	}
+}

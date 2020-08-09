@@ -1,13 +1,13 @@
 {
-	makeRequest(url, jsonData, type = 'POST'){
+	makeRequest(url, jsonData, type = 'POST', _dataType='json', _contentType='application/json; charset=utf-8'){
 		_vue.loader.isLoading = true;
 		return new Promise(request => {
 			let ajaxData = {
 				url: url,
 				method: type,
 				data: {},
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
+				contentType: _contentType,
+				dataType: _dataType,
 				beforeSend: f => {
 				},
 				success: f => {
