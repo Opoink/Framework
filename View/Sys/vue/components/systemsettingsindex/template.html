@@ -1,4 +1,4 @@
-<div class="p-15" v-if="systemsettingsindex.settings.admin">
+<div class="p-15" v-if="systemsettingsindex.settingFetched">
 	<div class="col-md-12">
 		<div class="card">
 			<div class="row">
@@ -15,12 +15,12 @@
 				</div>
 
 				<div id="accordion" class="col-lg-9">
-					<form id="sys_settings_form_field" action="" method="POST">
+					<form v-on:submit.prevent="systemsettingsindex.onSubmit($event)">
 						<div id="sys_general_settings" class="collapse show" data-parent="#accordion">
 							<div class="card-body">
-								<h5 class="card-title m-b-0">General Setting</h5>
+								<h5 class="card-title m-0">General Setting</h5>
 								<hr>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_accepted_domain_url">
 										Accepted Domains 
 										<small class="text-muted">
@@ -34,7 +34,7 @@
 										v-model="systemsettingsindex.settings.domains"
 									>
 								</div>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_admin_url">
 										Admin url 
 										<small class="text-muted">
@@ -49,7 +49,7 @@
 										v-model="systemsettingsindex.settings.admin"
 									>
 								</div>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_system_url">
 										System url 
 										<small class="text-muted">
@@ -64,7 +64,7 @@
 										v-model="systemsettingsindex.settings.system_url"
 									>
 								</div>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_mode">
 										Mode
 									</label>
@@ -79,14 +79,84 @@
 										<option value="developer">Developer</option>
 									</select>
 								</div>
+
+								<h5 class="card-title mB-0 mT-50">Auth</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mode">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.auth.key"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mode">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.auth.secret"
+									>
+								</div>
+										
+										
+								<h5 class="card-title mB-0 mT-50">Google re-Captcha</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_g_recaptcha">
+										Enable
+									</label>
+									<select 
+										id="sys_g_recaptcha" 
+										class="select2 form-control custom-select" 
+										name="sys_g_recaptcha" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.sys_g_recaptcha"
+									>
+										<option value="0">No</option>
+										<option value="1">Yes</option>
+									</select>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="g_recaptcha_key">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="g_recaptcha_key" 
+										name="g_recaptcha_key" 
+										type="text" 
+										v-model="systemsettingsindex.settings.g_recaptcha_key"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="g_recaptcha_secret">
+										Secret
+									</label>
+									<input 
+										class="form-control" 
+										id="g_recaptcha_secret" 
+										name="g_recaptcha_secret" 
+										type="text" 
+										v-model="systemsettingsindex.settings.g_recaptcha_secret"
+									>
+								</div>
 							</div>
 						</div>
 							
 						<div id="sys_cache" class="collapse" data-parent="#accordion">
 							<div class="card-body">
-								<h5 class="card-title m-b-0">Cache Settings</h5>
+								<h5 class="card-title m-0">Cache Settings</h5>
 								<hr>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_cache_lifetime">
 										Cache max life time 
 										<small class="text-muted">
@@ -106,13 +176,13 @@
 							
 						<div id="sys_file_stream" class="collapse" data-parent="#accordion">
 							<div class="card-body">
-								<h5 class="card-title m-b-0">File Stream Settings</h5>
+								<h5 class="card-title m-0">File Stream Settings</h5>
 								<hr>
-								<div class="form-group m-t-20 col-md-12">
+								<div class="form-group mT-20 col-md-12">
 									<p class="m-b-0">This will be the accepted file type, the controller can stream</p>
 									<p class="m-b-0">Example: {{_vue.url.getUrl('/images/your-image-name.', true)}}<span class="f-w-600">png</span></p>
 								</div>
-								<div class="form-group m-t-20 col-md-6">
+								<div class="form-group mT-20 col-md-6">
 									<label for="sys_cache_lifetime">
 										Images 
 										<small class="text-muted">
@@ -127,7 +197,7 @@
 							<div class="card-body">
 								<hr>
 								<div class="form-group m-0 col-md-12">
-									<button type="button" class="save btn btn-primary" name="saveSetting">Save Changes</button>
+									<button class="save btn btn-primary" name="saveSetting">Save Changes</button>
 								</div>
 							</div>
 						</div>

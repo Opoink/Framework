@@ -1,6 +1,8 @@
 {
 	announcements: null,
 	init(){
+		console.log('_vue.url.opoinkBaseUrl', _vue.url.opoinkBaseUrl);
+
 		this.getAnnouncements();
 	},
 	getAnnouncements(){

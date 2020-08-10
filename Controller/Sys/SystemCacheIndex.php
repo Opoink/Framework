@@ -7,7 +7,7 @@ namespace Of\Controller\Sys;
 
 class SystemCacheIndex extends Sys {
 	
-	protected $pageTitle = 'Opoink Cache Management';
+	protected $pageTitle = 'Cache Management';
 	protected $cacheManager;
 	protected $cacheStatus;
 
@@ -26,8 +26,7 @@ class SystemCacheIndex extends Sys {
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-
-		$this->addInlineJs();
+		
 		return $this->renderHtml();
 	}
 }

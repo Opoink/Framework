@@ -1,4 +1,16 @@
 {
+	getFormKey(){
+		return new Promise(fk => {
+			_vue.request.makeRequest('/'+_vue.url.getRoute()+'/install/formkey', '', 'GET')
+			.then(formkey => {
+				if(!formkey.error && formkey.result){
+					fk(formkey.result.formKey);
+				} else {
+					fk(null);
+				}
+			});
+		});
+	},
 	makeRequest(url, jsonData, type = 'POST', _dataType='json', _contentType='application/json; charset=utf-8'){
 		_vue.loader.isLoading = true;
 		return new Promise(request => {
@@ -25,7 +37,7 @@
 				ajaxData.data = JSON.stringify(jsonData);
 			}
 
-			$.ajax(ajaxData);
+			jQuery.ajax(ajaxData);
 		});
 	}
 }

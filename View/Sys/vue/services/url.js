@@ -15,7 +15,7 @@
 	getRoute(){
 		let pathArray = this.getPathname().substring(1).split('/');
 		if(typeof pathArray[0] != 'undefined'){
-			return pathArray[0];
+			return pathArray[0].toLowerCase();
 		} else {
 			return '';
 		}
@@ -27,7 +27,7 @@
 			return "/" + this.getRoute() + path;
 		}
 	},
-	redirect(location){
-		window.location = location;
+	redirect(location, isFullUrl=false){
+		window.location.href = this.getUrl(location, isFullUrl) ;
 	}
 }

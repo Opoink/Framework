@@ -10,7 +10,7 @@
 	getRoute(){
 		let pathArray = this.path.substring(1).split('/');
 		if(typeof pathArray[0] != 'undefined'){
-			return pathArray[0];
+			return pathArray[0].toLowerCase();
 		} else {
 			return 'system';
 		}
@@ -21,6 +21,7 @@
 		this.sysControllers[sysRoute + '_login_index'] = 'opoinkloginindex';
 		this.sysControllers[sysRoute + '_install_index'] = 'opoinkinstall';
 		this.sysControllers[sysRoute + '_settings_index'] = 'systemsettingsindex';
+		this.sysControllers[sysRoute + '_cache_index'] = 'systemcacheindex';
 		return this;
 	},
 	getPageComponent(){
