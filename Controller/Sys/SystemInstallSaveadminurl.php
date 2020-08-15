@@ -12,7 +12,7 @@ class SystemInstallSaveadminurl extends Sys {
 	protected $pageTitle = 'Save Admin Url';
 	
 	public function run(){
-		$this->requireNotInstalled();
+		$this->requireNotInstalled(false);
 		$response = [
 			'error' => 1,
 			'message' => ''

@@ -1,4 +1,4 @@
-{
-	isLoading: false,
-	text: 'Loading...'
+class loader {
+	isLoading = false;
+	text = 'Loading...';
 }

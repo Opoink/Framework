@@ -1,4 +1,6 @@
-{
+class request {
+	contentType = 'application/json; charset=utf-8';
+	dataType = 'json';
 	getFormKey(){
 		return new Promise(fk => {
 			_vue.request.makeRequest('/'+_vue.url.getRoute()+'/install/formkey', '', 'GET')
@@ -10,17 +12,45 @@
 				}
 			});
 		});
-	},
-	makeRequest(url, jsonData, type = 'POST', _dataType='json', _contentType='application/json; charset=utf-8'){
-		_vue.loader.isLoading = true;
+	};
+	/**
+	 * set the url param for the request
+	 * @param params object the list of param to be added into the url
+	 */
+	buildQuery(params){
+		let keys = Object.keys(params);
+		let paramArray = [];
+		for (let key of keys) {
+			if(params[key] != null){
+				paramArray.push(key + '=' + params[key]);
+			}
+		}
+		if(paramArray.length){
+			return '?' + paramArray.join('&');
+		} else {
+			return '';
+		}
+	};
+
+	/**
+	 * set the url param for the request
+	 * @url
+	 * @jsonData
+	 * @type
+	 * @loader
+	 */
+	makeRequest(url, jsonData, type = 'POST', loader = false){
 		return new Promise(request => {
 			let ajaxData = {
 				url: url,
 				method: type,
 				data: {},
-				contentType: _contentType,
-				dataType: _dataType,
+				contentType: this.contentType,
+				dataType: this.dataType,
 				beforeSend: f => {
+					if(loader){
+						_vue.loader.isLoading = true;
+					}
 				},
 				success: f => {
 					request({error: null,result: f});
@@ -39,5 +69,5 @@
 
 			jQuery.ajax(ajaxData);
 		});
-	}
+	};
 }

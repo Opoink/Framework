@@ -1,16 +1,16 @@
-{
-	settingFetched: false,
-	settings: {
+class systemsettingsindex {
+	settingFetched = false;
+	settings = {
 		domains: null,
 		admin: null,
 		system_url: null,
 		mode: null,
 		cache: null,
 		images: null,
-	},
+	};
 	init(){
 		this.getSettings();
-	},
+	};
 	getSettings(){
 		_vue.request.makeRequest('/'+_vue.url.getRoute()+'/settings?settings=1', '', 'GET')
 		.then(settings => {
@@ -18,7 +18,7 @@
 				this.setSetting(settings.result);
 			}
 		});
-	},
+	};
 	setSetting(settings){
 		this.settings.domains = settings.domains.join(', ');
 		this.settings.admin = settings.admin;
@@ -33,7 +33,7 @@
 
 
 		this.settingFetched = true;
-	},
+	};
 	onSubmit(e){
 		e.preventDefault();
 		_vue.loader.text = 'Fetching form key...';
@@ -59,5 +59,5 @@
 				});
 			}
 		});
-	}
+	};
 }

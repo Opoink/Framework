@@ -12,7 +12,8 @@ class SystemInstallOpoinkbmodule extends Sys {
 	protected $pageTitle = 'Install Opoink Bmodule';
 	
 	public function run(){
-		$this->requireInstalled();
+		$this->requireInstalled(false);
+		$this->requireLogin(false);
 		$response = [
 			'error' => 1,
 			'message' => ''

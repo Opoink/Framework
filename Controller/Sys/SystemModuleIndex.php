@@ -24,14 +24,21 @@ class SystemModuleIndex extends Sys {
 		$this->_modManager = $modManager;
 	}
 
-	
-
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
 
+		$modules = $this->_request->getParam('modules');
+		if($modules){
+			$this->getModules();
+		} else {
+			$this->addInlineJs();
+			return $this->renderHtml();
+		}
+	}
+
+	protected function getModules(){
 		$this->modules = $this->_modManager->getAll();
-		$this->addInlineJs();
-		return $this->renderHtml();
+		$this->jsonEncode($this->modules);
 	}
 }

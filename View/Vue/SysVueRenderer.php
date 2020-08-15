@@ -52,7 +52,7 @@ class SysVueRenderer {
 
 			$target = self::SERVICE_DIR .'/' . $service;
 
-			$this->services[$serviceName] = $serviceName . ': ' .file_get_contents($target);
+			$this->services[$serviceName] = file_get_contents($target);
 		}
 	}
 
@@ -72,8 +72,10 @@ class SysVueRenderer {
 		if($component && $template){
 			$component = str_replace("{{template}}", $template, $component);
 			$this->components[$componentName] = [
+				'name' => $componentName,
 				'component' => $component,
-				'global_data' => $componentName.": ".$this->getFile($componentName, 'data.js')
+				// 'global_data' => $componentName.": ".$this->getFile($componentName, 'data.js')
+				'global_data' => $this->getFile($componentName, 'data.js')
 			];
 		}
 	}
@@ -131,18 +133,22 @@ class SysVueRenderer {
 	public function toJs(){
 		$minifier = new Minify\JS();
 
+		$Vue = '';
 		$data = [];
+
 		foreach ($this->services as $key => $service) {
-			$data[] = $service;
+			$Vue .= $service . ' ' . PHP_EOL;
+			$data[] = $key . ': new ' . $key . '()';
 		}
 
 		foreach ($this->components as $key => $component) {
 			$minifier->add($component['component']);
-			$data[] = $component['global_data'];
+			$Vue .= $component['global_data'] . ' ' . PHP_EOL;
+			$data[] = $component['name'] . ': new ' . $component['name'] . '()';
 		}
 		$data = implode(',', $data);
 
-		$Vue = "var _vue = new Vue({
+		$Vue .= "var _vue = new Vue({
 			el: '#root',
 			data: {
 				".$data."

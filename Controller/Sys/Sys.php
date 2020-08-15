@@ -60,28 +60,44 @@ class Sys implements SysInterface {
 		}
 	}	
 	
-	protected function requireLogin(){
+	protected function requireLogin($redirect=true){
 		if(!$this->_systemSession->isLogedIn()){
-			$this->_systemSession->setReturnUrl($this->_url->getCurrent());
-			$this->_url->redirectTo($this->getUrl('/system/login'));
+			if($redirect){
+				$this->_systemSession->setReturnUrl($this->_url->getCurrent());
+				$this->_url->redirectTo($this->getUrl('/system/login'));
+			} else {
+				$this->returnError('401', 'Please login before accessing the content of this API/Page.');
+			}
 		}
 	}
 	
-	protected function requireNotLogin(){
+	protected function requireNotLogin($redirect=true){
 		if($this->_systemSession->isLogedIn()){
-			$this->_url->redirectTo($this->getUrl('/system'));
+			if($redirect){
+				$this->_url->redirectTo($this->getUrl('/system'));
+			} else {
+				$this->returnError('401', 'You’re already logged in.');
+			}
 		}
 	}
 	
-	protected function requireInstalled(){
+	protected function requireInstalled($redirect=true){
 		if(!$this->checkInstall()){
-			$this->_url->redirectTo($this->getUrl('/system/install'));
+			if($redirect){
+				$this->_url->redirectTo($this->getUrl('/system/install'));
+			} else {
+				$this->returnError('401', 'The system is not installed yet.');
+			}
 		}
 	}
 	
-	protected function requireNotInstalled(){
+	protected function requireNotInstalled($redirect=true){
 		if($this->checkInstall()){
-			$this->_url->redirectTo($this->getUrl('/system'));
+			if($redirect){
+				$this->_url->redirectTo($this->getUrl('/system'));
+			} else {
+				$this->returnError('401', 'The system was already installed.');
+			}
 		}
 	}
 
@@ -217,7 +233,15 @@ class Sys implements SysInterface {
 		echo $j;
 		exit;
 		die;
-	}	
+	}
+
+	protected function returnError($code, $msg=''){
+		$codes = $this->_di->get('Of\Http\Codes');
+		header("HTTP/1.0 " . $code . " " . $codes->getCode($code));
+		echo $msg;
+		exit;
+		die;
+	}
 	
 	public function run(){
 		

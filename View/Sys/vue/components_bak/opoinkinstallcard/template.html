@@ -1,0 +1,190 @@
+<div class="install">
+	<div class="card">
+		<div class="card-header">
+			<img src="/public/sys/assets/images/logo_and_text.png">
+		</div>
+		<div class="card-body">
+			<div v-if="opoinkinstall.currentStep == 1">
+				<p>Welcome to Opoink Framework installation</p>
+				<p>By clicking the Agree and Continue button, you agree to our <a href="https://www.opoink.com/termsandconditions" target="_blank">terms and conditions</a>.</p>
+			</div>
+			<div v-if="opoinkinstall.currentStep == 2">
+				<p class="mB-5 fs-18 fw-800">Server Requirement:</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.phpver.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.phpver.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.phpver.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.phpver.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.phpver.message}}
+				</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.memlimit.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.memlimit.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.memlimit.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.memlimit.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.memlimit.message}}
+				</p>
+				<p class="mB-0">
+					<span>
+						<i class="fas fa-spinner mR-15" v-if="opoinkinstall.requirement.writabledir.passed == null"></i>
+						<i class="fas fa-spinner mR-15 fa-spin" v-if="opoinkinstall.requirement.writabledir.passed == 'checking'"></i>
+						<i class="fas fa-check mR-15" v-if="opoinkinstall.requirement.writabledir.passed == true"></i>
+						<i class="fas fa-times mR-15" v-if="opoinkinstall.requirement.writabledir.passed == false"></i>
+					</span>
+					{{opoinkinstall.requirement.writabledir.message}}
+				</p>
+				<p class="mB-0 mT-30">We highly recommend to use Maria Database server version: ^10.x.x</p>
+			</div>
+			<div v-if="opoinkinstall.currentStep == 3">
+				<p class="mB-5 fs-18 fw-800">
+					Database: 
+					<span class="fs-16 fw-400">Make sure that the database name was already exisitng.</span>
+					<span class="fs-16 fw-400">If not Opoink will try to create a database.</span>
+					<br />
+					<span class="fs-16 fw-400">We highly recommend to use MariaDB version: ^10.x.x</span>
+				</p>
+				<div class="row mT-30">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="input_host">Host <span class="fc-red">*</span></label>
+							<input type="text" class="form-control" id="input_host" v-model="opoinkinstall.form.database.host"/>
+							<small class="form-text text-muted">Database host that will be used.</small>
+						</div>
+
+						<div class="form-group">
+							<label for="input_user">User <span class="fc-red">*</span></label>
+							<input type="text" class="form-control" id="input_user" v-model="opoinkinstall.form.database.user"/>
+							<small class="form-text text-muted">The database username</small>
+						</div>
+
+						<div class="form-group">
+							<label for="input_prefix">Prefix</label>
+							<input type="text" class="form-control" id="input_prefix" maxlength="5" v-model="opoinkinstall.form.database.prefix"/>
+							<small class="form-text text-muted">Optional, will be added into the table name</small>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="input_name">Database name <span class="fc-red">*</span></label>
+							<input type="text" class="form-control" id="input_name" v-model="opoinkinstall.form.database.name"/>
+							<small class="form-text text-muted">The database name</small>
+						</div>
+
+						<div class="form-group">
+							<label for="input_password">Password</label>
+							<input type="text" class="form-control" id="input_password" v-model="opoinkinstall.form.database.password"/>
+							<small class="form-text text-muted">Optional, the database password</small>
+						</div>
+					</div>
+				</div>
+				<p class="mT-15 fc-red" v-if="opoinkinstall.form.database.error">{{opoinkinstall.form.database.error}}</p>
+			</div>
+
+			<div v-if="opoinkinstall.currentStep == 4">
+				<p class="mB-5 fs-18 fw-800">
+					System Account: 
+					<span class="fs-16 fw-400">System’s account is used only for this installation of Opoink Framework.</span>
+					<br />
+					<span class="fs-16 fw-400">Opoink Framework will never collect this information, and will never be shared to anyone else.</span>
+				</p>
+				<div class="row mT-30">
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="input_first_name">First Name <span class="fc-red">*</span></label>
+							<input type="text" class="form-control" id="input_first_name" v-model="opoinkinstall.form.sysuser.firstname"/>
+						</div>
+						<div class="form-group">
+							<label for="input_last_name">Last Name <span class="fc-red">*</span></label>
+							<input type="text" class="form-control" id="input_last_name" v-model="opoinkinstall.form.sysuser.lastname"/>
+						</div>
+						<div class="form-group">
+							<label for="input_email">Email <span class="fc-red">*</span></label>
+							<input type="email" class="form-control" id="input_email" v-model="opoinkinstall.form.sysuser.email"/>
+							<small class="form-text text-muted">It is important for you to type a working email address here.</small>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="form-group">
+							<label for="input_password">Password <span class="fc-red">*</span></label>
+							<input type="password" class="form-control" id="input_password" v-model="opoinkinstall.form.sysuser.password"/>
+						</div>
+						<div class="form-group">
+							<label for="input_retype_password">Re-type Password <span class="fc-red">*</span></label>
+							<input type="password" class="form-control" id="input_retype_password" v-model="opoinkinstall.form.sysuser.retypepassword"/>
+						</div>
+					</div>
+				</div>
+				<p class="mT-15 fc-red" v-if="opoinkinstall.form.sysuser.error">{{opoinkinstall.form.sysuser.error}}</p>
+			</div>
+
+			<div v-if="opoinkinstall.currentStep == 5">
+				<div class="row mT-30">
+					<div class="col-md-6">
+						<p class="mB-5 fs-18 fw-800">
+							System and Admin Link: <span class="fs-16 fw-400">This will be the suffix for the System’s and Admin’s link. These two are optional but highly recommended if you are going to deploy your project into production mode.</span>
+						</p>
+						<div class="form-group mT-30">
+							<label for="input_admin_url">Admin URL: {{opoinkinstall.getUrl()}}/admin{{opoinkinstall.form.urls.admin_url}}</label>
+							<input type="text" class="form-control" id="input_admin_url" v-model="opoinkinstall.form.urls.admin_url" maxlength="10"/>
+						</div>
+						<div class="form-group">
+							<label for="input_system_url">System URL: {{opoinkinstall.getUrl()}}/system{{opoinkinstall.form.urls.system_url}}</label>
+							<input type="text" class="form-control" id="input_system_url" v-model="opoinkinstall.form.urls.system_url" maxlength="10"/>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<p class="mB-5 fs-18 fw-800">
+							Auth: <span class="fs-16 fw-400">This are used for authentication.</span>
+						</p>
+						<div class="form-group mT-30">
+							<label for="input_auth_key">Admin URL: </label>
+							<input type="text" class="form-control" id="input_auth_key" v-model="opoinkinstall.form.urls.auth_key" maxlength="10"/>
+						</div>
+						<div class="form-group">
+							<label for="input_auth_secret">System URL:</label>
+							<input type="text" class="form-control" id="input_auth_secret" v-model="opoinkinstall.form.urls.auth_secret" maxlength="10"/>
+						</div>
+					</div>
+				</div>
+				<p class="mT-15 fc-red" v-if="opoinkinstall.form.urls.error">{{opoinkinstall.form.urls.error}}</p>
+			</div>
+			<div v-if="opoinkinstall.currentStep == 6">
+				<p class="mB-5 fs-18 fw-800">
+					System and Admin Panel: <span class="fs-16 fw-400">Don't forget to save this information before anything else.</span>
+				</p>
+				<div class="row mT-30">
+					<div class="col-md-6">
+						<p class="mB-5 fs-16">
+							System Url: <span><a v-bind:href="opoinkinstall.getUrl() + '/system' + opoinkinstall.form.urls.system_url">{{opoinkinstall.getUrl()}}/system{{opoinkinstall.form.urls.system_url}}</a></span>
+						</p>
+						<p class="mB-5 fs-16">
+							Admin Url: <span><a v-bind:href="opoinkinstall.getUrl() + '/admin' + opoinkinstall.form.urls.admin_url">{{opoinkinstall.getUrl()}}/admin{{opoinkinstall.form.urls.admin_url}}</a></span>
+						</p>
+						<p class="mB-5 fs-16">
+							Front Url: <span><a v-bind:href="opoinkinstall.getUrl()">{{opoinkinstall.getUrl()}}</a</span>
+						</p>
+					</div>
+					<div class="col-md-6">
+						<p class="mB-5 fs-16">System Admin Email: <span>{{opoinkinstall.form.sysuser.email}}</span></p>
+						<p class="mB-5 fs-16">System Admin Password: <span>{{opoinkinstall.form.sysuser.password}}</span></p>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card-footer" v-if="opoinkinstall.currentStep < 6">
+			<div class="text-right">
+				<button type="button" class="btn btn-outline-primary mR-15" v-if="opoinkinstall.currentStep > 1" v-on:click="opoinkinstall.currentStep--">
+					Back
+				</button>
+				<button type="button" class="btn btn-primary" v-on:click="opoinkinstall.goTo(opoinkinstall.currentStep)">
+					{{opoinkinstall.buttonName['step' + opoinkinstall.currentStep]}}
+				</button>
+			</div>
+		</div>
+	</div>
+</div>

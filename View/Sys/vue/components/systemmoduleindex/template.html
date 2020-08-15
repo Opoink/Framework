@@ -1,0 +1,100 @@
+<div class="p-15">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="m-0">Installed Modules</h4>
+				</div>
+				<div class="card-body pL-0 pR-0">
+					<table class="table">
+						<thead class="thead-light">
+							<tr>
+								<th style="width: 10px;">
+									<label class="customcheckbox mB-0">
+										<input class="multiCheboxSelect" type="checkbox" >
+										<span class="checkmark"></span>
+									</label>
+								</th>
+								<th scope="col" style="width: 250px;">Name</th>
+								<th scope="col">Installed Version</th>
+								<th scope="col">Config Version</th>
+								<th scope="col">Routes</th>
+								<th scope="col">Controllers</th>
+								<th scope="col">Action</th>
+							</tr>
+						</thead>
+						<tbody class="customtable">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row mT-30">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header">
+					<h4 class="m-0">Available Modules</h4>
+				</div>
+				<div class="card-body pL-0 pR-0">
+					<table class="table">
+						<thead class="thead-light">
+							<tr>
+								<th style="width: 10px;">
+									<label class="customcheckbox mB-0">
+										<input class="multiCheboxSelect" type="checkbox" >
+										<span class="checkmark"></span>
+									</label>
+								</th>
+								<th scope="col" style="width: 250px;">Name</th>
+								<th scope="col">Version</th>
+								<th scope="col">Routes And Controllers</th>
+								<th scope="col">Action</th>
+							</tr>
+						</thead>
+						<tbody class="customtable">
+							<!-- empty state -->
+							<template v-if="!systemmoduleindex.modules.uninstalled.length">
+								<tr>
+									<td colspan="5">
+										No available module
+									</td>
+								</tr>
+							</template>
+							<!-- empty state -->
+
+							<template v-if="systemmoduleindex.modules.uninstalled.length">
+								<tr v-for="module in systemmoduleindex.modules.uninstalled">
+									<td>
+										<label class="customcheckbox mB-0">
+											<input class="multiCheboxSelect" type="checkbox" >
+											<span class="checkmark"></span>
+										</label>
+									</td>
+									<td style="width: 250px;" class="fs-14">{{module.key}}</th>
+									<td class="fs-14">{{module.value.version}}</th>
+									<td>
+										<div class="MH-150 of-auto">
+											<template v-for="con in module.value.controllers">
+												<template v-if="con.isRegex">
+													<p>
+														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
+														<code>{{con.value.class}}</code>
+													</p>
+												</template>
+												<template v-if="!con.isRegex">
+													<p><code>{{con.key}}</code> : <code>{{con.value}}</code></p>
+												</template>
+											</template>
+										</div>
+									</th>
+									<td class="fs-14">Action</th>
+								</tr>
+							</template>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

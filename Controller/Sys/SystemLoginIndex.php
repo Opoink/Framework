@@ -30,8 +30,10 @@ class SystemLoginIndex extends Sys {
 	}
 	
 	public function run(){
+		$errorRedirect = (bool)$this->getParam('isredirect');
+
 		$this->requireInstalled();
-		$this->requireNotLogin();
+		$this->requireNotLogin($errorRedirect);
 		
 		$this->email = $this->getParam('email');
 		$this->password = $this->getParam('password');

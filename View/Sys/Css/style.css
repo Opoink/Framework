@@ -509,3 +509,37 @@ a {
 .of-auto {
   overflow: auto;
 }
+.ellipsis{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.skeleton-box {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    background-color: #cbcbcb;
+}
+.skeleton-box:after {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	-webkit-transform: translateX(-100%);
+	transform: translateX(-100%);
+	background-image: -webkit-gradient(linear, left top, right top, color-stop(0, rgba(255, 255, 255, 0)), color-stop(20%, rgba(255, 255, 255, 0.2)), color-stop(60%, rgba(255, 255, 255, 0.5)), to(rgba(255, 255, 255, 0)));
+	background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0, rgba(255, 255, 255, 0.2) 20%, (255, 255, 255, 0.5) 60%, rgba(255, 255, 255, 0));
+	-webkit-animation: shimmer 2s infinite;
+	animation: shimmer 2s infinite;
+	content: '';
+}   
+@keyframes shimmer {
+	100% {
+		transform: translateX(100%);
+	}
+}
+code {
+  background: #fafafa;
+  padding: 5px;
+}

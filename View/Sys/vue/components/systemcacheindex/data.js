@@ -1,31 +1,28 @@
-{
-	selectAllVall: 0,
-	cache_services: {
+class systemcacheindex {
+	selectAllVall = 0;
+	cache_services = {
 		less: 0,
 		deployed_files: 0,
 		xml: 0,
 		database: 0,
-	},
-	cache: {},
+	};
+	cache = {};
 	init(){
 		this.getCache();
-	},
+	};
 	getCache(){
 		_vue.request.makeRequest('/'+_vue.url.getRoute()+'/cache/action', '', 'GET').then(status => {
 			if(!status.error && status.result){
 				this.cache = status.result;
-
-				console.log('this.cache this.cache', this.cache);
 			}
 		});
-	},
+	};
 	selectAll(){
 		this.cache_services.less = this.selectAllVall;
 		this.cache_services.deployed_files = this.selectAllVall;
 		this.cache_services.xml = this.selectAllVall;
 		this.cache_services.database = this.selectAllVall;
-		console.log(this.cache_services);
-	},
+	};
 	openModalConfirm(){
 		_vue.modalconfirm.modalTitle = 'Purge Cache';
 		_vue.modalconfirm.modalContent = '<p class="fw-400">Are you sure you want to purge cache of the selected item/s?</p>';
@@ -34,7 +31,7 @@
 		_vue.modalconfirm.callback = (f => {
 			this.purge()
 		});
-	},
+	};
 	purge(){
 		let toPurgeArray = [];
 		if(this.cache_services.less){
@@ -51,7 +48,7 @@
 		}
 		this.purgeArray(toPurgeArray, 0);
 	  	_vue.modalconfirm.hide();
-	},
+	};
 	purgeArray(array, index){
 		let count = array.length - 1;
 		if(index <= count ){
@@ -69,7 +66,7 @@
 				}
 			});
 		}
-	},
+	};
 	purgeHelper(type){
 		_vue.loader.text = 'Purging ' + type + ' cache...';
 		return new Promise(p => {
