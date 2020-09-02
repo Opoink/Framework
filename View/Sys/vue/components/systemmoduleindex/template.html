@@ -10,22 +10,67 @@
 						<thead class="thead-light">
 							<tr>
 								<th style="width: 10px;">
-									<label class="customcheckbox mB-0">
+									<!-- <label class="customcheckbox mB-0">
 										<input class="multiCheboxSelect" type="checkbox" >
 										<span class="checkmark"></span>
-									</label>
+									</label> -->
 								</th>
 								<th scope="col" style="width: 250px;">Name</th>
 								<th scope="col">Installed Version</th>
 								<th scope="col">Config Version</th>
-								<th scope="col">Routes</th>
-								<th scope="col">Controllers</th>
+								<th scope="col">Routes and Controllers</th>
 								<th scope="col">Action</th>
 							</tr>
 						</thead>
 						<tbody class="customtable">
+							<!-- empty state -->
+							<template v-if="!systemmoduleindex.modules.installed.length">
+								<tr>
+									<td colspan="5">
+										No installed module
+									</td>
+								</tr>
+							</template>
+							<!-- empty state -->
+
+							
+							<template v-if="systemmoduleindex.modules.installed.length">
+								<tr v-for="module in systemmoduleindex.modules.installed">
+									<td>
+										<label class="customcheckbox mB-0">
+											<input class="multiCheboxSelect" type="checkbox" v-bind:value="module.key" v-model="systemmoduleindex.modForm.installed" >
+											<span class="checkmark"></span>
+										</label>
+									</td>
+									<td style="width: 250px;" class="fs-14">{{module.key}}</th>
+									<td class="fs-14">{{module.value.installed_version}}</th>
+									<td class="fs-14">{{module.value.version}}</th>
+									<td>
+										<div class="MH-150 of-auto">
+											<template v-for="con in module.value.controllers">
+												<template v-if="con.isRegex">
+													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
+														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
+														<code>{{con.value.class}}</code>
+													</p>
+												</template>
+												<template v-if="!con.isRegex">
+													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+														<code>{{con.key}}</code> : <code>{{con.value}}</code>
+													</p>
+												</template>
+											</template>
+										</div>
+									</th>
+									<td class="fs-14">Action</th>
+								</tr>
+							</template>
 						</tbody>
 					</table>
+				</div>
+				<div class="card-footer">
+					<button class="btn btn-primary" v-on:click="systemmoduleindex.upgradeModules()">Upgrade</button>
+					<button class="btn btn-outline-danger mL-15" v-on:click="systemmoduleindex.upgradeModules()">Uninstall</button>
 				</div>
 			</div>
 		</div>
@@ -41,10 +86,10 @@
 						<thead class="thead-light">
 							<tr>
 								<th style="width: 10px;">
-									<label class="customcheckbox mB-0">
+									<!-- <label class="customcheckbox mB-0">
 										<input class="multiCheboxSelect" type="checkbox" >
 										<span class="checkmark"></span>
-									</label>
+									</label> -->
 								</th>
 								<th scope="col" style="width: 250px;">Name</th>
 								<th scope="col">Version</th>
@@ -67,7 +112,7 @@
 								<tr v-for="module in systemmoduleindex.modules.uninstalled">
 									<td>
 										<label class="customcheckbox mB-0">
-											<input class="multiCheboxSelect" type="checkbox" >
+											<input class="multiCheboxSelect" type="checkbox"  v-bind:value="module.key" v-model="systemmoduleindex.modForm.uninstalled">
 											<span class="checkmark"></span>
 										</label>
 									</td>
@@ -77,13 +122,15 @@
 										<div class="MH-150 of-auto">
 											<template v-for="con in module.value.controllers">
 												<template v-if="con.isRegex">
-													<p>
+													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
 														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
 														<code>{{con.value.class}}</code>
 													</p>
 												</template>
 												<template v-if="!con.isRegex">
-													<p><code>{{con.key}}</code> : <code>{{con.value}}</code></p>
+													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+														<code>{{con.key}}</code> : <code>{{con.value}}</code>
+													</p>
 												</template>
 											</template>
 										</div>
@@ -93,6 +140,9 @@
 							</template>
 						</tbody>
 					</table>
+				</div>
+				<div class="card-footer">
+					<button class="btn btn-primary" v-on:click="systemmoduleindex.installModules()">Install</button>
 				</div>
 			</div>
 		</div>

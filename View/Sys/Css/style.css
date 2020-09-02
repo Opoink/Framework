@@ -452,7 +452,7 @@ a {
 
 .toast-container {
   position: fixed;
-  top: 10px;
+  top: 70px;
   right: 10px;
 }
 
@@ -505,6 +505,7 @@ a {
   width: calc(100% - 250px);
   top: 0;
   right: 0;
+  z-index: 3;
 }
 .of-auto {
   overflow: auto;

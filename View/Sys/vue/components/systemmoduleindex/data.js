@@ -1,12 +1,23 @@
 class systemmoduleindex {
 
+	/**
+	 * this is the list of the module that was already in 
+	 * <installation_dir>/App/Ext disrectory
+	 */
 	modules  = {
 		installed: [],
 		uninstalled: []
 	};
 
+	/**
+	 * this are the selected module that are ready for installation, upgrade or uninstallation
+	 */
+	modForm = {
+		installed: [],
+		uninstalled: []
+	};
+
 	init(){
-		console.log('systemmoduleindex systemmoduleindex');
 		this.getModules();
 	};
 
@@ -18,8 +29,8 @@ class systemmoduleindex {
 		_vue.request.makeRequest(url, '', 'GET')
 		.then(a => {
 			if(!a.error && a.result){
+				this.modules.installed = this.convertModuleIntoArray(a.result.installed);
 				this.modules.uninstalled = this.convertModuleIntoArray(a.result.uninstalled);
-				console.log('this.modules.uninstalled', this.modules.uninstalled)
 			}
 		});
 	};
@@ -50,7 +61,6 @@ class systemmoduleindex {
 			}
 		});
 		
-		console.log('mods mods mods', mods);
 		return mods;
 	};
 
@@ -71,5 +81,45 @@ class systemmoduleindex {
 			}
 		}
 		return mods;
+	};
+
+	/**
+	 * install all module that is checked in the UI
+	 */
+	installModules(){
+		if(this.modForm.uninstalled.length > 0){
+			_vue.loader.text = 'Fetching form key...';
+			_vue.request.getFormKey().then(formkey => {
+				if(formkey){
+					let jsonData = {
+						'form_key': formkey,
+						'availableModule': this.modForm.uninstalled
+					}
+					let url = '/' + _vue.url.getRoute() + '/module/install';
+					_vue.request.makeRequest(url, jsonData, 'POST')
+					.then(a => {
+						console.log('installModules installModules', a);
+	
+						// if(!a.error && a.result){
+						// 	this.modules.installed = this.convertModuleIntoArray(a.result.installed);
+						// 	this.modules.uninstalled = this.convertModuleIntoArray(a.result.uninstalled);
+						// }
+					});
+	
+				}
+			});
+		} else {
+			_vue.toast.add('Please select atleast one module to install');
+		}
+	};
+
+	/**
+	 * upgrade all selected module
+	 * and reset all selected after
+	 */
+	upgradeModules(){
+		console.log(this.modForm.installed);
+
+		this.modForm.installed = [];
 	};
 }
