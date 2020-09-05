@@ -17,6 +17,9 @@ class systemmoduleindex {
 		uninstalled: []
 	};
 
+	/** hold the list of on-going and done task */
+	installTasks = [];
+
 	init(){
 		this.getModules();
 	};
@@ -88,30 +91,70 @@ class systemmoduleindex {
 	 */
 	installModules(){
 		if(this.modForm.uninstalled.length > 0){
-			_vue.loader.text = 'Fetching form key...';
-			_vue.request.getFormKey().then(formkey => {
-				if(formkey){
-					let jsonData = {
-						'form_key': formkey,
-						'availableModule': this.modForm.uninstalled
-					}
-					let url = '/' + _vue.url.getRoute() + '/module/install';
-					_vue.request.makeRequest(url, jsonData, 'POST')
-					.then(a => {
-						console.log('installModules installModules', a);
-	
-						// if(!a.error && a.result){
-						// 	this.modules.installed = this.convertModuleIntoArray(a.result.installed);
-						// 	this.modules.uninstalled = this.convertModuleIntoArray(a.result.uninstalled);
-						// }
-					});
-	
-				}
+			this.installTasks = [];
+
+			jQuery.noConflict();
+			$('#modInstallModal').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+
+			this.installModulesAssync(this.modForm.uninstalled, 0).then(() => {
+				this.getModules();
+				$('#modInstallModal').modal('hide');
 			});
 		} else {
 			_vue.toast.add('Please select atleast one module to install');
 		}
 	};
+
+	/**
+	 * we need to wait for each module to finish its install
+	 * before firing a new one
+	 * @param {*} mods is the light of module that was being proccess
+	 * @param {*} index is the key of the array
+	 */
+	installModulesAssync(mods, index){
+		return new Promise(install => {
+			if(typeof mods[index] != 'undefined'){
+				this.installTasks.push('Installing ' + mods[index] + '...');
+
+				_vue.loader.text = 'Fetching form key...';
+				_vue.request.getFormKey().then(formkey => {
+					if(formkey){
+						let jsonData = {
+							'form_key': formkey,
+							'availableModule': [mods[index]]
+						}
+						let url = '/' + _vue.url.getRoute() + '/module/install';
+						_vue.request.makeRequest(url, jsonData, 'POST')
+						.then(a => {
+							setTimeout(f => {
+								if(!a.error && a.result){
+									this.installTasks.push(mods[index] + ' successfully installed...');
+								} else {
+									this.installTasks.push('Failed to install ' + mods[index] + '...');
+									this.installTasks.push('Check this module if already saved on your database, if it is you may want to delete it first.');
+									this.installTasks.push('Check the permission of etc directory and make sure that it is writable.');
+								}
+								let newIndex = index + 1;
+								if(typeof mods[newIndex] != 'undefined'){
+									install(this.installModulesAssync(mods, newIndex));
+								} else {
+									install(true);
+								}
+							}, 3000);
+						});
+					} else {
+						this.installTasks.push('Failed, can\'t get a form key...');
+						install(false);
+					}
+				});
+			} else {
+				install(false);
+			}
+		});
+	}
 
 	/**
 	 * upgrade all selected module
