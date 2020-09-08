@@ -20,6 +20,12 @@ class systemmoduleindex {
 	/** hold the list of on-going and done task */
 	installTasks = [];
 
+	/** either to display the finish button or not  */
+	moduleTaskFinishButton = false;
+
+	/** tell what action the modal start button will do */
+	modalAction = '';
+
 	init(){
 		this.getModules();
 	};
@@ -87,21 +93,30 @@ class systemmoduleindex {
 	};
 
 	/**
+	 * open the modal for task
+	 * @param {*} action the action of the modal to perform 
+	 */
+	openModal(action){
+		this.modalAction = action;
+		this.installTasks = [];
+
+		jQuery.noConflict();
+		$('#modInstallModal').modal({
+			backdrop: 'static',
+			keyboard: false
+		});
+		this.moduleTaskFinishButton = true;
+	}
+
+	/**
 	 * install all module that is checked in the UI
 	 */
 	installModules(){
 		if(this.modForm.uninstalled.length > 0){
-			this.installTasks = [];
-
-			jQuery.noConflict();
-			$('#modInstallModal').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
-
+			this.moduleTaskFinishButton = false;
 			this.installModulesAssync(this.modForm.uninstalled, 0).then(() => {
 				this.getModules();
-				$('#modInstallModal').modal('hide');
+				this.moduleTaskFinishButton = true;
 			});
 		} else {
 			_vue.toast.add('Please select atleast one module to install');
@@ -139,6 +154,7 @@ class systemmoduleindex {
 								}
 								let newIndex = index + 1;
 								if(typeof mods[newIndex] != 'undefined'){
+									this.installTasks.push("-------------------------------------");
 									install(this.installModulesAssync(mods, newIndex));
 								} else {
 									install(true);
@@ -160,9 +176,71 @@ class systemmoduleindex {
 	 * upgrade all selected module
 	 * and reset all selected after
 	 */
-	upgradeModules(){
-		console.log(this.modForm.installed);
+	upgradeModules(action){
+		if(this.modForm.installed.length > 0){
+			this.moduleTaskFinishButton = false;
+			this.updateModuleAssync(this.modForm.installed, 0, action).then(() => {
+				this.getModules();
+				this.moduleTaskFinishButton = true;
+			});
+		} else {
+			_vue.toast.add('Please select atleast one module to upgrade');
+		}
+	}
 
-		this.modForm.installed = [];
-	};
+	/**
+	 * we need to wait for each module to finish its install
+	 * before firing a new one
+	 * @param {*} mods is the light of module that was being proccess
+	 * @param {*} index is the key of the array
+	 */
+	updateModuleAssync(mods, index, action){
+		return new Promise(install => {
+			if(typeof mods[index] != 'undefined'){
+				if(action == 'upgrade'){
+					this.installTasks.push('Upgrading ' + mods[index] + '...');
+				}
+				else if(action == 'uninstall'){
+					this.installTasks.push('Uninstalling module ' + mods[index] + '...');
+					this.installTasks.push('The file structure and the database included in this module will not be removed. You will have to remove it manually.');
+				}
+
+				_vue.request.getFormKey().then(formkey => {
+					if(formkey){
+						let jsonData = {
+							'form_key': formkey,
+							'action': action,
+							'intalledModule': [mods[index]]
+						}
+						let url = '/' + _vue.url.getRoute() + '/module/action';
+						_vue.request.makeRequest(url, jsonData, 'POST')
+						.then(a => {
+							console.log('aaaaaaaaa', a);
+							setTimeout(f => {
+								if(!a.error && a.result){
+									a.result.message.forEach(msg => {
+										this.installTasks.push(msg);
+									});
+								} else {
+									this.installTasks.push('Failed to upgrade ' + mods[index] + '...');
+								}
+								let newIndex = index + 1;
+								if(typeof mods[newIndex] != 'undefined'){
+									this.installTasks.push("-------------------------------------");
+									install(this.updateModuleAssync(mods, newIndex, action));
+								} else {
+									install(true);
+								}
+							}, 3000);
+						});
+					} else {
+						this.installTasks.push('Failed, can\'t get a form key...');
+						install(false);
+					}
+				});
+			} else {
+				install(false);
+			}
+		});
+	}
 }

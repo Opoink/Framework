@@ -69,8 +69,8 @@
 					</table>
 				</div>
 				<div class="card-footer">
-					<button class="btn btn-primary" v-on:click="systemmoduleindex.upgradeModules()">Upgrade</button>
-					<button class="btn btn-outline-danger mL-15" v-on:click="systemmoduleindex.upgradeModules()">Uninstall</button>
+					<button class="btn btn-primary" v-on:click="systemmoduleindex.openModal('upgrade')">Upgrade</button>
+					<button class="btn btn-outline-danger mL-15" v-on:click="systemmoduleindex.openModal('uninstall')">Uninstall</button>
 				</div>
 			</div>
 		</div>
@@ -142,7 +142,7 @@
 					</table>
 				</div>
 				<div class="card-footer">
-					<button class="btn btn-primary" v-on:click="systemmoduleindex.installModules()">Install</button>
+					<button class="btn btn-primary" v-on:click="systemmoduleindex.openModal('install')">Install</button>
 				</div>
 			</div>
 		</div>
@@ -153,10 +153,22 @@
 		<div class="modal-content">
 			<div class="card">
 				<div class="card-header">
-					sadsa
+					Module {{systemmoduleindex.modalAction}} tasks
 				</div>
 				<div class="card-body">
+					<p class="fs-14 mb-30" v-if="systemmoduleindex.modalAction == 'upgrade'">
+						If you are sure to upgrade all selected module click <button class="btn btn-outline-primary" v-on:click="systemmoduleindex.upgradeModules('upgrade')">Upgrade now</button>
+					</p>
+					<p class="fs-14 mb-30" v-if="systemmoduleindex.modalAction == 'uninstall'">
+						If you are sure to uninstall all selected module click <button class="btn btn-outline-danger" v-on:click="systemmoduleindex.upgradeModules('uninstall')">Uninstall now</button>
+					</p>
+					<p class="fs-14 mb-30" v-if="systemmoduleindex.modalAction == 'install'">
+						If you are sure to install all selected module click <button class="btn btn-outline-primary" v-on:click="systemmoduleindex.installModules('uninstall')">Install now</button>
+					</p>
 					<p class="fs-14 mb-0" v-for="task of systemmoduleindex.installTasks">{{task}}</p>
+				</div>
+				<div class="card-footer text-right" v-if="systemmoduleindex.moduleTaskFinishButton">
+					<button class="btn btn-outline-primary" data-dismiss="modal" aria-label="Close">Finish</button>
 				</div>
 			</div>
 		</div>
