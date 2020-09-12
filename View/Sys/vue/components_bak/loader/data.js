@@ -1,4 +1,0 @@
-{
-	isLoading: false,
-	text: 'Loading...'
-}

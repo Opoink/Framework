@@ -1,10 +1,13 @@
 class systemmoduleindex {
 
+	/** url service */
+	url = null
+
 	/**
 	 * this is the list of the module that was already in 
 	 * <installation_dir>/App/Ext disrectory
 	 */
-	modules  = {
+	modules = {
 		installed: [],
 		uninstalled: []
 	};
@@ -26,8 +29,15 @@ class systemmoduleindex {
 	/** tell what action the modal start button will do */
 	modalAction = '';
 
+	/** tell if the process of module is currently being done or not */
+	initializing = false;
+
+	constructor(){
+	}
+
 	init(){
 		this.getModules();
+		this.url = _vue.url;
 	};
 
 	/**
@@ -99,6 +109,7 @@ class systemmoduleindex {
 	openModal(action){
 		this.modalAction = action;
 		this.installTasks = [];
+		this.initializing = false;
 
 		jQuery.noConflict();
 		$('#modInstallModal').modal({
@@ -114,9 +125,12 @@ class systemmoduleindex {
 	installModules(){
 		if(this.modForm.uninstalled.length > 0){
 			this.moduleTaskFinishButton = false;
+			this.initializing = true;
 			this.installModulesAssync(this.modForm.uninstalled, 0).then(() => {
 				this.getModules();
 				this.moduleTaskFinishButton = true;
+				this.modForm.installed = [];
+				this.modForm.uninstalled = [];
 			});
 		} else {
 			_vue.toast.add('Please select atleast one module to install');
@@ -179,9 +193,12 @@ class systemmoduleindex {
 	upgradeModules(action){
 		if(this.modForm.installed.length > 0){
 			this.moduleTaskFinishButton = false;
+			this.initializing = true;
 			this.updateModuleAssync(this.modForm.installed, 0, action).then(() => {
 				this.getModules();
 				this.moduleTaskFinishButton = true;
+				this.modForm.installed = [];
+				this.modForm.uninstalled = [];
 			});
 		} else {
 			_vue.toast.add('Please select atleast one module to upgrade');
@@ -215,7 +232,6 @@ class systemmoduleindex {
 						let url = '/' + _vue.url.getRoute() + '/module/action';
 						_vue.request.makeRequest(url, jsonData, 'POST')
 						.then(a => {
-							console.log('aaaaaaaaa', a);
 							setTimeout(f => {
 								if(!a.error && a.result){
 									a.result.message.forEach(msg => {

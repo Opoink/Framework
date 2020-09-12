@@ -23,6 +23,7 @@ class router {
 		this.sysControllers[sysRoute + '_settings_index'] = 'systemsettingsindex';
 		this.sysControllers[sysRoute + '_cache_index'] = 'systemcacheindex';
 		this.sysControllers[sysRoute + '_module_index'] = 'systemmoduleindex';
+		this.sysControllers[sysRoute + '_module_create'] = 'systemmodulecreate';
 		return this;
 	};
 	getPageComponent(){
