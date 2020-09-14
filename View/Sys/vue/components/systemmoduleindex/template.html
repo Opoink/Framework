@@ -63,7 +63,7 @@
 										</div>
 									</th>
 									<td class="fs-14">
-										<a v-bind:href="systemmoduleindex.url.getUrl('/module/edit/mod/' + module.key)">
+										<a v-bind:href="systemmoduleindex.url.getUrl('/module/edit?vendor=' + module.value.vendor + '&module=' + module.value.module + '&version=' + module.value.version)">
 											<i class="far fa-edit"></i><span class="mL-5">Edit</span>
 										</a>
 									</th>
@@ -140,7 +140,7 @@
 										</div>
 									</th>
 									<td class="fs-14">
-										<a v-bind:href="systemmoduleindex.url.getUrl('/module/edit/mod/' + module.key)">
+										<a v-bind:href="systemmoduleindex.url.getUrl('/module/edit?vendor=' + module.value.vendor + '&module=' + module.value.module + '&version=' + module.value.version)">
 											<i class="far fa-edit"></i><span class="mL-5">Edit</span>
 										</a>
 									</th>

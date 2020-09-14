@@ -24,6 +24,7 @@ class router {
 		this.sysControllers[sysRoute + '_cache_index'] = 'systemcacheindex';
 		this.sysControllers[sysRoute + '_module_index'] = 'systemmoduleindex';
 		this.sysControllers[sysRoute + '_module_create'] = 'systemmodulecreate';
+		this.sysControllers[sysRoute + '_module_edit'] = 'systemmoduleedit';
 		return this;
 	};
 	getPageComponent(){
