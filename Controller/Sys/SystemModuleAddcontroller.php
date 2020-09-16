@@ -77,7 +77,7 @@ class SystemModuleAddcontroller extends Sys {
 			} 
 
 			if($route == 'system' || $route == 'System'){
-				$this->_message->setMessage('System route is reserved for Opoink\'s developer panel.', 'danger');
+				$this->returnError('400', 'System route is reserved for Opoink\'s developer panel.');
 			} else {
 
 				if($crr === 'yes'){
@@ -198,16 +198,18 @@ class SystemModuleAddcontroller extends Sys {
 					->setFileextension('phtml')
 					->write();
 					/** end create the sample template here */
-					$this->_message->setMessage('New conroller created.', 'success');
+
+					$response = [];
+					$response['error'] = 0;
+					$response['message'] = 'New conroller created.';
+					$this->jsonEncode($response);
 				} else {
-					$this->_message->setMessage('Cannot create, controller is already existing.', 'danger');
+					$this->returnError('400', 'Cannot create, controller is already existing.');
 				}
 			}
 		} else {
-			$this->_message->setMessage('Module name is not existing.', 'danger');
+			$this->returnError('400', 'Module name does not exist.');
 		}
-
-		$this->_url->redirectTo($this->getUrl($redirectUrl));
 	}
 
 

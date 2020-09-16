@@ -136,8 +136,10 @@ class Router {
 			return true;
 		}
 		if($isRegex){
-			$match = (bool)preg_match($configValue, $requestValue);
-			return $match;
+			if( preg_match("/^\/.+\/[a-z]*$/i",$configValue)) {
+				$match = (bool)preg_match($configValue, $requestValue);
+				return $match;
+			}
 		}
 		return false;
 	}
