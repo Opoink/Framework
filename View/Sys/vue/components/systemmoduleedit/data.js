@@ -17,6 +17,7 @@ class systemmoduleedit {
 	 * the value of the controller form field
 	 */
 	controllerForm = {
+		extend_to_class: '',
 		controller_type: 'public',
 		controller_route_regex: false,
 		controller_route: '',
@@ -68,6 +69,7 @@ class systemmoduleedit {
 	 */
 	createController(){
 		let jsonData = {
+			extend_to_class: this.controllerForm.extend_to_class,
 			controller_type: this.controllerForm.controller_type,
 			vendor_name: this.form.vendor_name,
 			module_name: this.form.module_name,
@@ -100,7 +102,8 @@ class systemmoduleedit {
 			this.request.makeRequest(url, jsonData, 'POST', true)
 			.then(mod => {
 				if(!mod.error && mod.result){
-					
+					this.controllerForm.extend_to_class = '';
+					this.controllerForm.controller_type = 'public';
 					this.controllerForm.controller_route_regex = false;
 					this.controllerForm.controller_route = '';
 					this.controllerForm.controller_controller_regex = false;

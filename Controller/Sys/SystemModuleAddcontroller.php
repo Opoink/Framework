@@ -116,11 +116,11 @@ class SystemModuleAddcontroller extends Sys {
 					try {
 						/* 
 						 * this is to try if the class to extend exists
-						 * if it is not injectore will raise an error
+						 * if it is not injector will raise an error
 						 */
 					    $this->_di->make($extends);
-					} catch (Exception $e) {
-					    /* do nothing */
+					} catch (\Exception $e) {
+						$this->returnError('400', $e->getMessage());
 					}
 
 					$this->_controller->setExtends($extends);
@@ -192,8 +192,12 @@ class SystemModuleAddcontroller extends Sys {
 
 					$this->_xml->setVendor($vendor_name)
 					->setModule($module_name)
-					->setFileName($xmlFilename)
-					->create(true, $isAdmin, 999, $body);
+					->setFileName($xmlFilename);
+					if($isAdmin){
+						$this->_xml->create(false, $isAdmin, 999, $body);
+					} else {
+						$this->_xml->create(true, $isAdmin, 999, $body);
+					}
 					/** end create controller xml layout here */
 
 					/** create the sample template here */
