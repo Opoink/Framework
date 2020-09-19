@@ -79,15 +79,27 @@ class SystemModuleAddcontroller extends Sys {
 			if($route == 'system' || $route == 'System'){
 				$this->returnError('400', 'System route is reserved for Opoink\'s developer panel.');
 			} else {
-
+				$invalidPatternMsg = 'You will use regex for the {{path}}, but your pattern seems to be invalid. To avoid error please make sure your pattern is valid.';
 				if($crr === 'yes'){
-					$route = 'Reg'.sha1($route);
+					if( preg_match("/^\/.+\/[a-z]*$/i", $route)) {
+						$route = 'Reg'.sha1($route);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'route', $invalidPatternMsg));
+					}
 				}
-				if($ccr === 'yes'){
-					$conroller = 'Reg'.sha1($conroller);
+				if($ccr === 'yes'){;
+					if( preg_match("/^\/.+\/[a-z]*$/i", $conroller)) {
+						$conroller = 'Reg'.sha1($conroller);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'conroller', $invalidPatternMsg));
+					}
 				}
 				if($car === 'yes'){
-					$action = 'Reg'.sha1($action);
+					if( preg_match("/^\/.+\/[a-z]*$/i", $action)) {
+						$action = 'Reg'.sha1($action);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'action', $invalidPatternMsg));
+					}
 				}
 
 				$conType = 'public';

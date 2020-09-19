@@ -66,11 +66,6 @@ class systemmoduleedit {
 	 * make an API request to creat new controller
 	 */
 	createController(){
-		console.log('this.controllerForm this.controllerForm', this.controllerForm);
-
-		this.loader.isLoading = true;
-		this.loader.text = 'Creating new controller.';
-
 		let jsonData = {
 			vendor_name: this.form.vendor_name,
 			module_name: this.form.module_name,
@@ -88,6 +83,8 @@ class systemmoduleedit {
 		else if(this.controllerForm.controller_action_regex && !this.controllerForm.controller_action) {
 			this.toast.add('If you will use action as regex, you have to enter your expression into action\'s field', 'Error');
 		} else {
+			this.loader.isLoading = true;
+			this.loader.text = 'Creating new controller.';
 			if(this.controllerForm.controller_route_regex){
 				jsonData['controller_route_regex'] = 'yes';
 			}
