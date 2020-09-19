@@ -9,7 +9,7 @@ use MatthiasMullie\Minify;
 
 class SysVueRenderer {
 
-	const REWRITEVUECOMPONENTJS = true;
+	const REWRITEVUECOMPONENTJS = false;
 	const COMPONENT_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'components';
 	const SERVICE_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'services';
 	protected $components = [];
@@ -28,21 +28,6 @@ class SysVueRenderer {
 		$this->targetDir = ROOT . DS . 'Var' . DS . 'Sys' . DS . 'Js';
 		$this->targetFilename = 'sysvuecomponents';
 		$this->targetFilenameExt = 'js';
-	}
-
-	/**
-	 * check if the vue js component is already exist
-	 * return boolean
-	 */
-	private function isExist(){
-		if(self::REWRITEVUECOMPONENTJS){
-			return false;
-		} else {
-			return true;
-		}
-		$curentDir = dirname(dirname(__FILE__)) . DS . 'Sys' . DS . 'Js' . DS . 'sysvuecomponents.js';
-		var_dump($curentDir);
-		die;
 	}
 
 	/**
