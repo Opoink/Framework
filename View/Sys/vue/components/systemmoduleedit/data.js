@@ -17,6 +17,7 @@ class systemmoduleedit {
 	 * the value of the controller form field
 	 */
 	controllerForm = {
+		controller_type: 'public',
 		controller_route_regex: false,
 		controller_route: '',
 		controller_controller_regex: false,
@@ -67,6 +68,7 @@ class systemmoduleedit {
 	 */
 	createController(){
 		let jsonData = {
+			controller_type: this.controllerForm.controller_type,
 			vendor_name: this.form.vendor_name,
 			module_name: this.form.module_name,
 			controller_route: this.controllerForm.controller_route,
