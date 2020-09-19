@@ -9,7 +9,7 @@ use MatthiasMullie\Minify;
 
 class SysVueRenderer {
 
-	const REWRITEVUECOMPONENTJS = true;
+	const REWRITEVUECOMPONENTJS = false;
 	const COMPONENT_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'components';
 	const SERVICE_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'services';
 	protected $components = [];
