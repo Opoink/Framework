@@ -171,7 +171,12 @@ class Xmltohtml {
 			$htmlTag = $node->getAttribute('htmlTag');
 		}
 
-		$div = '<'.$htmlTag.$htmlId.$htmlClass.'>';
+		$attribute = '';
+		if($node->hasAttribute('attr')){
+			$attribute = ' ' . $node->getAttribute('attr');
+		}
+
+		$div = '<'.$htmlTag.$htmlId.$htmlClass.$attribute.'>';
 		
 		$i = '';
 		if($indent > 0 && $this->mode == Constants::MODE_DEV){
