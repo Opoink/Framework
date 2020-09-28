@@ -8,6 +8,9 @@ namespace Of;
 use Of\Route\Router;
 use Of\Http\Request;
 
+defined('DS') ? null : define("DS", DIRECTORY_SEPARATOR);
+defined('ROOT') ? null : define("ROOT", dirname(dirname(dirname(__DIR__))) );
+
 class Application {
 	
 	/*
@@ -37,7 +40,6 @@ class Application {
 	
 	public function __construct($Router=null, $Request=null, $config=null){
 		$this->_di = new \Of\Std\Di();
-		
 		$this->_router = $Router;
 		$this->_request = $Request;
 		$this->config = $config;
