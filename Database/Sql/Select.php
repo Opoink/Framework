@@ -7,7 +7,7 @@ namespace Of\Database\Sql;
 
 class Select {
 
-    public $query = ["SELECT"];
+    // public $query = ["SELECT"];
     
     public $columns = [];
     public $tableName = [];
@@ -34,20 +34,47 @@ class Select {
      * @param $colNames either string or array
      * return this instance
      */
-    public function select($colNames){
+    public function select($colNames=null, $keyValPair=true){
         if(is_string($colNames)){
             $this->columns[] = "`".$colNames."`";
         }
         elseif(is_array($colNames)){
             foreach($colNames as $key => $value){
-                $_key = str_replace('.', '`.`', $key);
-                $this->columns[] = "`".$_key."` AS `".$value."`";
+                if($keyValPair){
+                    if(!empty($value)){
+                        $_keys = explode('.', $key);
+
+                        if(count($_keys) > 1){
+                            $col = "`".$_keys[0]."`";
+
+                            if($_keys[1] == "*"){
+                                $col .= ".*";
+                            } else {
+                                $col .= ".`".$_keys[1]."` AS `".$value."`";
+                            }
+                            $this->columns[] = $col;
+                        } else {
+                            $this->columns[] = "`".$key."` AS `" . $value . "`";
+                        }
+                    }
+                    else {
+                        $this->columns[] = "`".$key."`";
+                    }
+                } else {
+                    $this->columns[] = "`".$value."`";
+                }
             }
+        }
+        else {
+            $this->columns[] = "*";
         }
         return $this;
     }
 
-    public function getLastQuery(){
+    /**
+     * return query query string
+     */
+    public function getQuery(){
         $query = "SELECT ";
         $query .= $this->getColumns();
         $query .= $this->getFrom();
