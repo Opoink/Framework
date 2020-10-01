@@ -13,17 +13,20 @@ class Entity {
     protected $primaryKey;
 
     protected $_connection;
-    public $_select;
+    public $_di;
     
     public function __construct(
-        \Of\Database\Connection $Connection,
-        \Of\Database\Sql\Select $Select
+        \Of\Database\Connection $Connection
     ){
         $this->_connection = $Connection;
-        $this->_select = $Select;
+        $this->_di = new \Of\Std\Di();
     }
 
     public function getConnection(){
         return $this->_connection->getConnection();
+    }
+
+    public function getSelect(){
+        return $this->_di->make('\Of\Database\Sql\Select');
     }
 }

@@ -7,26 +7,18 @@ namespace Of\Database\Sql;
 
 class Select {
 
-    // public $query = ["SELECT"];
-    
-    public $columns = [];
-    public $tableName = [];
+    public $_fromStatement;
+    public $_columnStatement;
+    public $_whereStatement;
 
-    /**
-     * set the table name where to fetch data from database
-     * @param $tableName either string or array
-     * return this instance
-     */
-    public function from($tableName){
-        if(is_string($tableName)){
-            $this->tableName[] = "`".$tableName."`";
-        }
-        elseif(is_array($tableName)){
-            foreach($tableName as $key => $value){
-                $this->tableName[] = "`".$key."` AS `".$value."`";
-            }
-        }
-        return $this;
+    public function __construct(
+        \Of\Database\Sql\Statements\From $From,
+        \Of\Database\Sql\Statements\Column $Column,
+        \Of\Database\Sql\Statements\Where $Where
+    ){
+        $this->_fromStatement = $From;
+        $this->_columnStatement = $Column;
+        $this->_whereStatement = $Where;
     }
 
     /**
@@ -34,40 +26,27 @@ class Select {
      * @param $colNames either string or array
      * return this instance
      */
-    public function select($colNames=null, $keyValPair=true){
-        if(is_string($colNames)){
-            $this->columns[] = "`".$colNames."`";
-        }
-        elseif(is_array($colNames)){
-            foreach($colNames as $key => $value){
-                if($keyValPair){
-                    if(!empty($value)){
-                        $_keys = explode('.', $key);
+    public function select($colNames=null){
+        $this->_columnStatement->parseValue($colNames);
+        return $this;
+    }
 
-                        if(count($_keys) > 1){
-                            $col = "`".$_keys[0]."`";
+    /**
+     * set the table name where to fetch data from database
+     * @param $tableName either string or array
+     * return this instance
+     */
+    public function from($tableName){
+        $this->_fromStatement->parseValue($tableName);
+        return $this;
+    }
 
-                            if($_keys[1] == "*"){
-                                $col .= ".*";
-                            } else {
-                                $col .= ".`".$_keys[1]."` AS `".$value."`";
-                            }
-                            $this->columns[] = $col;
-                        } else {
-                            $this->columns[] = "`".$key."` AS `" . $value . "`";
-                        }
-                    }
-                    else {
-                        $this->columns[] = "`".$key."`";
-                    }
-                } else {
-                    $this->columns[] = "`".$value."`";
-                }
-            }
-        }
-        else {
-            $this->columns[] = "*";
-        }
+    /**
+     * add filter where to sql query
+     * @param string
+     */
+    public function where($where, $condition, $value){
+        $this->_whereStatement->where($where, $condition, $value);
         return $this;
     }
 
@@ -76,22 +55,12 @@ class Select {
      */
     public function getQuery(){
         $query = "SELECT ";
-        $query .= $this->getColumns();
-        $query .= $this->getFrom();
+        $query .= $this->_columnStatement->getColumns();
+        $query .= $this->_fromStatement->getFrom();
 
         echo $query;
         die;
     }
 
-    protected function getColumns(){
-        if(count($this->columns) > 0){
-            return implode(', ', $this->columns);
-        } else {
-            return "*";
-        }
-    }
-
-    protected function getFrom(){
-        return " FROM " . implode(', ', $this->tableName);
-    }
+    
 }
