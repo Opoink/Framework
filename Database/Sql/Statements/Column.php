@@ -10,9 +10,15 @@ class Column Extends \Of\Database\Sql\Statements\Statement {
 	public $columns = [];
 
     /**
+     * tells if the parseValue function if triggered 
+     */
+    public $isTriggered = false;
+
+    /**
      * parse value of of the columns name
      */
 	public function parseValue($colNames){
+        $this->isTriggered = true;
 		if(is_string($colNames)){
             $this->columns[] = $this->parseStr($colNames);
         }
@@ -36,10 +42,14 @@ class Column Extends \Of\Database\Sql\Statements\Statement {
      * @return string
      */
     public function getColumns(){
-        if(count($this->columns) > 0){
-            return implode(', ', $this->columns);
+        if(!$this->isTriggered){
+            return '';
         } else {
-            return "*";
+            if(count($this->columns) > 0){
+                return implode(', ', $this->columns);
+            } else {
+                return "*";
+            }
         }
     }
 }

@@ -21,6 +21,16 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     public $where = [];
 
     /**
+     * prefix that will be appended on query for insecure data
+     */
+    public $valPrefix = '';
+
+    /**
+     * current value for variable of value
+     */
+    public $valVar = 'a';
+
+    /**
      * temporary string for where while waiting for 
      * its condition and value
      * where function will reset this variable
@@ -30,7 +40,7 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     /**
      * this will hold the value that was set into condition functions
      */
-    private $unsecureValue = [];
+    public $unsecureValue = [];
 
     /**
      * set the where tempory string before it goes into
@@ -70,9 +80,26 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      */
     public function addConVal($condition, $value){
         if(!empty($this->whereTmp)){
-            $this->whereTmp .= $condition . ' ?';
-            $this->addWhere($this->whereTmp);
-            $this->unsecureValue[] = $value;
+
+            if($value instanceof \Closure){
+                $di = new \Of\Std\Di();
+                $subquery = $di->get('\Of\Database\Sql\Select');
+                $value($subquery);
+
+                $this->whereTmp .= $condition . ' ';
+                $this->where[] = [
+                    'operator' => self::OPWHERE,
+                    'qry' => $this->whereTmp,
+                    'subquery' => $subquery
+                ];
+            } else {
+                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
+                $this->whereTmp .= $condition . ' ' . $insecureDataKey;
+                $this->addWhere($this->whereTmp);
+                $this->unsecureValue[$insecureDataKey] = $value;
+                $this->valVar++;
+            }
+
         }
     }
 
@@ -107,8 +134,10 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
             }
             $this->whereTmp .= $not . 'BETWEEN ? AND ?';
             $this->addWhere($this->whereTmp);
-            $this->unsecureValue[] = $from;
-            $this->unsecureValue[] = $to;
+
+            $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
+            $this->unsecureValue[$insecureDataKey] = $from;
+            $this->unsecureValue[$insecureDataKey] = $to;
         }
     }
 
@@ -156,13 +185,20 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     // }
 
     public function getWhere(){
-        // $qry = "";
-        // foreach ($this->where as $key => $value) {
-        //     $qry .= " " . $key . " " . $value . "";
-        // }
-        // return $qry;
-        var_dump($this->where);
-        var_dump($this->unsecureValue);
+        $qry = "";
+        foreach ($this->where as $key => $value) {
+            if(isset($value['subquery'])){
+                if($value['subquery'] instanceof \Of\Database\Sql\Select){
+                    $qry .= " " . $value['operator'] . " " . $value['qry'] . "(" . $value['subquery']->getQuery() . ")";
+                    foreach ($value['subquery']->_whereStatement->unsecureValue as $key => $value) {
+                        $this->unsecureValue[$key] = $value;
+                    }
+                }
+            } else {
+                $qry .= " " . $value['operator'] . " " . $value['qry'] . "";
+            }
+        }
+        return $qry;
     }
 }
 ?>

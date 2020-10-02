@@ -9,7 +9,13 @@ class From Extends \Of\Database\Sql\Statements\Statement {
 	
 	public $tableName = [];
 
+    /**
+     * tells if the parseValue function if triggered 
+     */
+    public $isTriggered = false;
+
 	public function parseValue($tableName){
+        $this->isTriggered = true;
 		if(is_string($tableName)){
             $this->tableName[] = "`".$tableName."`";
         }
@@ -29,7 +35,11 @@ class From Extends \Of\Database\Sql\Statements\Statement {
 	}
 
 	public function getFrom(){
-        return " FROM " . implode(', ', $this->tableName);
+        if($this->isTriggered){
+            return " FROM " . implode(', ', $this->tableName);
+        } else {
+            return '';
+        }
     }
 }
 ?>

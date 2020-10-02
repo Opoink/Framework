@@ -27,6 +27,7 @@ class Entity {
     }
 
     public function getSelect(){
-        return $this->_di->make('\Of\Database\Sql\Select');
+        $di = new \Of\Std\Di();
+        return $di->get('\Of\Database\Sql\Select');
     }
 }

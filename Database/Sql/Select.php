@@ -152,13 +152,15 @@ class Select {
      * return query query string
      */
     public function getQuery(){
-        $query = "SELECT ";
-        $query .= $this->_columnStatement->getColumns();
-        $query .= $this->_fromStatement->getFrom();
+        $query = "";
+        if($this->_columnStatement->isTriggered && $this->_fromStatement->isTriggered){
+            $query .= "SELECT ";
+            $query .= $this->_columnStatement->getColumns();
+            $query .= $this->_fromStatement->getFrom();
+        }
         $query .= $this->_whereStatement->getWhere();
 
-        echo $query;
-        die;
+        return  $query;
     }
 
     
