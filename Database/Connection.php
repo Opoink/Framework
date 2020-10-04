@@ -74,7 +74,7 @@ class Connection {
 
     public function getConnection(){
         if($this->connection){
-            return $this->connection->getConnection();
+            return $this->connection;
         } else {
             $this->setConfig()->connect();
             return $this->getConnection();

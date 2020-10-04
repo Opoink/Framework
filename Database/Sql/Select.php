@@ -52,6 +52,38 @@ class Select {
     }
 
     /**
+     * add sub select for the sql statement
+     * @param $value instance of object \Closure
+     * @param $addOperator either to add operator of not
+     * sample of operator is WHERE
+     */
+    public function group($value,  $addOperator=true){
+        if($value instanceof \Closure){
+            $this->_whereStatement->where('where');
+            $this->_whereStatement->addConVal('', $value, $addOperator);
+        } else {
+            throw new \Exception('calling on group select statement of none instanceof \Closure');
+        }
+        return $this;
+    }
+    
+    /**
+     * add sub select for the sql statement
+     * @param $value instance of object \Closure
+     * @param $addOperator either to add operator of not
+     * sample of operator is WHERE
+     */
+    public function orGroup($value,  $addOperator=true){
+        if($value instanceof \Closure){
+            $this->_whereStatement->orWhere('orWhere');
+            $this->_whereStatement->addConVal('', $value, $addOperator);
+        } else {
+            throw new \Exception('calling on orGroup select statement of none instanceof \Closure');
+        }
+        return $this;
+    }
+
+    /**
      * add the value equals condition from previous where statement
      * @param $value string
      */
@@ -143,25 +175,86 @@ class Select {
         return $this;
     }
 
-    public function orWhere($where, $condition, $value){
-        $this->_whereStatement->orWhere($where, $condition, $value);
+    /**
+     * add the like statement from previous where statement
+      * @param $values array
+     */
+    public function like($value){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::LIKE, $value);
+        return $this;
+    }
+
+    /**
+     * add the not like statement from previous where statement
+      * @param $values array
+     */
+    public function notLike($value){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::NOTLIKE, $value);
+        return $this;
+    }
+
+    /**
+     * add the is null statement from previous where statement
+     * @param $values array
+     */
+    public function isNull($isNull=true){
+        $this->_whereStatement->isNull($isNull);
+        return $this;
+    }
+
+    /**
+     * add or condition 
+     * @param $orwhere array
+     */ 
+    public function orWhere($orWhere){
+        $this->_whereStatement->orWhere($orWhere);
         return $this;
     }
 
     /**
      * return query query string
+     * @param $isSub boolean tells if the query is sub or not
      */
-    public function getQuery(){
+    public function getQuery($isSub=false){
         $query = "";
         if($this->_columnStatement->isTriggered && $this->_fromStatement->isTriggered){
             $query .= "SELECT ";
             $query .= $this->_columnStatement->getColumns();
             $query .= $this->_fromStatement->getFrom();
         }
-        $query .= $this->_whereStatement->getWhere();
+        $query .= $this->_whereStatement->getWhere($isSub);
 
         return  $query;
     }
 
-    
+    /*
+    *   return escaped string
+    */
+    protected function escape($string){
+        return addcslashes((string) $string, "\x00\n\r\\'\"\x1a");
+    }
+
+    /**
+     * return query query string unsercrured varialble is now change into its value
+     * @param $isSub boolean tells if the query is sub or not
+     */
+    public function getLastSqlQuery(){
+        $qry = $this->getQuery();
+
+        foreach ($this->_whereStatement->unsecureValue as $key => $value) {
+            $qry = str_replace($key, "'".$this->escape($value)."'", $qry);
+        }
+        return $qry;
+    }
+
+    /**
+     * dump the query include the unsecure data passed into sql query string
+     */
+    public function dumpQuery(){
+        echo "<pre>";
+        echo $this->getQuery() . PHP_EOL  . PHP_EOL;
+        echo $this->getLastSqlQuery() . PHP_EOL  . PHP_EOL;
+        print_r($this->_whereStatement->unsecureValue);
+        die;
+    }
 }

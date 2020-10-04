@@ -12,7 +12,11 @@ class Entity {
 	protected $tablename;
     protected $primaryKey;
 
+    /**
+     * instance of \Of\Database\Connection
+     */
     protected $_connection;
+
     public $_di;
     
     public function __construct(
@@ -29,5 +33,9 @@ class Entity {
     public function getSelect(){
         $di = new \Of\Std\Di();
         return $di->get('\Of\Database\Sql\Select');
+    }
+
+    public function fetchAll(\Of\Database\Sql\Select $select){
+        return $this->getConnection()->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
     }
 }

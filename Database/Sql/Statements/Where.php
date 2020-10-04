@@ -17,6 +17,10 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     const LTOE = '<=';
     const GT = '>';
     const GTOE = '>=';
+    const LIKE = 'LIKE';
+    const NOTLIKE = 'NOT LIKE';
+    const ISNULL = 'IS NULL';
+    const ISNOTNULL = 'IS NOT NULL';
 
     public $where = [];
 
@@ -26,7 +30,7 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     public $valPrefix = '';
 
     /**
-     * current value for variable of value
+     * current value for variable of value sample :a 
      */
     public $valVar = 'a';
 
@@ -36,6 +40,13 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      * where function will reset this variable
      */
     private $whereTmp = '';
+
+    /**
+     * temporary string for where while waiting for 
+     * its condition and value
+     * where function will reset this variable
+     */
+    private $orWhereTmp = '';
 
     /**
      * this will hold the value that was set into condition functions
@@ -52,23 +63,58 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     }
 
     /**
+     * find which where will be used either 
+     * whereTmp or orWhereTmp
+     * return string
+     */
+    private function getWhereOrWhereTmp(){
+        $tmp = '';
+        if(!empty($this->whereTmp) && empty($this->orWhereTmp)){
+            $tmp = $this->whereTmp;
+        }
+        elseif(empty($this->whereTmp) && !empty($this->orWhereTmp)){
+            $tmp = $this->orWhereTmp;
+        }
+        return $tmp;
+    }
+
+    /**
+     * return the operator to be used in SQL WHERE Clause 
+     */
+    private function getOperator(){
+        $operator = self::OPAND;
+        if(!empty($this->whereTmp) && empty($this->orWhereTmp)){
+            if(!count($this->where)){
+                $operator = self::OPWHERE;
+            }
+        }
+        elseif(empty($this->whereTmp) && empty(!$this->orWhereTmp)){
+            $operator = self::OPOR;
+        }
+
+        return $operator;
+    }
+
+    /**
      * add where condition for the query
      * if $where is an empty array means it is the start 
      * so it will add WHERE operator, else add AND operator instead
      * @param $qry string the field to be conditioned
      */
-    public function addWhere($qry){
-    	if(!count($this->where)){
-    		$this->where[] = [
-                'operator' => self::OPWHERE,
-                'qry' => $qry
-            ];
-    	} else {
-            $this->where[] = [
-                'operator' => self::OPAND,
-                'qry' => $qry
-            ];
-    	}
+    public function addWhere($qry, $subquery=null, $addOperator=true){
+        $where = [
+            'operator' => $addOperator ? $this->getOperator() : '',
+            'qry' => $qry
+        ];
+
+        if($subquery instanceof \Of\Database\Sql\Select){
+            $where['subquery'] = $subquery;
+        }
+
+        $this->where[] = $where;
+
+        $this->whereTmp = '';
+        $this->orWhereTmp = '';
     }
 
     /**
@@ -78,29 +124,39 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      * @param $condition string
      * @param $value string 
      */
-    public function addConVal($condition, $value){
-        if(!empty($this->whereTmp)){
+    public function addConVal($condition, $value, $addOperator=true){
+        $tmp = $this->getWhereOrWhereTmp();
+
+        if(!empty($tmp)){
 
             if($value instanceof \Closure){
-                $di = new \Of\Std\Di();
-                $subquery = $di->get('\Of\Database\Sql\Select');
+                $subquery = $this->getSubSelect();
                 $value($subquery);
-
-                $this->whereTmp .= $condition . ' ';
-                $this->where[] = [
-                    'operator' => self::OPWHERE,
-                    'qry' => $this->whereTmp,
-                    'subquery' => $subquery
-                ];
+                $tmp .= $condition . ' ';
+                $this->addWhere($tmp, $subquery, $addOperator);
             } else {
-                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
-                $this->whereTmp .= $condition . ' ' . $insecureDataKey;
-                $this->addWhere($this->whereTmp);
+                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
+                $tmp .= $condition . ' ' . $insecureDataKey;
+                $this->addWhere($tmp);
                 $this->unsecureValue[$insecureDataKey] = $value;
                 $this->valVar++;
             }
-
         }
+    }
+
+    /**
+     * retun new instance of \Of\Database\Sql\Select
+     */ 
+    private function getSubSelect(){
+        $di = new \Of\Std\Di();
+        $subquery = $di->get('\Of\Database\Sql\Select');
+        if($this->valPrefix == ''){
+            $this->valPrefix = 'a';
+        } else {
+            $this->valPrefix++;
+        }
+        $subquery->_whereStatement->valPrefix = $this->valPrefix;
+        return $subquery;
     }
 
     /**
@@ -132,12 +188,18 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
             if($between){
                 $not = '';
             }
-            $this->whereTmp .= $not . 'BETWEEN ? AND ?';
-            $this->addWhere($this->whereTmp);
+
+            $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
+            $this->whereTmp .= $not . 'BETWEEN '.$insecureDataKey.' AND ';
+            $this->unsecureValue[$insecureDataKey] = $from;
+            $this->valVar++;
 
             $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
-            $this->unsecureValue[$insecureDataKey] = $from;
+            $this->whereTmp .= $insecureDataKey;
             $this->unsecureValue[$insecureDataKey] = $to;
+            $this->valVar++;
+
+            $this->addWhere($this->whereTmp);
         }
     }
 
@@ -164,38 +226,74 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
                 $not = '';
             }
 
-            $qry = $not . "IN (";
+            if($values instanceof \Closure){
+                // $subquery = $this->getSubSelect();
+                // $value($subquery);
 
-            $vals = [];
-            foreach ($values as $key => $value) {
-                $vals[] = '"?"';
-                $this->unsecureValue[] = $value;
+                // $tmp .= $condition . ' ';
+
+                // $this->where[] = [
+                //     'operator' => $operator,
+                //     'qry' => $tmp,
+                //     'subquery' => $subquery
+                // ];
+
+                // $this->whereTmp = '';
+                // $this->orWhereTmp = '';
+            } else {
+                $qry = $not . "IN (";
+                $vals = [];
+                foreach ($values as $key => $value) {
+                    $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
+                    $vals[] = $insecureDataKey;
+                    $this->unsecureValue[$insecureDataKey] = $value;
+                    $this->valVar++;
+                }
+
+                $qry .= implode(', ', $vals);
+                $qry .= ")";
+                $this->whereTmp .= $qry;
+                $this->addWhere($this->whereTmp);
             }
-
-            $qry .= implode(', ', $vals);
-            $qry .= ")";
-            $this->whereTmp .= $qry;
-            $this->addWhere($this->whereTmp);
         }
     }
 
-    // public function orWhere($where, $condition, $value) {
-    //     $qry = $this->parseStr($where) . ' ' . $condition . " '" . $value . "'";
-    //     $this->where[self::OPOR] = $qry;
-    // }
+    public function isNull($isNull){
+        if($isNull == true){
+            $this->whereTmp .= self::ISNULL;
+        } else {
+            $this->whereTmp .= self::ISNOTNULL;
+        }
+        $this->addWhere($this->whereTmp);
+    }
 
-    public function getWhere(){
+    public function orWhere($orWhere) {
+        $this->orWhereTmp = $this->parseStr($orWhere) . ' ';
+    }
+
+    public function getWhere($isSub=false){
         $qry = "";
         foreach ($this->where as $key => $value) {
             if(isset($value['subquery'])){
                 if($value['subquery'] instanceof \Of\Database\Sql\Select){
-                    $qry .= " " . $value['operator'] . " " . $value['qry'] . "(" . $value['subquery']->getQuery() . ")";
+                   
+                    $qry .= " " . $value['operator'];
+
+                    if($value['subquery']->_columnStatement->isTriggered && $value['subquery']->_fromStatement->isTriggered){
+                        $qry .= " " . $value['qry'] . "(" . $value['subquery']->getQuery() . ")";
+                    } else {
+                        $qry .= " (" . $value['subquery']->getQuery(true) . ") ";
+                    }
                     foreach ($value['subquery']->_whereStatement->unsecureValue as $key => $value) {
                         $this->unsecureValue[$key] = $value;
                     }
                 }
             } else {
-                $qry .= " " . $value['operator'] . " " . $value['qry'] . "";
+                if($isSub && $key < 1){
+                    $qry .= " " . $value['qry'] . " ";
+                } else {
+                    $qry .= " " . $value['operator'] . " " . $value['qry'] . " ";
+                }
             }
         }
         return $qry;

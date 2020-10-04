@@ -27,5 +27,13 @@ class PdoDriver {
     public function getConnection(){
         return $this->connection;
     }
+
+
+    public function fetchAll($sql, $unsecured=[]){
+        $sth = $this->getConnection()->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+        $sth->execute($unsecured);
+        $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+        return  $result;
+    }
 }
 ?>
