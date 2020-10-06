@@ -38,4 +38,17 @@ class Entity {
     public function fetchAll(\Of\Database\Sql\Select $select){
         return $this->getConnection()->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
     }
+
+    public function count(\Of\Database\Sql\Select $select, $col = null, $alias=''){
+        $_select = clone $select;
+        $_select->count($col, $alias);
+        $count = $this->fetchAll($_select);
+        $_select->dumpQuery();
+        if(count($count)){
+            $count = $count[0];
+            return $count;
+        } else {
+            return null;
+        }
+    }
 }

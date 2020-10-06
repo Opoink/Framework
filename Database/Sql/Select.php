@@ -11,6 +11,22 @@ class Select {
     public $_columnStatement;
     public $_whereStatement;
 
+    /**
+	 * to make query distinct
+     */
+    protected $distinct = '';
+
+    /**
+     * this tells if the query is a count or not
+     */
+    protected $count;
+
+    /**
+     * hold the value of min and max statement
+     * string
+     */
+    protected $minmax = '';
+
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
         \Of\Database\Sql\Statements\Column $Column,
@@ -29,6 +45,59 @@ class Select {
     public function select($colNames=null){
         $this->_columnStatement->parseValue($colNames);
         return $this;
+    }
+
+    /**
+     * select distinct
+     */
+    public function distinct(){
+    	$this->distinct = 'DISTINCT ';
+    	return $this;
+    }
+
+    /**
+     * select count
+     * @param $col the column name to counted
+     */
+    public function count($col=null, $alias=''){
+    	if(!$col){
+    		$this->count = ' count(*)';
+    	} else {
+    		$this->count = ' count(DISTINCT '.$this->_whereStatement->parseStr($col).')';
+    	}
+
+    	if(!empty($alias)){
+    		$this->count .=  ' AS `'.$alias.'`';
+    	}
+    	return $this;
+    }
+
+    /**
+     * max statement
+     */ 
+    public function max($col, $alias=''){
+    	$this->minMax('MAX', $col, $alias);
+    	return $this;
+    }
+
+    /**
+     * min statement
+     */ 
+    public function min($col, $alias=''){
+    	$this->minMax('MIN', $col, $alias);
+    	return $this;
+    }
+
+    /**
+     * set min and max column
+     */
+    public function minMax($type, $col, $alias=''){
+    	$this->minmax = $type."(".$this->_whereStatement->parseStr($col).") ";
+
+    	if(!empty($alias)){
+    		$this->count .=  'AS `'.$alias.'` ';
+    	}
+    	return $this;
     }
 
     /**
@@ -219,8 +288,23 @@ class Select {
         $query = "";
         if($this->_columnStatement->isTriggered && $this->_fromStatement->isTriggered){
             $query .= "SELECT ";
-            $query .= $this->_columnStatement->getColumns();
-            $query .= $this->_fromStatement->getFrom();
+            
+            if($this->count){
+            	$query .= $this->count;
+            }
+            elseif($this->minmax){
+            	$query .= $this->minmax;
+            } else {
+            	$query .= $this->distinct;
+	            $query .= $this->_columnStatement->getColumns();
+            }
+
+            // if($this->count){
+            // 	$query .= $this->count;
+            // } else {
+	           //  $query .= $this->_columnStatement->getColumns();
+            // }
+        	$query .= $this->_fromStatement->getFrom();
         }
         $query .= $this->_whereStatement->getWhere($isSub);
 
@@ -255,6 +339,5 @@ class Select {
         echo $this->getQuery() . PHP_EOL  . PHP_EOL;
         echo $this->getLastSqlQuery() . PHP_EOL  . PHP_EOL;
         print_r($this->_whereStatement->unsecureValue);
-        die;
     }
 }
