@@ -50,7 +50,7 @@ class Connection {
         } else {
             $configFile = ROOT.DS.'etc'.DS.'database.php';
             if(file_exists($configFile)){
-                $this->config = require_once($configFile);
+                $this->config = include($configFile);
             }
         }
         return $this;
@@ -79,6 +79,17 @@ class Connection {
             $this->setConfig()->connect();
             return $this->getConnection();
         }
+    }
+
+    /**
+     * return table name
+     * with prefix if set 
+     */
+    public function getTablename($tableName){
+        if(!$this->config['driver']){
+            $this->setConfig();
+        }
+        return $this->config['table_prefix'] . $tableName;
     }
 }
 ?>

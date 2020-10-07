@@ -27,6 +27,11 @@ class Select {
      */
     protected $minmax = '';
 
+    /**
+     * limit of data to be fetched
+     */
+    protected $limit = '';
+
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
         \Of\Database\Sql\Statements\Column $Column,
@@ -281,6 +286,15 @@ class Select {
     }
 
     /**
+     * add limit statement 
+     * @limit $orwhere array
+     */
+    public function limit($limit=10){
+        $this->limit = ' LIMIT ' . $limit . ' ';
+        return $this;
+    }
+
+    /**
      * return query query string
      * @param $isSub boolean tells if the query is sub or not
      */
@@ -299,14 +313,11 @@ class Select {
 	            $query .= $this->_columnStatement->getColumns();
             }
 
-            // if($this->count){
-            // 	$query .= $this->count;
-            // } else {
-	           //  $query .= $this->_columnStatement->getColumns();
-            // }
         	$query .= $this->_fromStatement->getFrom();
         }
         $query .= $this->_whereStatement->getWhere($isSub);
+
+        $query .= $this->limit;
 
         return  $query;
     }
