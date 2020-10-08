@@ -35,5 +35,25 @@ class PdoDriver {
         $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
         return  $result;
     }
+
+    public function insert($tablename, $data){
+        $insert = new \Of\Database\Sql\Insert();
+        $qry = $insert->prepareData($data)->insert($tablename);
+
+        $dbh = $this->getConnection();
+        $tmt  = $dbh->prepare($qry);
+
+        try {
+            $dbh->beginTransaction();
+            $tmt->execute($insert->unsecureValue);
+            $lastId = $dbh->lastInsertId(); 
+            $dbh->commit();
+
+            return $lastId;
+        }catch (\Exception $e){
+            $dbh->rollback();
+            throw $e;
+        }
+    }
 }
 ?>

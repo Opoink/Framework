@@ -134,4 +134,40 @@ class Entity {
 
         return null;
     }
+
+    public function removeData($key){
+        if(isset($this->data[$key])){
+            unset($this->data[$key]);
+        }
+    }
+
+    public function save(){
+        $columns = get_class($this)::COLUMNS;
+        $data = $this->data;
+
+        $d = [];
+        foreach($data as $key => $val){
+            if(in_array($key, $columns)){
+                $d[$key] = $val;
+            }
+        }
+        if(count($d) > 0){
+            if(isset($d[$this->primaryKey])){
+                var_dump($d);
+                die;
+            } else {
+                return $this->getConnection()->insert($this->getTablename(), $d);
+            }
+        }
+    }
+
+    /**
+     * insert new data into database
+     * or update database instead
+     * @param key value pair
+     */
+    public function insert($param){
+        var_dump($param);
+        die;
+    }
 }
