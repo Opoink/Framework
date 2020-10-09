@@ -11,6 +11,7 @@ class Entity {
 	
 	protected $tablename;
     protected $primaryKey;
+    protected $_request;
 
     protected $data = [];
 
@@ -22,21 +23,40 @@ class Entity {
     public $_di;
     
     public function __construct(
-        \Of\Database\Connection $Connection
+        \Of\Database\Connection $Connection,
+        \Of\Http\Request $Request
     ){
         $this->_connection = $Connection;
         $this->_di = new \Of\Std\Di();
+        $this->_request = $Request;
     }
 
+    /**
+     * return the current connect
+     */
     public function getConnection(){
         return $this->_connection->getConnection();
     }
 
+    /**
+     * return instance of \Of\Std\Pagination
+     */
+    protected function getPagination(){
+        return $this->_di->make('\Of\Std\Pagination');
+    }
+
+    /**
+     * return new instance of select
+     */
     public function getSelect(){
         $di = new \Of\Std\Di();
         return $di->get('\Of\Database\Sql\Select');
     }
 
+    /**
+     * fetch all data
+     * @param $select instance of \Of\Database\Sql\Select
+     */
     public function fetchAll(\Of\Database\Sql\Select $select){
         $data = $this->getConnection()->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
         return $this->setCollection($data);
@@ -64,23 +84,23 @@ class Entity {
         return $result;
     }
 
+    /**
+     * return the tototal count
+     * @param $select instance of \Of\Database\Sql\Select
+     * @param $col field name from database
+     * @alias $col alias to be used for the result
+     */
     public function count(\Of\Database\Sql\Select $select, $col = null, $alias=''){
         $_select = clone $select;
         $_select->count($col, $alias);
         $count = $this->fetchAll($_select);
-        $_select->dumpQuery();
-        if(count($count)){
-            $count = $count[0];
-            return $count;
-        } else {
-            return null;
-        }
+        return $count->getData($alias);
     }
 
-    /*
-    *   return table name
-    *   with prefix if set 
-    */
+    /**
+     * return table name
+     * with prefix if set 
+     */
     public function getTablename($tableName=null){
         if(!$tableName) {
             $tn = $this->tablename;
@@ -153,8 +173,8 @@ class Entity {
         }
         if(count($d) > 0){
             if(isset($d[$this->primaryKey])){
-                var_dump($d);
-                die;
+                $this->updateByColumn(['id' => $d[$this->primaryKey]], $d);
+                return $d[$this->primaryKey];
             } else {
                 return $this->getConnection()->insert($this->getTablename(), $d);
             }
@@ -162,12 +182,63 @@ class Entity {
     }
 
     /**
-     * insert new data into database
-     * or update database instead
-     * @param key value pair
+     * update table by its column
+     * @param col array key value pair to set in where statement
      */
-    public function insert($param){
-        var_dump($param);
-        die;
+    public function updateByColumn($cols, $data){
+        $rowCount = $this->getConnection()->update($this->getSelect(), $cols, $data, $this->getTablename());
+        return $rowCount;
+    }
+
+    /**
+     * check if the returned data is an instance of the 
+     * current class (entity)
+     */
+    protected function isInstance($val){
+        $class =  get_class($this);
+        return $val instanceof $class;
+    }
+
+    /**
+     * return paginated data
+     * @param $select instance of \Of\Database\Sql\Select
+     */
+    public function getFinalResponse(\Of\Database\Sql\Select $select){
+        $count = (int)$this->count($select, 'id', 'count');
+
+        $page = (int)$this->_request->getParam('page');
+        if(!$page){
+            $page = 1;
+        }
+
+        $limit = (int)$this->_request->getParam('limit');
+        if(!$limit){
+            $limit = 10;
+        }
+
+        $pagination = $this->getPagination();
+        $pagination->set($page, $count, $limit);
+
+        $select->offset($pagination->offset())
+        ->limit($limit);
+
+        $data = $this->fetchAll($select);
+
+        $o = [
+            'total_count' => $count,
+            'total_page' => $pagination->total_pages(),
+            'current_page' => $pagination->currentPage(),
+            'per_page' => $select->_limit,
+            'data' => []
+        ];
+
+        if($this->isInstance($data)){
+            $o['data'][] = $data->getData();
+        } else {
+            foreach ($data as $key => $value) {
+                $o['data'][] = $value->getData();
+            }
+        }
+        return $o;
     }
 }

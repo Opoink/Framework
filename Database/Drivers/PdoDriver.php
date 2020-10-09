@@ -55,5 +55,32 @@ class PdoDriver {
             throw $e;
         }
     }
+    /**
+     * prepare query and try to update entry
+     * @param $select instance of \Of\Database\Sql\Select
+     */
+    public function update(\Of\Database\Sql\Select $select, $fields, $data, $tablename){
+        $update = new \Of\Database\Sql\Update();
+        foreach ($fields as $key => $field) {
+            $select->where($key)->eq($field);
+        }
+
+        $qry = $update->prepareData($data)->updateQry($tablename, $select);
+
+        $dbh = $this->getConnection();
+        $tmt  = $dbh->prepare($qry);
+
+        try {
+            $dbh->beginTransaction();
+            $tmt->execute($update->unsecureValue);
+            $rowCount = $tmt->rowCount(); 
+            $dbh->commit();
+
+            return $rowCount;
+        }catch (\Exception $e){
+            $dbh->rollback();
+            throw $e;
+        }
+    }
 }
 ?>

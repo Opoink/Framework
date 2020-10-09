@@ -28,9 +28,24 @@ class Select {
     protected $minmax = '';
 
     /**
-     * limit of data to be fetched
+     * limit of data to be fetched string ex: LIMIT 10
      */
-    protected $limit = '';
+    public $limit = '';
+
+    /**
+     * limit of data to be fetched integere
+     */
+    public $_limit = 0;
+
+    /**
+     * offset of data to be fetched string ex: OFFSET 10
+     */
+    public $offset = '';
+
+    /**
+     * order by
+     */
+    public $orderBy = '';
 
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
@@ -287,11 +302,47 @@ class Select {
 
     /**
      * add limit statement 
-     * @limit $orwhere array
+     * @param $limit int
      */
-    public function limit($limit=10){
-        $this->limit = ' LIMIT ' . $limit . ' ';
+    public function limit($_limit){
+        $limit = (int)$_limit;
+        if($limit){
+            $this->limit = ' LIMIT ' . $limit . ' ';
+            $this->_limit = $limit;
+        }
         return $this;
+    }
+
+    /**
+     * add offset statement 
+     * @param $_offset array
+     */
+    public function offset($_offset){
+        $offset = (int)$_offset;
+        $this->offset = ' OFFSET ' . $offset . ' ';
+        return $this;
+    }
+
+    /**
+     * add offset statement 
+     * @param $by array || string
+     * @param $criterion string ASC or DESC
+     */
+    public function orderBy($by, $criterion='ASC'){
+        $qry = ' ORDER BY ';
+        if(is_string($by)){
+            $qry .= $this->_whereStatement->parseStr($by);
+        } else {
+            $this->_fromStatement->isAssociative($by);
+        }
+
+        $c = strtoupper($criterion);
+        if($c == 'ASC' || $c == 'DESC'){
+            $qry .= ' ' . $c . ' ';
+        } else {
+            $qry .= ' ASC ';
+        }
+        $this->orderBy = $qry;
     }
 
     /**
@@ -316,8 +367,10 @@ class Select {
         	$query .= $this->_fromStatement->getFrom();
         }
         $query .= $this->_whereStatement->getWhere($isSub);
-
+        
+        $query .= $this->orderBy;
         $query .= $this->limit;
+        $query .= $this->offset;
 
         return  $query;
     }
