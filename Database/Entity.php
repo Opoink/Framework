@@ -229,6 +229,7 @@ class Entity {
             'total_page' => $pagination->total_pages(),
             'current_page' => $pagination->currentPage(),
             'per_page' => $select->_limit,
+            'pages' => $pagination->pages(),
             'data' => []
         ];
 
