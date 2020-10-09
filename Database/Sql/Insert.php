@@ -36,6 +36,10 @@ class Insert Extends \Of\Database\Sql\Statements\Statement {
         return $this;
 	}
 
+	/**
+	 * build the insert query 
+	 * return qry string
+	 */
 	public function insert($tableName){
 		$qry = "INSERT INTO " . $this->parseStr($tableName);
 		$qry .= "(". implode(', ', $this->fields) .")";
