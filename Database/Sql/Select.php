@@ -10,6 +10,7 @@ class Select {
     public $_fromStatement;
     public $_columnStatement;
     public $_whereStatement;
+    public $_joinStatement;
 
     /**
 	 * to make query distinct
@@ -50,11 +51,13 @@ class Select {
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
         \Of\Database\Sql\Statements\Column $Column,
-        \Of\Database\Sql\Statements\Where $Where
+        \Of\Database\Sql\Statements\Where $Where,
+        \Of\Database\Sql\Statements\JoinTable $JoinTable
     ){
         $this->_fromStatement = $From;
         $this->_columnStatement = $Column;
         $this->_whereStatement = $Where;
+        $this->_joinStatement = $JoinTable;
     }
 
     /**
@@ -344,6 +347,31 @@ class Select {
         }
         $this->orderBy = $qry;
     }
+
+    /**
+     * @param $tableName the table name to add in query as join
+     * @param $alias string
+     * @param $joinType either INNER, LEFT, RIGHT, FULL OUTER
+     */
+    public function join($tableName, $alias=null, $joinType="INNER"){
+        $this->_joinStatement->join($tableName, $alias, $joinType);
+        return $this;
+    }
+
+    public function onJoin($field1, $field2, $condition="="){
+        $this->_joinStatement->onJoin($field1, $field2, $condition="=");
+        return $this;
+    }
+
+	public function andJoin($field1, $field2, $condition="="){
+		$this->_joinStatement->andJoin($field1, $field2, $condition);
+		return $this;
+	}
+
+	public function orJoin($field1, $field2, $condition="="){
+		$this->_joinStatement->orJoin($field1, $field2, $condition);
+		return $this;
+	}
 
     /**
      * return query query string
