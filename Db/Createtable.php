@@ -307,14 +307,22 @@ class Createtable {
 	
 	public function addForeignKey($tableName, $column, $referenceTableName, $referenceColumn){	
 		$query = "ALTER TABLE `".$this->getTablename($tableName)."` ";
-		$query .= "ADD FOREIGN KEY (`".$column."`) REFERENCES ".$this->getTablename($referenceTableName)."(`".$referenceColumn."`); ";
+		$query .= "ADD FOREIGN KEY (`".$column."`) REFERENCES ".$this->getTablename($referenceTableName)."(`".$referenceColumn."`) ";
+		$query .= ' ON DELETE CASCADE;';
 		$this->save($query);
 	}
 	
-	public function saveUpdate(){	
-		$query = "ALTER TABLE `".$this->getTablename()."` ";
-		$query .= "ADD ".implode(', ', $this->columns).";";
-		$this->save($query);
+	public function saveUpdate($after=null){	
+		$cols = $this->columns;
+		foreach ($cols as $key => $value) {
+			$query = "ALTER TABLE `".$this->getTablename()."` ";
+			$a = '';
+			if($after){
+				$a = ' AFTER `'.$after.'` ';
+			}
+			$query .= "ADD " . $value . $a .";";
+			$this->save($query);
+		}
 	}
 	
 	public function save($query=null){
