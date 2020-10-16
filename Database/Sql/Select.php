@@ -346,6 +346,7 @@ class Select {
             $qry .= ' ASC ';
         }
         $this->orderBy = $qry;
+        return $this;
     }
 
     /**

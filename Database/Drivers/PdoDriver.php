@@ -55,6 +55,7 @@ class PdoDriver {
             throw $e;
         }
     }
+
     /**
      * prepare query and try to update entry
      * @param $select instance of \Of\Database\Sql\Select
@@ -68,12 +69,33 @@ class PdoDriver {
         $qry = $update->prepareData($data)->updateQry($tablename, $select);
 
         $dbh = $this->getConnection();
-        $tmt  = $dbh->prepare($qry);
+        $stmt  = $dbh->prepare($qry);
 
         try {
             $dbh->beginTransaction();
-            $tmt->execute($update->unsecureValue);
-            $rowCount = $tmt->rowCount(); 
+            $stmt->execute($update->unsecureValue);
+            $rowCount = $stmt->rowCount(); 
+            $dbh->commit();
+
+            return $rowCount;
+        }catch (\Exception $e){
+            $dbh->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * prepare query and try to update entry
+     * @param $select instance of \Of\Database\Sql\DeleteStatement
+     */
+    public function _delete(\Of\Database\Sql\DeleteStatement $delete){
+        $dbh = $this->getConnection();
+        $qry = $delete->getQuery();
+        $stmt = $dbh->prepare($qry);
+        try {
+            $dbh->beginTransaction();
+            $stmt->execute($delete->_whereStatement->unsecureValue);
+            $rowCount = $stmt->rowCount(); 
             $dbh->commit();
 
             return $rowCount;

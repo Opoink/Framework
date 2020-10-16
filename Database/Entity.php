@@ -54,6 +54,13 @@ class Entity {
     }
 
     /**
+     * return new instance of DeleteStatement
+     */
+    public function getDelete(){
+        return $this->_di->make('\Of\Database\Sql\DeleteStatement');
+    }
+
+    /**
      * fetch all data
      * @param $select instance of \Of\Database\Sql\Select
      */
@@ -161,6 +168,11 @@ class Entity {
         }
     }
 
+    /**
+     * save new entry or update existing one
+     * if the primary key is set 
+     * will update the exisitng entry
+     */
     public function save(){
         $columns = get_class($this)::COLUMNS;
         $data = $this->data;
@@ -173,7 +185,7 @@ class Entity {
         }
         if(count($d) > 0){
             if(isset($d[$this->primaryKey])){
-                $this->updateByColumn(['id' => $d[$this->primaryKey]], $d);
+                $this->updateByColumn([$this->primaryKey => $d[$this->primaryKey]], $d);
                 return $d[$this->primaryKey];
             } else {
                 return $this->getConnection()->insert($this->getTablename(), $d);
@@ -188,6 +200,37 @@ class Entity {
     public function updateByColumn($cols, $data){
         $rowCount = $this->getConnection()->update($this->getSelect(), $cols, $data, $this->getTablename());
         return $rowCount;
+    }
+
+    /**
+     * delete an entry from database, based on current data primary key
+     */
+    public function _delete(){
+        $data = $this->data;
+
+        $rows = null;
+        if(isset($data[$this->primaryKey])){
+            $rows = $this->deleteByColumn([$this->primaryKey => $data[$this->primaryKey]]);
+        }
+        return $rows;
+    }
+
+    /**
+     * delete entry from database with current Entity table name
+     * @param $cols, array key value pair
+     */
+    public function deleteByColumn($cols){
+        $delete = $this->getDelete();
+
+        $mainTable = $this->getTablename();
+        $delete->from($mainTable);
+
+        foreach ($cols as $key => $col) {
+            $delete->where($key)->eq($col);
+        }
+        $rows = $this->getConnection()->_delete($delete);
+
+        return $rows;
     }
 
     /**
