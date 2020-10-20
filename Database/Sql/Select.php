@@ -360,7 +360,7 @@ class Select {
     }
 
     public function onJoin($field1, $field2, $condition="="){
-        $this->_joinStatement->onJoin($field1, $field2, $condition="=");
+        $this->_joinStatement->onJoin($field1, $field2, $condition);
         return $this;
     }
 
@@ -373,6 +373,15 @@ class Select {
 		$this->_joinStatement->orJoin($field1, $field2, $condition);
 		return $this;
 	}
+
+    public function joinGroup($value){
+        if($value instanceof \Closure){
+            $this->_joinStatement->joinGroup($value);
+        } else {
+            throw new \Exception('calling on joinGroup statement of none instanceof \Closure');
+        }
+        return $this;
+    }
 
     /**
      * return query query string
@@ -394,7 +403,10 @@ class Select {
             }
 
         	$query .= $this->_fromStatement->getFrom();
+            $query .= $this->_joinStatement->getJoinQry();
         }
+        
+
         $query .= $this->_whereStatement->getWhere($isSub);
         
         $query .= $this->orderBy;

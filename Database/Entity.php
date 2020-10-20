@@ -247,7 +247,7 @@ class Entity {
      * @param $select instance of \Of\Database\Sql\Select
      */
     public function getFinalResponse(\Of\Database\Sql\Select $select){
-        $count = (int)$this->count($select, 'id', 'count');
+        $count = (int)$this->count($select, $this->getTablename() . '.' . $this->primaryKey, 'count');
 
         $page = (int)$this->_request->getParam('page');
         if(!$page){

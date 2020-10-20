@@ -15,7 +15,7 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 	/**
 	 * holds the string from joins
 	 */
-	protected $joins = [];
+	public $joins = [];
 
 	/**
 	 * temporary string for join statement
@@ -36,13 +36,14 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 				$qry .= ' AS ' . $this->parseStr($alias);
 			}
 		}
-
 		$this->joinTmp = $qry;
+		return $this;
 	}
 
 	public function onJoin($field1, $field2, $condition="="){
 		$this->joinHelper(self::OPON, $field1, $field2, $condition);
 		$this->joinTmp = '';
+		return $this;
 	}
 
 	public function andJoin($field1, $field2, $condition="="){
@@ -52,6 +53,7 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 			'type' => self::OPAND,
 			'field' => $this->parseStr($field1) . ' '.$condition.' ' . $this->parseStr($field2)
 		];
+		return $this;
 	}
 
 	public function orJoin($field1, $field2, $condition="="){
@@ -61,10 +63,33 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 			'type' => self::OPOR,
 			'field' => $this->parseStr($field1) . ' '.$condition.' ' . $this->parseStr($field2)
 		];
+		return $this;
+	}
 
-		echo "<pre>";
-		print_r($this->joins[$lastKey]['fields']);
-		die;
+	public function joinGroup($values){
+		if($values instanceof \Closure){
+			$di = new \Of\Std\Di();
+        	$subJoin = $di->get('\Of\Database\Sql\Statements\JoinTable');
+            $values($subJoin);
+            $lastKey = array_key_last($this->joins);
+            
+           	if(!is_integer($lastKey)){
+           		$this->joins[] = [
+					'table' => $this->joinTmp,
+					'fields' => [
+						[
+							'type' => self::OPON,
+							'field' => $subJoin
+						]
+					]
+				];
+           	} else {
+				$this->joins[$lastKey]['fields'][] = [
+					'type' => self::OPAND,
+					'field' => $subJoin
+				]; 
+           	}
+		}
 	}
 
 	public function joinHelper($operator, $field1, $field2, $condition="="){
@@ -77,6 +102,33 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 				]
 			]
 		];
+	}
+
+	public function getJoinQry($isSub=false){
+		$qry = "";
+		foreach ($this->joins as $key => $value) {
+			if(isset($value['table'])){
+				$qry .= ' ' . $value['table'] . ' ';
+			}
+
+			foreach ($value['fields'] as $fkey => $field) {	
+				if($field['field'] instanceof \Of\Database\Sql\Statements\JoinTable){
+					$qry .= ' ' . $field['type'] . ' ( ' . $field['field']->getJoinQry(true) . ')';
+				} else {
+					if($isSub){
+						if($fkey > 0){
+							$qry .= $field['type'] . ' ' . $field['field'];
+						} else {
+							$qry .= $field['field'];
+						}
+					} else {
+						$qry .= $field['type'] . ' ' . $field['field'];
+					}
+				}
+				$qry .= ' ';
+			}
+		}
+		return $qry;
 	}
 }
 ?>
