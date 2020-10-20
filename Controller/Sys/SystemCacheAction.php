@@ -35,11 +35,22 @@ class SystemCacheAction extends Sys {
 		$this->requireInstalled();
 		$this->requireLogin();
 
+		$this->purgeCache();
+		$this->getStatus();
+	}
+
+	protected function getStatus(){
+		$cache = include(ROOT.DS.'etc'.DS.'CacheStatus.php');
+		$this->jsonEncode($cache);
+	}
+
+	protected function purgeCache(){
 		$services = $this->_request->getParam('cache_services');
+
+		$result = [];
 		if(is_array($services)){
 			foreach($services as $service){
 				$s = strtolower($service);
-				$result = null;
 				if($s === 'less'){
 					$result = $this->_less->execute();
 				}
@@ -58,10 +69,12 @@ class SystemCacheAction extends Sys {
 					if($result['error'] == 1){
 						$type = 'danger';
 					}
-					$this->_message->setMessage($result['message'], $type);
 				}
 			}
+			$cache = include(ROOT.DS.'etc'.DS.'CacheStatus.php');
+			$result['cache'] = $cache;
+
+			$this->jsonEncode($result);
 		}
-		$this->_url->redirectTo($this->getUrl('/system/cache'));
 	}
 }

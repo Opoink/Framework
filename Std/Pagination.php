@@ -75,5 +75,30 @@ class Pagination {
 		$o->n200	= $this->nextp(200);
 		return $o;
 	}
+
+	
+	public function pagesArray(){
+		$o = [];
+		$o[] = $this->prevp(1000);
+		$o[] = $this->prevp(500);
+		$o[] = $this->prevp(250);
+		$o[] = $this->prevp(100);
+		$o[] = $this->prevp(50);
+		$o[] = $this->prevp(10);
+		$o[] = $this->prevp(3);
+		$o[] = $this->prevp(2);
+		$o[] = $this->prevp(1);
+		$o[] = $this->current_page;
+		$o[] = $this->nextp(1);	
+		$o[] = $this->nextp(2);	
+		$o[] = $this->nextp(3);	
+		$o[] = $this->nextp(10);	
+		$o[] = $this->nextp(50);	
+		$o[] = $this->nextp(100);
+		$o[] = $this->nextp(250);
+		$o[] = $this->nextp(500);
+		$o[] = $this->nextp(1000);
+		return $o;
+	}
 }
 ?>

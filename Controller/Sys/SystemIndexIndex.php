@@ -6,11 +6,13 @@
 namespace Of\Controller\Sys;
 
 class SystemIndexIndex extends Sys {
+
+	protected $pageTitle = 'Opoink Dashboard';
+
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
 
-		$this->addInlineJs();
 		return $this->renderHtml();
 	}
 }

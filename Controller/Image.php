@@ -41,6 +41,8 @@ class Image extends Filecontroller {
 	}
 
 	protected function doResize($targetFile, $destinationFile, $path){
+		/** for some reason image dont have complete details */
+		set_exception_handler(function(){});
 
 		$resize = new ImageResize($targetFile);
 		

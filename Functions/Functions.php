@@ -28,22 +28,22 @@ function opoink_renderError(){
         }
     }
     
-    header("HTTP/1.0 500 Internal Server Errorss");
+    header("HTTP/1.0 500 Internal Server Errors");
 	if($mode === \Of\Constants::MODE_DEV){
 		$fileData = opoink_fileData($e->getFile());
 
 		$firstLine = $e->getLine() - 3;
 		$lastLine = $e->getLine() + 3;
 		include(ROOT . '/vendor/opoink/framework/View/errortrace.phtml');
+        die;
 	} else {
 		$dir = new \Of\File\Dirmanager();
 		$logDir = ROOT . DS . 'Var' .DS . 'logs';
 		$dir->createDir($logDir);
         $message = "Type: " . get_class( $e ) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
         file_put_contents( $logDir . DS . "exceptions.log", $message . PHP_EOL, FILE_APPEND );
-        echo "Error occured, logs has more info.";
+        echo "Error occurred, logs has more info.";
 	}
-	die;
 }
 
 function opoink_hasError(){

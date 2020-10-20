@@ -1,0 +1,133 @@
+<div class="p-15">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="m-0">Update Module Version</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-group col-md-12">
+						<label for="mod_module_ver">Module version <small class="text-muted">Format: x.x.x</small></label>
+						<input 
+							id="mod_module_ver" 
+							name="module_ver" 
+							type="text" 
+							class="form-control"
+							v-model="systemmoduleedit.form.module_ver"
+						>
+					</div>
+				</div>
+				<div class="card-footer">
+					<button class="btn btn-primary" v-on:click="systemmoduleedit.save()">Save</button>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="m-0">Add Controller</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-group">
+						<label for="controller_type">Controller For</label>
+						<select class="select2 form-control custom-select" id="controller_type" v-model="systemmoduleedit.controllerForm.controller_type">
+							<option value="public">Public</option>
+							<option value="admin">Admin</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label for="controller_route">Route</label>
+						<div class="form-check">
+							<input 
+								type="checkbox" 
+								class="form-check-input" 
+								id="controller_route_regex" 
+								v-model="systemmoduleedit.controllerForm.controller_route_regex"
+							>
+							<label class="form-check-label" for="controller_route_regex">Use route regex <small class="text-muted">use regular expression for route.</small></label>
+						</div>
+						<input 
+							id="controller_route" 
+							name="controller_route" 
+							type="text" 
+							class="form-control"
+							v-model="systemmoduleedit.controllerForm.controller_route"
+						>
+						<template v-if="systemmoduleedit.controllerForm.controller_route_regex">
+							<small class="text-muted">If using route regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
+							<br>
+							<small class="text-muted">The URL will be <code>http://domain.com/string.html</code></small>
+						</template>
+					</div>
+
+
+					<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route">
+						<label for="controller_controller">Controller</label>
+						<div class="form-check">
+							<input 
+								type="checkbox" 
+								class="form-check-input" 
+								id="controller_controller_regex" 
+								v-model="systemmoduleedit.controllerForm.controller_controller_regex"
+							>
+							<label class="form-check-label" for="controller_controller_regex">Use controller regex <small class="text-muted">use regular expression for controller.</small></label>
+						</div>
+						<input 
+							id="controller_controller" 
+							name="controller_controller" 
+							type="text" 
+							class="form-control"
+							v-model="systemmoduleedit.controllerForm.controller_controller"
+						>
+						<template v-if="systemmoduleedit.controllerForm.controller_controller_regex">
+							<small class="text-muted">If using controller regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
+							<br>
+							<small class="text-muted">The URL will be <code>http://domain.com/route/string.html</code></small>
+						</template>
+					</div>
+
+					
+
+					<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route && systemmoduleedit.controllerForm.controller_controller">
+						<label for="controller_action">Action</label>
+						<div class="form-check">
+							<input 
+								type="checkbox" 
+								class="form-check-input" 
+								id="controller_action_regex" 
+								v-model="systemmoduleedit.controllerForm.controller_action_regex"
+							>
+							<label class="form-check-label" for="controller_action_regex">Use action regex <small class="text-muted">use regular expression for controller.</small></label>
+						</div>
+						<input 
+							id="controller_action" 
+							name="controller_action" 
+							type="text" 
+							class="form-control"
+							v-model="systemmoduleedit.controllerForm.controller_action"
+						>
+						<template v-if="systemmoduleedit.controllerForm.controller_action_regex">
+							<small class="text-muted">If using action regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
+							<br>
+							<small class="text-muted">The URL will be <code>http://domain.com/route/controller/string.html</code></small>
+						</template>
+					</div>
+
+					<div class="form-group">
+						<label for="extend_to_class">Extend To Class</label>
+						<input 
+							id="extend_to_class" 
+							name="extend_to_class" 
+							type="text" 
+							class="form-control"
+							v-model="systemmoduleedit.controllerForm.extend_to_class"
+						>
+					</div>
+				</div>
+				<div class="card-footer">
+					<button class="btn btn-primary" v-on:click="systemmoduleedit.createController()">Create Controller</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

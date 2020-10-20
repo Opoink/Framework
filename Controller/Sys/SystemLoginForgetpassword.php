@@ -40,8 +40,9 @@ class SystemLoginForgetpassword extends Sys {
 		
 		$this->email = $this->getParam('email');
 		
+		$response = [];
 		if($this->email != ''){
-			if($this->validateGRecaptcha()) {
+			// if($this->validateGRecaptcha()) {
 				$user = $this->_systemAdmin->getByColumn(['email' => $this->email]);
 				if($user){
 					$this->_jwt->setIssuer($this->_url->getUrl())
@@ -74,13 +75,18 @@ class SystemLoginForgetpassword extends Sys {
 					->setTemplatePath(ROOT.'/vendor/opoink/framework/View/Sys/Templates/mail/default.phtml')
 					->setMessage($messageTemplate)
 					->send();
-					$this->_message->setMessage('An instruction was sent to ' . $user->getData('email'), 'success');
+
+					$response['error'] = 0;
+					$response['message'] = 'Instruction was sent to ' . $user->getData('email');
+					$this->jsonEncode($response);
 				} else {
-					$this->_message->setMessage('Email not found.', 'danger');
+					header("HTTP/1.0 400 Bad Request");
+					echo 'Invalid email address';
+					die;
 				}
-			} else {
-				$this->_message->setMessage('Invalid reCaptcha.', 'danger');
-			}
+			// } else {
+			// 	$this->_message->setMessage('Invalid reCaptcha.', 'danger');
+			// }
 		}
 
 		$this->_url->redirect('/system'.$this->_config['system_url'].'/login');

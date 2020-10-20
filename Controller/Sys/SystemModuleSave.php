@@ -74,20 +74,18 @@ class SystemModuleSave extends Sys {
 					->setModule($module_name)
 					->setFileName('default')
 					->create();
-					
-					$this->_message->setMessage('New module successfully created.', 'success');
-					$redirectUrl = '/system/module';
 
+					$response['error'] = 0;
+					$response['message'] = 'New module successfully created.';
+					$this->jsonEncode($response);
 				} else {
-					$this->_message->setMessage('New module successfully created.', 'danger');
+					$this->returnError('400', 'New module successfully created.');
 				}
 			} else {
-				$this->_message->setMessage('Module name already exist.', 'danger');
+				$this->returnError('400', 'Module name already exist.');
 			}
 		} else {
-			$this->_message->setMessage('Invalid version format.', 'danger');
+			$this->returnError('400', 'Invalid version format.');
 		}
-
-		$this->_url->redirectTo($this->getUrl($redirectUrl));
 	}
 }

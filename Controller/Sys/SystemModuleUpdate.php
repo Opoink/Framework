@@ -50,15 +50,16 @@ class SystemModuleUpdate extends Sys {
 			if($config){
 				$config['version'] = $module_ver;
 
-				$this->_configManager->setConfig($config)
-				->createConfig();
+				$this->_configManager->setConfig($config)->createConfig();
+
+				$response['error'] = 0;
+				$response['message'] = $vendor_name . '_' . $module_name . ' module successfully updated';
+				$this->jsonEncode($response);
 			} else {
-				$this->_message->setMessage('Module name is not existing.', 'danger');
+				$this->returnError('400', 'Module name does not exist.');
 			}
 		} else {
-			$this->_message->setMessage('Invalid version format.', 'danger');
+			$this->returnError('400', 'Invalid version format.');
 		}
-
-		$this->_url->redirectTo($this->getUrl($redirectUrl));
 	}
 }

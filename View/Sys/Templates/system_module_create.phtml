@@ -3,17 +3,9 @@
 * Copyright 2018 Opoink Framework (http://opoink.com/)
 * Licensed under MIT, see LICENSE.md
 */
-
-
-$cardTitle1 = 'Create New Module';
-$formSaveMod = '/system/module/save';
-$vendorName = '';
-$moduleName = '';
-$moduleVer = '';
 ?>
-
-<?php require_once(__DIR__ . '/container_top.phtml') ?>
-	<div class="row">
-		<?php require_once(__DIR__ . '/moduleform/module.phtml') ?>
-	</div>
-<?php require_once(__DIR__ . '/container_bottom.phtml') ?>
+<sidenav :sidenav="sidenav" :url="url"></sidenav>
+<div class="container-wrapper">
+	<mainheader :mainheader="mainheader"></mainheader>
+	<systemmodulecreate :systemmodulecreate="systemmodulecreate"></systemmodulecreate>
+</div>

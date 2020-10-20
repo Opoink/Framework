@@ -33,12 +33,12 @@ class SystemModuleInstall extends Sys {
 			
 			$installedCount = count($installed);
 			$s = ($installedCount > 1) ? 's' : '';
-			$this->_message->setMessage($installedCount.' Module' . $s . ' successfully installed');
+
+			$response['error'] = 0;
+			$response['message'] = $installedCount.' Module' . $s . ' successfully installed';
+			$this->jsonEncode($response);
 		} else {
-			$this->_message->setMessage('Invalid request.', 'danger');
+			$this->returnError('400', 'Invalid formkey request');
 		}
-		
-		$this->_url->redirectTo($this->getUrl('/system/module'));
-		die;
 	}
 }

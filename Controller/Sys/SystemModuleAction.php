@@ -27,15 +27,29 @@ class SystemModuleAction extends Sys {
 		$this->requireLogin();
 		
 		$validate = $this->validateFormKey();
+		$action = strtolower($this->_request->getParam('action'));
+		
 		if($validate){
 			$intalledModule = $this->_request->getParam('intalledModule');
 			$upgradeds = $this->_modManager->setDi($this->_di)->moduleAction();
-			
-			$this->_message->setMessage('Module successfully updated', 'success');
+
+			$response = [];
+			foreach($upgradeds as $key => $val){
+				$response['message'] = [];
+
+				if($action == 'upgrade'){
+					$response['message'][] = $val['vendor'] . '_' . $val['module'] . ' module successfully Upgraded';
+					foreach($val['message'] as $msg){
+						$response['message'][] = $msg['message'];
+					}
+				}
+				if($action == 'uninstall'){
+					$response['message'][] = $val['vendor'] . '_' . $val['module'] . ' module successfully uninstalled';
+				}
+			}
+			$this->jsonEncode($response);
 		} else {
-			$this->_message->setMessage('Invalid request.', 'danger');
+			$this->returnError('400', 'Invalid request.');
 		}
-		
-		$this->_url->redirectTo($this->getUrl('/system/module'));
 	}
 }

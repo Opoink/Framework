@@ -77,17 +77,29 @@ class SystemModuleAddcontroller extends Sys {
 			} 
 
 			if($route == 'system' || $route == 'System'){
-				$this->_message->setMessage('System route is reserved for Opoink\'s developer panel.', 'danger');
+				$this->returnError('400', 'System route is reserved for Opoink\'s developer panel.');
 			} else {
-
+				$invalidPatternMsg = 'You will use regex for the {{path}}, but your pattern seems to be invalid. To avoid error please make sure your pattern is valid.';
 				if($crr === 'yes'){
-					$route = 'Reg'.sha1($route);
+					if( preg_match("/^\/.+\/[a-z]*$/i", $route)) {
+						$route = 'Reg'.sha1($route);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'route', $invalidPatternMsg));
+					}
 				}
-				if($ccr === 'yes'){
-					$conroller = 'Reg'.sha1($conroller);
+				if($ccr === 'yes'){;
+					if( preg_match("/^\/.+\/[a-z]*$/i", $conroller)) {
+						$conroller = 'Reg'.sha1($conroller);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'conroller', $invalidPatternMsg));
+					}
 				}
 				if($car === 'yes'){
-					$action = 'Reg'.sha1($action);
+					if( preg_match("/^\/.+\/[a-z]*$/i", $action)) {
+						$action = 'Reg'.sha1($action);
+					} else {
+						$this->returnError('400', str_replace('{{path}}', 'action', $invalidPatternMsg));
+					}
 				}
 
 				$conType = 'public';
@@ -104,11 +116,11 @@ class SystemModuleAddcontroller extends Sys {
 					try {
 						/* 
 						 * this is to try if the class to extend exists
-						 * if it is not injectore will raise an error
+						 * if it is not injector will raise an error
 						 */
 					    $this->_di->make($extends);
-					} catch (Exception $e) {
-					    /* do nothing */
+					} catch (\Exception $e) {
+						$this->returnError('400', $e->getMessage());
 					}
 
 					$this->_controller->setExtends($extends);
@@ -180,8 +192,12 @@ class SystemModuleAddcontroller extends Sys {
 
 					$this->_xml->setVendor($vendor_name)
 					->setModule($module_name)
-					->setFileName($xmlFilename)
-					->create(true, $isAdmin, 999, $body);
+					->setFileName($xmlFilename);
+					if($isAdmin){
+						$this->_xml->create(false, $isAdmin, 999, $body);
+					} else {
+						$this->_xml->create(true, $isAdmin, 999, $body);
+					}
 					/** end create controller xml layout here */
 
 					/** create the sample template here */
@@ -198,16 +214,18 @@ class SystemModuleAddcontroller extends Sys {
 					->setFileextension('phtml')
 					->write();
 					/** end create the sample template here */
-					$this->_message->setMessage('New conroller created.', 'success');
+
+					$response = [];
+					$response['error'] = 0;
+					$response['message'] = 'New conroller created.';
+					$this->jsonEncode($response);
 				} else {
-					$this->_message->setMessage('Cannot create, controller is already existing.', 'danger');
+					$this->returnError('400', 'Cannot create, controller is already existing.');
 				}
 			}
 		} else {
-			$this->_message->setMessage('Module name is not existing.', 'danger');
+			$this->returnError('400', 'Module name does not exist.');
 		}
-
-		$this->_url->redirectTo($this->getUrl($redirectUrl));
 	}
 
 

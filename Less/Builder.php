@@ -51,19 +51,45 @@ class Builder extends \Less_Parser {
 		
 			$less_files = $this->getCssFiles($path, $lessFileName, $cssFileName);
 
-			$options = ['cache_dir' => $cache_dir];
+			$isMinmified = $this->isMinmified($cssFileName);
 			
-			$this->makeDir($cache_dir);
-			
-			$css_file_name = \Less_Cache::Get($less_files, $options);
+			if($isMinmified){
+				$cssContent = '';
+				foreach ($less_files as $lKey => $lFile) {
+					$cssContent .= file_get_contents($lKey);
+				}
+				return $cssContent;
+			} else {
+				$options = ['cache_dir' => $cache_dir];
+				
+				$this->makeDir($cache_dir);
+				
+				$css_file_name = \Less_Cache::Get($less_files, $options);
 
-			$deploy = '/public/deploy';
-			if(file_exists(ROOT.DS.'public'.DS.'generation.php')){
-				$deploy .= include(ROOT.DS.'public'.DS.'generation.php');
+				$deploy = '/public/deploy';
+				if(file_exists(ROOT.DS.'public'.DS.'generation.php')){
+					$deploy .= include(ROOT.DS.'public'.DS.'generation.php');
+				}
+
+				return $this->changeVar('public_url', $deploy, $cache_dir, $css_file_name, $path, $file);
 			}
-
-			return $this->changeVar('public_url', $deploy, $cache_dir, $css_file_name, $path, $file);
 		}
+	}
+
+	/**
+	 * check if the request is already minified or not
+	 * if the file has "min" on its file name, means already minified
+	 */
+	protected function isMinmified($fileName){
+		$parts = explode('.', $fileName);
+
+		$isMinmified = false;
+		foreach ($parts as $key => $value) {
+			if(strtolower($value) == 'min'){
+				$isMinmified = true;
+			}
+		}
+		return $isMinmified;
 	}
 
 	/*

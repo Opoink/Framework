@@ -21,12 +21,9 @@ class SystemModuleCreate extends Sys {
 		parent::__construct($SystemSession,$FormSession,$Request,$Url,$Message);
 	}
 
-	
-
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-		$this->addInlineJs();
 		return $this->renderHtml();
 	}
 }

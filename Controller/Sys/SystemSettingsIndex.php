@@ -27,11 +27,22 @@ class SystemSettingsIndex extends Sys {
 		if($this->_request->getParam('form_key')){
 			return $this->saveSetting();
 		}
-		
-		$this->addInlineJs();
+		if($this->_request->getParam('settings')){
+			return $this->getSettings();
+		}
 		return $this->renderHtml();
 	}
+
+	/**
+	 * return application/json with the list of settings value
+	 */
+	protected function getSettings(){
+		$this->jsonEncode($this->_config);
+	}
 	
+	/**
+	 * save the system config in /etc/config.php file
+	 */
 	protected function saveSetting(){
 		$response = [
 			'error' => 1,
@@ -64,6 +75,9 @@ class SystemSettingsIndex extends Sys {
 			
 			$images = $this->_request->getParam('images');
 			$this->_config['images'] = array_map('ltrim', explode(',', $images));
+			
+			$auth = $this->_request->getParam('auth');
+			$this->_config['auth'] = $auth;
 			
 			$sys_g_recaptcha = (int)$this->_request->getParam('sys_g_recaptcha');
 			$this->_config['sys_g_recaptcha'] = [

@@ -171,7 +171,12 @@ class Xmltohtml {
 			$htmlTag = $node->getAttribute('htmlTag');
 		}
 
-		$div = '<'.$htmlTag.$htmlId.$htmlClass.'>';
+		$attribute = '';
+		if($node->hasAttribute('attr')){
+			$attribute = ' ' . $node->getAttribute('attr');
+		}
+
+		$div = '<'.$htmlTag.$htmlId.$htmlClass.$attribute.'>';
 		
 		$i = '';
 		if($indent > 0 && $this->mode == Constants::MODE_DEV){
@@ -425,7 +430,12 @@ class Xmltohtml {
 		if(!$node->hasAttribute('extra')){
 			$tag .= $node->getAttribute('extra');
 		}
-		$tag .= ' type="text/javascript"></script>';
+
+		$type = ' type="text/javascript"';
+		if($node->hasAttribute('type')){
+			$type = ' type="'.$node->getAttribute('type').'"';
+		}
+		$tag .= $type . '></script>';
 		$this->isCloseTag = false;
 		return $tag;
 	}

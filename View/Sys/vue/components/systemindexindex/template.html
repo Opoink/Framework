@@ -1,0 +1,85 @@
+<div class="p-15">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="m-0">Announcements</h5>
+				</div>
+				<div class="card-body" v-if="!systemindexindex.announcements">
+					<div class="list-group H-420 of-auto">
+						<a href="jsvascript:void(0)" class="list-group-item list-group-item-action">
+							<div class="d-flex w-100 mB-10 justify-content-between">
+								<div class="m-0 skeleton-box W-40-per H-20"></div>
+							</div>        
+							<div class="skeleton-box W-95-per H-15"></div>
+							<div class="skeleton-box W-55-per H-15"></div>
+						</a>
+					</div>
+				</div>
+				<div class="card-body" v-if="systemindexindex.announcements">
+					<div class="list-group" v-if="!systemindexindex.announcements.length">
+						<a href="jsvascript:void(0)" class="list-group-item list-group-item-action">
+							<div class="d-flex w-100 justify-content-between">
+								<p class="m-0 fw-800">No Announcement</p>
+								<small>{{moment(new Date(), "DD-MM-YYYY").format("MMM DD, YYYY")}}</small>
+							</div>        
+							<p class="m-0">--</p>
+						</a>
+					</div>
+
+					<div class="list-group H-420 of-auto" v-if="systemindexindex.announcements.length">
+						<a 
+							v-bind:href="_vue.url.opoinkBaseUrl + '/announcements?id=' + announcement.id" 
+							v-for="announcement in systemindexindex.announcements" 
+							class="list-group-item list-group-item-action"
+							target="_blank"
+						>
+							<div class="d-flex w-100 justify-content-between">
+								<p class="m-0 fw-800">{{announcement.title}}</p>
+								<small>{{moment(announcement.created_at, "DD-MM-YYYY").format("MMM DD, YYYY")}}</small>
+							</div>        
+							<p class="m-0">{{announcement.shortDescription}}</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="m-0">Donation</h5>
+				</div>
+				<div class="card-body">
+					<div class="H-420 of-auto">
+						<p>
+		    				Financial is one of many way to support an open source community. This is why you see a donate button in many Open Source websites.
+		    			</p>
+		    			<p>
+		    				While there are lots of big corporation that already have necessary funding to support the development of their Open Source project.
+		    			</p>
+		    			<p>
+		    				Most of them are developed by individuals using their own free time. However the development of an Open Source may require time and effort, at the most, it requires cost as well. Most of them came from their own pocket. 
+		    			</p>
+		    				Opoink Framework is one of the Open Source program, that helps you develop your project easily. If you would like to support us you can choose from the below or send us an email: support@opoink.com 
+		    			</p>
+		    			<ul class="m-0">
+		    				<li>
+		    					Donate some funds (give us some funds to buy pizaa :D)
+		    					<br />
+
+				    			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+									<input type="hidden" name="cmd" value="_s-xclick" />
+									<input type="hidden" name="hosted_button_id" value="6N2GL22E2LPVY" />
+									<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+									<img alt="" border="0" src="https://www.paypal.com/en_PH/i/scr/pixel.gif" width="1" height="1" />
+								</form>
+		    				</li>
+		    				<li>Be a contributor</li>
+		    				<li>Help us to imrpove documentation</li>
+		    			</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

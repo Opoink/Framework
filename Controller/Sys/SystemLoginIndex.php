@@ -30,35 +30,36 @@ class SystemLoginIndex extends Sys {
 	}
 	
 	public function run(){
+		$errorRedirect = (bool)$this->getParam('isredirect');
+
 		$this->requireInstalled();
-		$this->requireNotLogin();
+		$this->requireNotLogin($errorRedirect);
 		
 		$this->email = $this->getParam('email');
 		$this->password = $this->getParam('password');
 		
+		$response = [];
 		if($this->email != ''){
-			if($this->validateGRecaptcha()) {
-				$user = $this->_systemAdmin->getByColumn(['email' => $this->email]);
-				if($user){
-					$verify = $this->_password->setPassword($this->password)->setHash($user->getData('password'))->verify();
-					if($verify){
-						$this->_systemSession->setAsLogedIn($user->getData('id'));
-						$this->_message->setMessage('Welcome back ' . $user->getData('firstname'), 'success');
-						$this->_url->redirectTo(
-							$this->_systemSession->getReturnUrl()
-						);
-					} else {
-						$this->_message->setMessage('Wrong password.', 'danger');
-					}
+			$user = $this->_systemAdmin->getByColumn(['email' => $this->email]);
+			if($user){
+				$verify = $this->_password->setPassword($this->password)->setHash($user->getData('password'))->verify();
+				if($verify){
+					$this->_systemSession->setAsLogedIn($user->getData('id'));
+					$response['error'] = 0;
+					$response['message'] = 'Welcome back ' . $user->getData('firstname');
+
+					$this->jsonEncode($response);
 				} else {
-					$this->_message->setMessage('Email not found.', 'danger');
+					header("HTTP/1.0 400 Bad Request");
+					echo 'Invalid email or password';
+					die;
 				}
 			} else {
-				$this->_message->setMessage('Invalid reCaptcha.', 'danger');
+				header("HTTP/1.0 400 Bad Request");
+				echo 'Invalid email or password';
+				die;
 			}
 		}
-		
-		$this->addInlineJs();
 		return $this->renderHtml();
 	}
 	

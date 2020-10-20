@@ -1,0 +1,90 @@
+<div class="sidebar-nav">
+	<a v-bind:href="url.getUrl()">
+		<div class="sbn H-55 d-flex justify-content-center align-items-center">
+			<div class="list left d-flex justify-content-center align-items-center">
+				<img src="/public/sys/assets/images/logo-icon.png" alt="homepage">
+			</div>
+			<div class="list right d-flex align-items-center">
+				<img src="/public/sys/assets/images/logo-text.png" alt="homepage">
+			</div>
+		</div>
+	</a>
+
+	<a v-bind:href="url.getUrl()">
+		<div  class="sbn H-55 d-flex justify-content-center align-items-center">
+			<div class="list left d-flex justify-content-center align-items-center text-white">
+				<i class="fas fa-tachometer-alt"></i>
+			</div>
+			<div class="list right d-flex align-items-center text-white pL-10">
+				Dadhboard
+			</div>
+		</div>
+	</a>
+
+	
+	<div class="c-pointer sbn H-55 d-flex justify-content-center align-items-center" v-on:click="sidenav.showChildNav('System')">
+		<div class="list left d-flex justify-content-center align-items-center text-white">
+			<i class="fas fa-cogs"></i>
+		</div>
+		<div class="list right d-flex align-items-center text-white pL-10">
+			System
+		</div>
+	</div>
+
+	<div class="c-pointer sbn H-55 d-flex justify-content-center align-items-center" v-on:click="sidenav.showChildNav('Modules')">
+		<div class="list left d-flex justify-content-center align-items-center text-white">
+			<i class="fas fa-cubes"></i>
+		</div>
+		<div class="list right d-flex align-items-center text-white pL-10">
+			Modules
+		</div>
+	</div>
+
+	<a v-bind:href="url.getUrl('/logout')">
+		<div class="sbn H-55 d-flex justify-content-center align-items-center">
+			<div class="list left d-flex justify-content-center align-items-center text-white">
+				<i class="fas fa-sign-out-alt"></i>
+			</div>
+			<div class="list right d-flex align-items-center text-white pL-10">
+				Logout 
+			</div>
+		</div>
+	</a>
+
+	<div v-if="sidenav.isShowChildNav" class="child-nav text-white pB-15 pL-15 pR-15">
+		<div class="clearfix pT-15 mB-15">
+			<button v-on:click="sidenav.closeChildNav()" type="button" class="mT--15 ml-2 mb-1 close text-white">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			<h4>{{sidenav.childToDisplay}}</h4>
+		</div>
+		<div v-if="sidenav.childToDisplay == 'System'">
+			<a v-bind:href="url.getUrl('/settings')">
+				<div class="childnavlink row H-45 d-flex align-items-center">
+					Settings
+				</div>
+			</a>
+			<a v-bind:href="url.getUrl('/cache')">
+				<div class="childnavlink row H-45 d-flex align-items-center">
+					Cache
+				</div>
+			</a>
+		</div>
+
+		<div v-if="sidenav.childToDisplay == 'Modules'">
+			<a v-bind:href="url.getUrl('/module')">
+				<div class="childnavlink row H-45 d-flex align-items-center">
+					Module List
+				</div>
+			</a>
+			<a v-bind:href="url.getUrl('/module/create')">
+				<div class="childnavlink row H-45 d-flex align-items-center">
+					Create Module
+				</div>
+			</a>
+		</div>
+	</div>
+	<div class="side-footer">
+		<p class="">Framework v1.2.0</p>
+	</div>
+</div>

@@ -3,21 +3,9 @@
 * Copyright 2018 Opoink Framework (http://opoink.com/)
 * Licensed under MIT, see LICENSE.md
 */
-
-$mod = $this->getParam('mod');  
-$mod = explode('_', $mod);
-
-$cardTitle1 = 'Edit Module';
-$formSaveMod = '/system/module/update';
-
-$vendorName = ucfirst($this->config['vendor']);
-$moduleName = ucfirst($this->config['module']);
-$moduleVer = $this->config['version'];
 ?>
-
-<?php require_once(__DIR__ . '/container_top.phtml') ?>
-    <div class="row">
-        <?php require_once(__DIR__ . '/moduleform/module.phtml') ?>
-        <?php require_once(__DIR__ . '/moduleform/controller.phtml') ?>
-    </div>
-<?php require_once(__DIR__ . '/container_bottom.phtml') ?>
+<sidenav :sidenav="sidenav" :url="url"></sidenav>
+<div class="container-wrapper">
+	<mainheader :mainheader="mainheader"></mainheader>
+	<systemmoduleedit :systemmoduleedit="systemmoduleedit"></systemmoduleedit>
+</div>

@@ -33,7 +33,6 @@ class SystemModuleEdit extends Sys {
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-		$this->addInlineJs();
 
 		$mod = $this->getParam('mod');  
 		$mod = explode('_', $mod);
@@ -48,8 +47,6 @@ class SystemModuleEdit extends Sys {
 		    	$this->_message->setMessage('Module '.$vendorName.'_'.$moduleName.' is not exist.', 'danger');
 		    }
 		}
-
-
 
 		return $this->renderHtml();
 	}

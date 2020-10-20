@@ -4,41 +4,8 @@
 * Licensed under MIT, see LICENSE.md
 */
 ?>
-<?php require_once(__DIR__ . '/container_top.phtml') ?>
-	<div class="row">
-		<div class="col-md-12">
-	    	<div class="card">
-	    		<div class="card-body">
-	    			<h5 class="card-title m-b-15">Donation</h5>
-
-	    			<p>
-	    				Financial is one of many way to support an open source community. This is why you see a donate button in many Open Source websites.
-	    			</p>
-	    			<p>
-	    				While there are lots of big corporation that already have necessary funding to support the development of their Open Source project.
-	    			</p>
-	    			<p>
-	    				Most of them are developed by individuals using their own free time. However the development of an Open Source may require time and effort, at the most, it requires cost as well. Most of them came from their own pocket. 
-	    			</p>
-	    				Opoink Framework is one of the Open Source program, that helps you develop your project easily. If you would like to support us you can choose from the below or send us an email: support@opoink.com 
-	    			</p>
-	    			<ul>
-	    				<li>
-	    					Donate some funds (give us some funds to buy pizaa :D)
-	    					<br />
-
-			    			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-								<input type="hidden" name="cmd" value="_s-xclick" />
-								<input type="hidden" name="hosted_button_id" value="6N2GL22E2LPVY" />
-								<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-								<img alt="" border="0" src="https://www.paypal.com/en_PH/i/scr/pixel.gif" width="1" height="1" />
-							</form>
-	    				</li>
-	    				<li>Be a contributor</li>
-	    				<li>Help us to imrpove documentation</li>
-	    			</ul>
-	    		</div>
-	    	</div>
-		</div>
-	</div>
-<?php require_once(__DIR__ . '/container_bottom.phtml') ?>
+<sidenav :sidenav="sidenav" :url="url"></sidenav>
+<div class="container-wrapper">
+	<mainheader :mainheader="mainheader"></mainheader>
+	<systemindexindex :systemindexindex="systemindexindex"></systemindexindex>
+</div>
