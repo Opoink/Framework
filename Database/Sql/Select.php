@@ -179,8 +179,8 @@ class Select {
      * add the value equals condition from previous where statement
      * @param $value string
      */
-    public function eq($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::EQ, $value);
+    public function eq($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::EQ, $value, true, $isCol);
         return $this;
     }
 
@@ -188,8 +188,8 @@ class Select {
      * add the value not equals condition from previous where statement
      * @param $value string
      */
-    public function ne($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::NE, $value);
+    public function ne($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::NE, $value, true, $isCol);
         return $this;
     }
 
@@ -197,8 +197,8 @@ class Select {
      * add the value less than condition from previous where statement
      * @param $value string
      */
-    public function lt($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::LT, $value);
+    public function lt($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::LT, $value, true, $isCol);
         return $this;
     }
 
@@ -206,8 +206,8 @@ class Select {
      * add the value less than or equals condition from previous where statement
      * @param $value string
      */
-    public function ltoe($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::LTOE, $value);
+    public function ltoe($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::LTOE, $value, true, $isCol);
         return $this;
     }
 
@@ -215,8 +215,8 @@ class Select {
      * add the value greater than condition from previous where statement
      * @param $value string
      */
-    public function gt($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::GT, $value);
+    public function gt($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::GT, $value, true, $isCol);
         return $this;
     }
 
@@ -224,8 +224,8 @@ class Select {
      * add the value greater than or equals condition from previous where statement
      * @param $value string
      */
-    public function gtoe($value){
-        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::GTOE, $value);
+    public function gtoe($value, $isCol=false){
+        $this->_whereStatement->addConVal(\Of\Database\Sql\Statements\Where::GTOE, $value, true, $isCol);
         return $this;
     }
 
@@ -233,9 +233,11 @@ class Select {
      * add the between from previous where statement
      * @param $from int
      * @param $to int
+     * @param $isFromACol boolean either the $from is a column of a table or a int 
+     * @param $isToACol boolean either the $to is a column of a table or a int 
      */
-    public function between($from, $to){
-        $this->_whereStatement->between($from, $to);
+    public function between($from, $to, $isFromACol=false, $isToACol=false){
+        $this->_whereStatement->between($from, $to, $isFromACol, $isToACol);
         return $this;
     }
 
@@ -243,9 +245,11 @@ class Select {
      * add the not between from previous where statement
      * @param $from int
      * @param $to int
+     * @param $isFromACol boolean either the $from is a column of a table or a int 
+     * @param $isToACol boolean either the $to is a column of a table or a int 
      */
-    public function notBetween($from, $to){
-        $this->_whereStatement->notBetween($from, $to);
+    public function notBetween($from, $to, $isFromACol=false, $isToACol=false){
+        $this->_whereStatement->notBetween($from, $to, $isFromACol, $isToACol);
         return $this;
     }
 

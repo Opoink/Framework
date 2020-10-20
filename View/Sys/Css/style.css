@@ -493,6 +493,17 @@ a {
 .sidebar-nav .child-nav .childnavlink:hover {
   background: #343a40;
 }
+.sidebar-nav .side-footer {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+}
+.sidebar-nav .side-footer p {
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 5px;
+}
 
 .container-wrapper {
   margin-left: 250px;

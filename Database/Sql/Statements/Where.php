@@ -123,23 +123,28 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      * so it will add WHERE operator, else add AND operator instead
      * @param $condition string
      * @param $value string 
+     * @param $isCol boolean either the condition is a column of a table or a string 
      */
-    public function addConVal($condition, $value, $addOperator=true){
+    public function addConVal($condition, $value, $addOperator=true, $isCol=false){
         $tmp = $this->getWhereOrWhereTmp();
 
         if(!empty($tmp)){
-
             if($value instanceof \Closure){
                 $subquery = $this->getSubSelect();
                 $value($subquery);
                 $tmp .= $condition . ' ';
                 $this->addWhere($tmp, $subquery, $addOperator);
             } else {
-                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
-                $tmp .= $condition . ' ' . $insecureDataKey;
-                $this->addWhere($tmp);
-                $this->unsecureValue[$insecureDataKey] = $value;
-                $this->valVar++;
+                if(!$isCol){
+                    $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
+                    $tmp .= $condition . ' ' . $insecureDataKey;
+                    $this->addWhere($tmp);
+                    $this->unsecureValue[$insecureDataKey] = $value;
+                    $this->valVar++;
+                } else {
+                    $tmp .= $condition . ' ' . $this->parseStr($value);
+                    $this->addWhere($tmp);
+                }
             }
         }
     }
@@ -163,18 +168,22 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      * add the between from previous where statement
      * @param $from int
      * @param $to int
+     * @param $isFromACol boolean either the $from is a column of a table or a int 
+     * @param $isToACol boolean either the $to is a column of a table or a int 
      */
-    public function between($from, $to){
-        $this->betweenOrNotBetween($from, $to, true);
+    public function between($from, $to, $isFromACol=false, $isToACol=false){
+        $this->betweenOrNotBetween($from, $to, true, $isFromACol, $isToACol);
     }
 
     /**
      * add the not between from previous where statement
      * @param $from int
      * @param $to int
+     * @param $isFromACol boolean either the $from is a column of a table or a int 
+     * @param $isToACol boolean either the $to is a column of a table or a int 
      */
-    public function notBetween($from, $to){
-        $this->betweenOrNotBetween($from, $to, false);
+    public function notBetween($from, $to, $isFromACol=false, $isToACol=false){
+        $this->betweenOrNotBetween($from, $to, false, $isFromACol, $isToACol);
     }
 
     /**
@@ -182,22 +191,30 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
      * @param $from int
      * @param $to int
      */
-    public function betweenOrNotBetween($from, $to, $between = true){
+    public function betweenOrNotBetween($from, $to, $between = true, $isFromACol=false, $isToACol=false){
         if(!empty($this->whereTmp)){
             $not = 'NOT ';
             if($between){
                 $not = '';
             }
 
-            $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
-            $this->whereTmp .= $not . 'BETWEEN '.$insecureDataKey.' AND ';
-            $this->unsecureValue[$insecureDataKey] = $from;
-            $this->valVar++;
+            if(!$isFromACol){
+                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
+                $this->whereTmp .= $not . 'BETWEEN '.$insecureDataKey.' AND ';
+                $this->unsecureValue[$insecureDataKey] = $from;
+                $this->valVar++;
+            } else {
+                $this->whereTmp .= $not . 'BETWEEN '.$this->parseStr($from).' AND ';
+            }
 
-            $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
-            $this->whereTmp .= $insecureDataKey;
-            $this->unsecureValue[$insecureDataKey] = $to;
-            $this->valVar++;
+            if(!$isToACol){
+                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
+                $this->whereTmp .= $insecureDataKey;
+                $this->unsecureValue[$insecureDataKey] = $to;
+                $this->valVar++;
+            } else {
+                $this->whereTmp .= $this->parseStr($to);
+            }
 
             $this->addWhere($this->whereTmp);
         }
