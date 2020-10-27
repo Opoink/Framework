@@ -249,6 +249,10 @@ class Module {
 						'type' => 'success',
 						'message' => 'No upgrade in database made'
 					];
+					$result['message'][] = [
+						'type' => 'danger',
+						'message' => $e->getMessage()
+					];
 				}
 				
 				if(isset($config['controllers'])){
