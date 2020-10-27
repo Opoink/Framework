@@ -134,6 +134,7 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
                 $value($subquery);
                 $tmp .= $condition . ' ';
                 $this->addWhere($tmp, $subquery, $addOperator);
+                $this->valVar++;
             } else {
                 if(!$isCol){
                     $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
