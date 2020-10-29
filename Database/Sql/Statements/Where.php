@@ -156,12 +156,21 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     private function getSubSelect(){
         $di = new \Of\Std\Di();
         $subquery = $di->get('\Of\Database\Sql\Select');
+        /*$isEmpty = true;*/
         if($this->valPrefix == ''){
             $this->valPrefix = 'a';
         } else {
+            /*$isEmpty = false;*/
             $this->valPrefix++;
         }
         $subquery->_whereStatement->valPrefix = $this->valPrefix;
+        $this->valPrefix++;
+        $this->valPrefix++;
+        /*if($isEmpty){
+            $this->valPrefix = '';
+        } else {
+            $this->valPrefix--;
+        }*/
         return $subquery;
     }
 

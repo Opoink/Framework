@@ -18,6 +18,7 @@ class PdoDriver {
             $this->connection = new \PDO( $connectionStr, $config['username'], $config['password'], array(
                 \PDO::ATTR_PERSISTENT => true
             ));
+            $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $pe) {
             throw new \Exception("Could not connect to the database ".$config['database']." :" . $pe->getMessage());
         }
@@ -31,9 +32,13 @@ class PdoDriver {
 
     public function fetchAll($sql, $unsecured=[]){
         $sth = $this->getConnection()->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-        $sth->execute($unsecured);
-        $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
-        return  $result;
+        try {
+            $sth->execute($unsecured);
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+            return  $result;
+        } catch (\Exception $e){
+            throw new \Exception("Could not execute query :" . $e->getMessage());
+        }
     }
 
     public function insert($tablename, $data){

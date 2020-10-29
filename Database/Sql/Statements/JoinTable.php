@@ -10,7 +10,7 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 	const OPON = 'ON';
 	const OPAND = 'AND';
 	const OPOR = 'OR';
-	const TYPES = ['INNER', 'LEFT', 'RIGHT', 'FULL OUTER'];
+	const TYPES = ['INNER', 'LEFT', 'RIGHT', 'LEFT OUTER', 'RIGHT OUTER'];
 
 	/**
 	 * holds the string from joins
@@ -25,16 +25,17 @@ class JoinTable Extends \Of\Database\Sql\Statements\Statement {
 	/**
      * @param $tableName the table name to add in query as join
      * @param $alias string
-     * @param $joinType either INNER, LEFT, RIGHT, FULL OUTER
+     * @param $joinType either INNER, LEFT, RIGHT, 'LEFT OUTER', 'RIGHT OUTER'
      */
 	public function join($tableName, $alias=null, $joinType="INNER"){
+		$qry = 'INNER JOIN';
 		if(in_array($joinType, self::TYPES)) {
 			$qry = strtoupper($joinType) . ' JOIN';
-			$qry .= ' ' . $this->parseStr($tableName);
-
-			if($alias){
-				$qry .= ' AS ' . $this->parseStr($alias);
-			}
+		}
+		
+		$qry .= ' ' . $this->parseStr($tableName);
+		if($alias){
+			$qry .= ' AS ' . $this->parseStr($alias);
 		}
 		$this->joinTmp = $qry;
 		return $this;
