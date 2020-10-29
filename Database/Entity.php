@@ -63,10 +63,15 @@ class Entity {
     /**
      * fetch all data
      * @param $select instance of \Of\Database\Sql\Select
+     * @param $isReturnInstance if we are going to return an instance or just data from db
      */
-    public function fetchAll(\Of\Database\Sql\Select $select){
+    public function fetchAll(\Of\Database\Sql\Select $select, $isReturnInstance=true){
         $data = $this->getConnection()->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
-        return $this->setCollection($data);
+        if($isReturnInstance){
+            return $this->setCollection($data);
+        } else {
+            return $data;
+        }
     }
 
     /**
