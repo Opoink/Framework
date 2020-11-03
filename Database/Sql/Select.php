@@ -46,7 +46,7 @@ class Select {
     /**
      * order by
      */
-    public $orderBy = '';
+    public $_orderBy = '';
 
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
@@ -336,7 +336,10 @@ class Select {
      * @param $criterion string ASC or DESC
      */
     public function orderBy($by, $criterion='ASC'){
-        $qry = ' ORDER BY ';
+        $qry = ' ';
+        if(empty($this->_orderBy)){
+            $qry = ' ORDER BY ';
+        }
         if(is_string($by)){
             $qry .= $this->_whereStatement->parseStr($by);
         } else {
@@ -349,7 +352,11 @@ class Select {
         } else {
             $qry .= ' ASC ';
         }
-        $this->orderBy = $qry;
+        if(!empty($this->_orderBy)){
+            $this->_orderBy .= ' , ' . $qry;
+        } else {
+            $this->_orderBy .= $qry;
+        }
         return $this;
     }
 
@@ -413,7 +420,7 @@ class Select {
 
         $query .= $this->_whereStatement->getWhere($isSub);
         
-        $query .= $this->orderBy;
+        $query .= $this->_orderBy;
         $query .= $this->limit;
         $query .= $this->offset;
 
