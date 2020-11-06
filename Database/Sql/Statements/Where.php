@@ -254,19 +254,16 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
             }
 
             if($values instanceof \Closure){
-                // $subquery = $this->getSubSelect();
-                // $value($subquery);
+                $subquery = $this->getSubSelect();
+                $values($subquery);
 
-                // $tmp .= $condition . ' ';
-
-                // $this->where[] = [
-                //     'operator' => $operator,
-                //     'qry' => $tmp,
-                //     'subquery' => $subquery
-                // ];
-
-                // $this->whereTmp = '';
-                // $this->orWhereTmp = '';
+                $qry = $not . " IN (" . $subquery->getQuery() . ") ";
+                $this->whereTmp .= $qry;
+                $this->addWhere($this->whereTmp);
+                foreach ($subquery->_whereStatement->unsecureValue as $key => $value) {
+                    $this->unsecureValue[$key] = $value;
+                }
+                $this->valVar++;
             } else {
                 $qry = $not . "IN (";
                 $vals = [];
