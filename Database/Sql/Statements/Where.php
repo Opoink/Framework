@@ -218,7 +218,7 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
             }
 
             if(!$isToACol){
-                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.':';
+                $insecureDataKey = ':'.$this->valPrefix.$this->valVar.'opoink';
                 $this->whereTmp .= $insecureDataKey;
                 $this->unsecureValue[$insecureDataKey] = $to;
                 $this->valVar++;

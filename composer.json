@@ -12,8 +12,8 @@
     },
     "require": {
         "php": ">=7.1.0",
-        "laminas/laminas-db": "^2.11.2",
-        "laminas/laminas-json": "^3.1.2",
+        "laminas/laminas-db": "2.11.3",
+        "laminas/laminas-json": "3.1.2",
         "php-di/php-di": "^5.4",
         "matthiasmullie/minify": "^1.3"
     },
