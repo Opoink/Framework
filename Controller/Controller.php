@@ -52,6 +52,14 @@ class Controller {
 		
 		return $this;
 	}
+
+	public function getPageName(){
+		return $this->_router->getPageName();
+	}
+
+	public function getCurrentRoute(){
+		return $this->_router->getCurrentRoute();
+	}
 	
 	public function run(){
 		if($this->page){

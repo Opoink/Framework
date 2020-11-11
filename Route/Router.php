@@ -24,6 +24,10 @@ class Router {
 	protected $action_regex = false;
 	protected $matchedRoute = null;
 
+	public $requestRoute = null;
+	public $requestController = null;
+	public $requestAction = null;
+
 	public function __construct($config=null){
 		if($config){
 			$this->setConfig($config);
@@ -98,13 +102,13 @@ class Router {
 						 * in this part the router is using a regular expresion
 						 * on either route or controller or action
 						 */
-						$requestRoute = $this->getRoute(false);
-						$requestController = $this->getController(false);
-						$requestAction = $this->getAction(false);
+						$this->requestRoute = $this->getRoute(false);
+						$this->requestController = $this->getController(false);
+						$this->requestAction = $this->getAction(false);
 
-						$r = $this->doCompare($requestRoute, $routValue['route'], $routValue['route_regex']);
-						$c = $this->doCompare($requestController, $routValue['controller'], $routValue['controller_regex']);
-						$a = $this->doCompare($requestAction, $routValue['action'], $routValue['action_regex']);
+						$r = $this->doCompare($this->requestRoute, $routValue['route'], $routValue['route_regex']);
+						$c = $this->doCompare($this->requestController, $routValue['controller'], $routValue['controller_regex']);
+						$a = $this->doCompare($this->requestAction, $routValue['action'], $routValue['action_regex']);
 
 						$this->route_regex = $r;
 						$this->controller_regex = $c;
@@ -341,6 +345,14 @@ class Router {
 				}
 			}
 		}
+	}
+
+	public function getCurrentRoute(){
+		return [
+			'route' => $this->requestRoute ? $this->requestRoute : $this->route,
+			'route' => $this->requestController ? $this->requestController : $this->controller,
+			'action' => $this->requestAction ? $this->requestAction : $this->action
+		];
 	}
 }
 ?>
