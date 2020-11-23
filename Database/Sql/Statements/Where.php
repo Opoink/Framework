@@ -153,7 +153,7 @@ class Where Extends \Of\Database\Sql\Statements\Statement {
     /**
      * retun new instance of \Of\Database\Sql\Select
      */ 
-    private function getSubSelect(){
+    public function getSubSelect(){
         $di = new \Of\Std\Di();
         $subquery = $di->get('\Of\Database\Sql\Select');
         /*$isEmpty = true;*/

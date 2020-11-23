@@ -48,6 +48,16 @@ class Select {
      */
     public $_orderBy = '';
 
+    /**
+     * group by col names
+     */
+    public $_groupByColNames = [];
+
+    /**
+     * will hold the sum query
+     */
+    public $sum = [];
+
     public function __construct(
         \Of\Database\Sql\Statements\From $From,
         \Of\Database\Sql\Statements\Column $Column,
@@ -58,6 +68,8 @@ class Select {
         $this->_columnStatement = $Column;
         $this->_whereStatement = $Where;
         $this->_joinStatement = $JoinTable;
+
+        $this->_columnStatement->_whereStatement = $this->_whereStatement;
     }
 
     /**
@@ -68,6 +80,15 @@ class Select {
     public function select($colNames=null){
         $this->_columnStatement->parseValue($colNames);
         return $this;
+    }
+
+    /**
+     * tells if the select asterisk will be ommited if the 
+     * the select() method param is null 
+     */
+    public function colNoAsterisk(){
+         $this->_columnStatement->noAsterisk = true;
+         return $this;
     }
 
     /**
@@ -395,6 +416,58 @@ class Select {
     }
 
     /**
+     * SUM query
+     * @param $col string, the table field name
+     * @param $alias string || null, this is option
+     */
+    public function sum($col, $alias=null){
+        $query = 'SUM('.$this->_whereStatement->parseStr($col).')';
+        if($alias){
+           $query .=  ' AS `'.$alias.'`';
+        } 
+        $this->sum[] = $query;
+        return $this;
+    }
+
+    /**
+     * return the sum query as a string
+     */
+    public function getSum($cols){
+        if(count($this->sum)){
+            $qry = '';
+            if(!empty($cols)){
+                $qry = ', ';
+            }
+            return $qry . implode(', ', $this->sum) . ' ';
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * group by statement
+     * @param $cols string || array the field name/s
+     */
+    public function groupBy($cols){
+        if(is_string($cols)){
+            $this->_groupByColNames[] = $this->_whereStatement->parseStr($cols);
+        } elseif(is_array($cols)) {
+            foreach ($cols as $key => $value) {
+                $this->_groupByColNames[] = $this->_whereStatement->parseStr($value);
+            }
+        }
+    }
+
+    public function getGroupBy(){
+        $qry = '';
+        if(count($this->_groupByColNames) > 0){
+            $qry .= 'GROUP BY';
+            $qry .= ' ' . implode(', ', $this->_groupByColNames);
+        }
+        return $qry;
+    }
+
+    /**
      * return query query string
      * @param $isSub boolean tells if the query is sub or not
      */
@@ -403,6 +476,7 @@ class Select {
         if($this->_columnStatement->isTriggered && $this->_fromStatement->isTriggered){
             $query .= "SELECT ";
             
+            $cols = $this->_columnStatement->getColumns();
             if($this->count){
             	$query .= $this->count;
             }
@@ -410,8 +484,9 @@ class Select {
             	$query .= $this->minmax;
             } else {
             	$query .= $this->distinct;
-	            $query .= $this->_columnStatement->getColumns();
+	            $query .= $cols;
             }
+            $query .= $this->getSum($cols);
 
         	$query .= $this->_fromStatement->getFrom();
             $query .= $this->_joinStatement->getJoinQry();
@@ -419,7 +494,7 @@ class Select {
         
 
         $query .= $this->_whereStatement->getWhere($isSub);
-        
+        $query .= $this->getGroupBy();
         $query .= $this->_orderBy;
         $query .= $this->limit;
         $query .= $this->offset;

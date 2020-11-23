@@ -14,6 +14,22 @@ class Column Extends \Of\Database\Sql\Statements\Statement {
      */
     public $isTriggered = false;
 
+    public $_whereStatement = null;
+
+    /**
+     * this will be the efault alias is the colname is a closure
+     */
+    public $closureInstanceAlias = 'col_a';
+
+    public $noAsterisk = false;
+
+    /**
+     * retun new instance of \Of\Database\Sql\Select
+     */ 
+    private function getSubSelect(){
+        return $this->_whereStatement->getSubSelect();
+    }
+
     /**
      * parse value of of the columns name
      */
@@ -27,15 +43,39 @@ class Column Extends \Of\Database\Sql\Statements\Statement {
 
         	if($isAssociative){
         		foreach ($colNames as $key => $value) {
-	                $this->columns[] = $this->parseStr($key)." AS `".$value."`";
+                    if($value instanceof \Closure){
+                        $this->closureInstanceAlias++;
+                        $this->parseValueClosureInstance($value, $key);
+                    } else {
+                        $this->columns[] = $this->parseStr($key)." AS `".$value."`";
+                    }
         		}
         	} else {
 	            foreach($colNames as $value){
-        			$this->columns[] = $this->parseStr($value);
+                    if($value instanceof \Closure){
+                        $this->closureInstanceAlias++;
+                        $this->parseValueClosureInstance($value, $this->closureInstanceAlias);
+                    } else {
+                        $this->columns[] = $this->parseStr($value);
+                    }
 	            }
         	}
         }
+        elseif($colNames instanceof \Closure){
+            $this->closureInstanceAlias++;
+            $this->parseValueClosureInstance($colNames, $this->closureInstanceAlias);
+        }
 	}
+
+    protected function parseValueClosureInstance($value, $alias){
+        $subquery = $this->getSubSelect();
+        $value($subquery);
+        $this->columns[] = '('.$subquery->getQuery().') AS `' . $alias . '`';
+
+        foreach ($subquery->_whereStatement->unsecureValue as $key => $value) {
+            $this->_whereStatement->unsecureValue[$key] = $value;
+        }
+    }
 
     /**
      * convert the columns array into an sql string 
@@ -48,7 +88,9 @@ class Column Extends \Of\Database\Sql\Statements\Statement {
             if(count($this->columns) > 0){
                 return implode(', ', $this->columns);
             } else {
-                return "*";
+                if(!$this->noAsterisk){
+                    return "*";
+                }
             }
         }
     }
