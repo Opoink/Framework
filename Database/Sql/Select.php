@@ -391,18 +391,18 @@ class Select {
         return $this;
     }
 
-    public function onJoin($field1, $field2, $condition="="){
-        $this->_joinStatement->onJoin($field1, $field2, $condition);
+    public function onJoin($field1, $field2, $condition="=", $field2isString=false){
+        $this->_joinStatement->onJoin($field1, $field2, $condition, $field2isString);
         return $this;
     }
 
-	public function andJoin($field1, $field2, $condition="="){
-		$this->_joinStatement->andJoin($field1, $field2, $condition);
+	public function andJoin($field1, $field2, $condition="=", $field2isString=false){
+		$this->_joinStatement->andJoin($field1, $field2, $condition, $field2isString);
 		return $this;
 	}
 
-	public function orJoin($field1, $field2, $condition="="){
-		$this->_joinStatement->orJoin($field1, $field2, $condition);
+	public function orJoin($field1, $field2, $condition="=", $field2isString=false){
+		$this->_joinStatement->orJoin($field1, $field2, $condition, $field2isString);
 		return $this;
 	}
 
@@ -456,6 +456,7 @@ class Select {
                 $this->_groupByColNames[] = $this->_whereStatement->parseStr($value);
             }
         }
+        return $this;
     }
 
     public function getGroupBy(){
@@ -491,7 +492,9 @@ class Select {
         	$query .= $this->_fromStatement->getFrom();
             $query .= $this->_joinStatement->getJoinQry();
         }
-        
+        foreach ($this->_joinStatement->unsecureValue as $keyJU => $valueJU) {
+            $this->_whereStatement->unsecureValue[$keyJU] = $valueJU;
+        }
 
         $query .= $this->_whereStatement->getWhere($isSub);
         $query .= $this->getGroupBy();

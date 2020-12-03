@@ -167,9 +167,18 @@ class Entity {
         return null;
     }
 
-    public function removeData($key){
-        if(isset($this->data[$key])){
-            unset($this->data[$key]);
+    /**
+     * remove an specific data by key
+     * @param $key string the field to be removed
+     * if not set iw will remove all set data
+     */
+    public function removeData($key=null){
+        if(!$key){
+            $this->data = [];
+        } else {
+            if(isset($this->data[$key])){
+                unset($this->data[$key]);
+            }
         }
     }
 
