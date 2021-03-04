@@ -107,7 +107,11 @@ class Application {
 			} else {
 				$controller = $this->isSupportedFile();
 				if(!$controller){
-					$this->error(404);
+					if(file_exists(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html')){
+						include(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html');
+					} else {
+						$this->error(404);
+					}
 				}
 			}
 			$this->content = ob_get_contents();
