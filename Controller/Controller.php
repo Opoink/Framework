@@ -68,6 +68,17 @@ class Controller {
 			}
 		}
 	}
+
+	/**
+	 * render as a json object
+	 */
+	protected function toJson($data){
+		$j = json_encode($data);
+		header("Content-Type: application/json; charset=UTF-8");
+		echo $j;
+		exit;
+		die;
+	}
 }
 
 ?>

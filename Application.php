@@ -101,7 +101,11 @@ class Application {
 						->setDi($this->_di)
 						->run();
 					} else {
-						$this->error(404);
+						if(file_exists(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html')){
+							include(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html');
+						} else {
+							$this->error(404);
+						}
 					}
 				}
 			} else {
