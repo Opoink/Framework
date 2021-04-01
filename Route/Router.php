@@ -136,6 +136,7 @@ class Router {
 							 * this can be usefull for rest API request
 							 */
 							$params = $this->opoinkRouter->getMatch($routeValue);
+								
 							if(is_array($params)){
 								foreach($params as $key => $value){
 									$_GET[$key] = $value;

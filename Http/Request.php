@@ -64,17 +64,17 @@ class Request {
 	
 	public function getParam($param=null){
 		if($param){
-			if(isset($this->params[$param])){
-				if(is_array($this->params[$param])){
-					return $this->params[$param];
+			if(isset($_GET[$param])){
+				if(is_array($_GET[$param])){
+					return $_GET[$param];
 				} else {
-					return trim($this->params[$param]);
+					return trim($_GET[$param]);
 				}
 			} else {
 				return null;
 			}
 		} else {
-			return $this->params;
+			return $_GET;
 		}
 	}
 	

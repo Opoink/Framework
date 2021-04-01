@@ -13,6 +13,8 @@ class systemmoduleedit {
 		save: 'save'
 	}
 
+	controllerType = 'RCA';
+
 	/**
 	 * the value of the controller form field
 	 */
@@ -25,6 +27,8 @@ class systemmoduleedit {
 		controller_controller: '',
 		controller_action_regex: false,
 		controller_action: '',
+		controller_pattern: '',
+		controller_request_method: '*'
 	}
 
 	init(){
@@ -32,6 +36,8 @@ class systemmoduleedit {
 		this.toast = _vue.toast;
 		this.url = _vue.url;
 		this.loader = _vue.loader;
+
+		this.resetControllerForm();
 
 		this.form.vendor_name = this.url.getParam('vendor');
 		this.form.module_name = this.url.getParam('module');
@@ -63,12 +69,22 @@ class systemmoduleedit {
 			});
 		});
 	}
-
 	/**
 	 * make an API request to creat new controller
 	 */
 	createController(){
+		if(this.controllerType == 'RCA'){
+			this.createControllerRCA();
+		} else if(this.controllerType == 'PATTERN') {
+			this.createControllerPATTERN();
+		}
+	}
+	/**
+	 * make an API request to creat new controller
+	 */
+	createControllerRCA(){
 		let jsonData = {
+			type: this.controllerType,
 			extend_to_class: this.controllerForm.extend_to_class,
 			controller_type: this.controllerForm.controller_type,
 			vendor_name: this.form.vendor_name,
@@ -98,44 +114,51 @@ class systemmoduleedit {
 			if(this.controllerForm.controller_action_regex){
 				jsonData['controller_action_regex'] = 'yes';
 			}
-			let url = '/' + this.url.getRoute() + '/module/addcontroller';
-			this.request.makeRequest(url, jsonData, 'POST', true)
-			.then(mod => {
-				if(!mod.error && mod.result){
-					this.controllerForm.extend_to_class = '';
-					this.controllerForm.controller_type = 'public';
-					this.controllerForm.controller_route_regex = false;
-					this.controllerForm.controller_route = '';
-					this.controllerForm.controller_controller_regex = false;
-					this.controllerForm.controller_controller = '';
-					this.controllerForm.controller_action_regex = false;
-					this.controllerForm.controller_action = '';
-
-					this.toast.add(mod.result.message, 'Success');
-				} else if(mod.error && !mod.result){
-					this.toast.add(mod.error.responseText, 'Error');
-				}
-				this.loader.isLoading = false;
-			});
+			this.requestToCreate(jsonData);
 		}
 	}
 
-	/**
-	 * this will reset controller form depending on what is the given param
-	 * @param {*} type either route || controller
-	 */
-	/**regexSelected(type){
-		if(type == 'route'){
-			this.controllerForm.controller_controller_regex = false;
-			this.controllerForm.controller_controller = '';
-			this.controllerForm.controller_action_regex = false;
-			this.controllerForm.controller_action = '';
-		}
-		else if(type == 'controller'){
-			this.controllerForm.controller_action_regex = false;
-			this.controllerForm.controller_action = '';
-		}
+	requestToCreate(jsonData){
+		let url = '/' + this.url.getRoute() + '/module/addcontroller';
+		this.request.makeRequest(url, jsonData, 'POST', true)
+		.then(mod => {
+			if(!mod.error && mod.result){
+				this.resetControllerForm();
+				this.toast.add(mod.result.message, 'Success');
+			} else if(mod.error && !mod.result){
+				this.toast.add(mod.error.responseText, 'Error');
+			}
+			this.loader.isLoading = false;
+		});
+	}
 
-		console.log('regexSelected regexSelected', type)
-	}*/
+	resetControllerForm(){
+		this.controllerForm.extend_to_class = '\\Of\\Controller\\Controller';
+		this.controllerForm.controller_type = 'public';
+		this.controllerForm.controller_route_regex = false;
+		this.controllerForm.controller_route = '';
+		this.controllerForm.controller_controller_regex = false;
+		this.controllerForm.controller_controller = '';
+		this.controllerForm.controller_action_regex = false;
+		this.controllerForm.controller_action = '';
+		this.controllerForm.controller_pattern = '';
+		this.controllerForm.controller_request_method = '*';
+	}
+
+	createControllerPATTERN(){
+		let jsonData = {
+			type: this.controllerType,
+			controller_pattern: this.controllerForm.controller_pattern,
+			vendor_name: this.form.vendor_name,
+			module_name: this.form.module_name,
+			controller_request_method: this.controllerForm.controller_request_method,
+			extend_to_class: this.controllerForm.extend_to_class
+		};
+		this.requestToCreate(jsonData);
+	}
+
+	setControllerType(type){
+		this.resetControllerForm();
+		this.controllerType = type;
+	}
 }
