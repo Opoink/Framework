@@ -30,13 +30,14 @@ class SystemModuleInstall extends Sys {
 		if($validate){
 			$availableModules = $this->_request->getParam('availableModule');
 			$installed = $this->_modManager->setDi($this->_di)->installModule($availableModules);
-			
-			$installedCount = count($installed);
-			$s = ($installedCount > 1) ? 's' : '';
-
-			$response['error'] = 0;
-			$response['message'] = $installedCount.' Module' . $s . ' successfully installed';
-			$this->jsonEncode($response);
+			if($installed){
+				$installedCount = count($installed);
+				$s = ($installedCount > 1) ? 's' : '';
+	
+				$response['error'] = 0;
+				$response['message'] = $installedCount.' Module' . $s . ' successfully installed';
+				$this->jsonEncode($response);
+			}
 		} else {
 			$this->returnError('400', 'Invalid formkey request');
 		}

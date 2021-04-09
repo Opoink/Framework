@@ -134,9 +134,9 @@ class Module {
 				if(file_exists($target)){
 					$moduleConfig = include($target);
 					
-					$saveModule = $this->_extensionEntity->getByColumn(['vendor' => $vendor, 'extension' => $module]);
+					// $saveModule = $this->_extensionEntity->getByColumn(['vendor' => $vendor, 'extension' => $module]);
 
-					if(!$saveModule){
+					// if(!$saveModule){
 						$result = [
 							'vendor' => $vendor,
 							'module' => $module
@@ -150,31 +150,47 @@ class Module {
 							$this->_config['modules'][$vendor][] = $module;
 						
 							if(isset($moduleConfig['controllers'])){
-								/*$controllerCount = 0;*/
 								$this->_config['controllers'][$fullName] = $moduleConfig['controllers'];
-								/*foreach($moduleConfig['controllers'] as $route => $controller){
-									$this->_config['controllers'][$fullName][$route] = $controller;
-									$controllerCount++;
-								}
-								$result['controller_count'] = $controllerCount;*/
 							}
 							
+							/** 
+							 * this old schema type will going to be depricated on the future release 
+							 * encourage the dev to use the new type of schema instead
+							 */
 							$installSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Install.php';
 							if(file_exists($installSchema)){
 								$installSchema = $this->_di->make("$vendor\\$module\Schema\Install");
 								$installSchema->setAdapter()->createSchema();
 								$result['schema_installed'] = true;
 							}
+							$UpgradeSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Upgrade.php';
+							if(file_exists($UpgradeSchema)){
+								$UpgradeSchema = $this->_di->make("$vendor\\$module\Schema\Upgrade");
+								$UpgradeSchema->setAdapter()->upgradeSchema("0.0.0", $moduleConfig['version']);
+								$result['upgrade_schema_installed'] = true;
+							}
+							/** end old schema */
+
 							$this->_extensionEntity->setDatas([
 								'vendor' => $vendor,
 								'extension' => $module,
 								'version' => $moduleConfig['version'],
 								'status' => \Of\Std\Status::ENABLED
 							])->__save();
+
+							/**
+							 * this schema will be the new migration
+							 */
+							try {
+								$migration = $this->_di->make("Of\Database\Migration\Migrate");
+								$migration->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+							} catch(\Exception $e){
+								$result['error_messages'][] = $e->getMessage();
+							}
 							
 							$installedModule[] = $result;
 						}
-					}
+					// }
 				}
 			}
 		}
