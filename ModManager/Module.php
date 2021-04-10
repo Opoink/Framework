@@ -183,7 +183,10 @@ class Module {
 							 */
 							try {
 								$migration = $this->_di->make("Of\Database\Migration\Migrate");
-								$migration->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+
+								/** init() return a table name that was just intalled or updated */
+								$tableNames = $migration->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+								$result['schema_table_installed_or_update'] = $tableNames;
 							} catch(\Exception $e){
 								$result['error_messages'][] = $e->getMessage();
 							}

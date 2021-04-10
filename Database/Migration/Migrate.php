@@ -5,6 +5,8 @@
 */
 namespace Of\Database\Migration;
 
+use \Of\Database\Migration\Columns;
+
 class Migrate {
 
     protected $vendorName;
@@ -51,6 +53,8 @@ class Migrate {
      */
     public function init(){
         $targetDir = ROOT . DS . 'App' . DS . 'Ext' . DS . $this->vendorName . DS . $this->moduleName . DS . 'Schema' . DS . 'tables';
+
+        $installedTableNames = [];
         if(is_dir($targetDir)){
             $files = $this->getDirFiles($targetDir);
             if($files){
@@ -62,16 +66,17 @@ class Migrate {
                             throw new \Exception("Invalid JSON schema: " . $_file, 1);
                         }
 
-                        $this->createTable($tableName);
-                        // var_dump($fields);
-                        // die;
-
-
-                        // $fields = json_decode(file_get_contents($_file), true);
+                        $fields = json_decode(file_get_contents($_file), true);
+                        if(json_last_error() == JSON_ERROR_NONE){ /** to make sure that the json file was no error */
+                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file);
+                        } else {
+                            throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 1);
+                        }
                     }
                 }
             }
         }
+        return $installedTableNames;
     }
 
     /**
@@ -95,7 +100,7 @@ class Migrate {
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema
      */
-    protected function createTable($tableName){
+    protected function createTable($tableName, $fields, $_file){
 
         $databaseName = $this->_connection->getConfig('database');
         $tableName = $this->_connection->getTablename($tableName);
@@ -103,14 +108,31 @@ class Migrate {
         $r = $this->fetchTableName($databaseName, $tableName);
 
         if($r['count'] == 0 || $r['count'] == '0') {
-            /** in this part the table is not exist so we have to create it */
-            $sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (Prename VARCHAR( 50 ) NOT NULL)";
-            $connection = $this->_connection->getConnection()->getConnection();
-            $connection->exec($sql);
+            
+            $columns = [];
+            if(isset($fields['fields']) ){
+                $columns = $fields['fields'];
+            }
+            
+            if(count($columns)){
+                $_columns = new Columns();
+                foreach ($columns as $keyColumn => $valueColumn) {
+                    $_columns->addColumn($valueColumn, $_file);
+                }
+                $cols = implode(', ', $_columns->getColumns());
 
-            $r = $this->fetchTableName($databaseName, $tableName);
-            var_dump($r);
-            die;
+                $primaryKey = '';
+                if (array_key_exists('primary_key', $fields)) {
+                    $primaryKey = ' , PRIMARY KEY (`'.$fields['primary_key'].'`) ';
+                }
+    
+                /** in this part the table is not exist so we have to create it */
+                $sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+                $connection = $this->_connection->getConnection()->getConnection();
+                $connection->exec($sql);
+
+                return $tableName;
+            }
         } else {
             /** 
              * the table was already exisitng here
