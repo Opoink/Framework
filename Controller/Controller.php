@@ -79,6 +79,17 @@ class Controller {
 		exit;
 		die;
 	}
+
+	/**
+	 * stop the request and make output error
+	 */
+	protected function returnError($code, $msg=''){
+		$codes = $this->_di->get('Of\Http\Codes');
+		header("HTTP/1.0 " . $code . " " . $codes->getCode($code));
+		echo $msg;
+		exit;
+		die;
+	}
 }
 
 ?>

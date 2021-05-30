@@ -108,68 +108,68 @@ class SystemModuleAddcontroller extends Sys {
 							if(isset($controller['pattern'])){
 								if($controller['pattern'] == $patternRegex){
 									$this->returnError('406', 'Route already exist.');
-								} else {
-									if(!empty($extends)){
-										try {
-											/* 
-											 * this is to try if the class to extend exists
-											 * if it is not injector will raise an error
-											 */
-											$this->_di->make($extends);
-										} catch (\Exception $e) {
-											$this->returnError('406', $e->getMessage());
-										}
-										$this->_controller->setExtends($extends);
-									}
-
-									$create = $this->_controller->setVendor($this->vendor_name)
-									->setModule($this->module_name)
-									->createPattern($patternRegexArray, $patternForFileCreateArray, $target);
-									if($create){
-										$routerInfo = [
-											'pattern' => $patternRegex,
-											'class' => $this->vendor_name.'\\'.$this->module_name.'\\Controller\\'.$patternForNameSpace,
-											'page_name' => $patternForNameSpace,
-											'method' => $controller_request_method,
-										];
-
-										/** insert into module config */
-										$this->config['controllers'][] = $routerInfo;
-						
-										$this->_configManager->setConfig($this->config)
-										->createConfig();
-										/** end insert into module config */
-
-										/** insert into installation config */
-										$_config = ROOT . DS . 'etc' . DS. 'Config.php';
-										if(file_exists($_config)){
-											$_config = include($_config);
-
-											$vm = $this->vendor_name."_".$this->module_name;
-											if(isset($_config['controllers'][$vm])){
-												$_config['controllers'][$vm][] = $routerInfo;
-
-												$data = '<?php' . PHP_EOL;
-												$data .= 'return ' . var_export($_config, true) . PHP_EOL;
-												$data .= '?>';
-
-												$_writer = new \Of\File\Writer();
-												$_writer->setDirPath(ROOT . DS . 'etc' . DS)
-												->setData($data)
-												->setFilename('Config')
-												->setFileextension('php')
-												->write();
-											}
-										}
-										/** end insert into installation config */
-										$response = [];
-										$response['error'] = 0;
-										$response['message'] = 'New conroller created.';
-										$this->jsonEncode($response);
-									}
-								}
+								} 
 							}
 						}
+					}
+
+					/**
+					 * this is to try if the class to extend exists
+					 * if it is not injector will raise an error
+					 */
+					if(!empty($extends)){
+						try {
+							$this->_di->make($extends);
+						} catch (\Exception $e) {
+							$this->returnError('406', $e->getMessage());
+						}
+						$this->_controller->setExtends($extends);
+					}
+
+					$create = $this->_controller->setVendor($this->vendor_name)
+					->setModule($this->module_name)
+					->createPattern($patternRegexArray, $patternForFileCreateArray, $target);
+					if($create){
+						$routerInfo = [
+							'pattern' => $patternRegex,
+							'class' => $this->vendor_name.'\\'.$this->module_name.'\\Controller\\'.$patternForNameSpace,
+							'page_name' => $patternForNameSpace,
+							'method' => $controller_request_method,
+						];
+
+						/** insert into module config */
+						$this->config['controllers'][] = $routerInfo;
+		
+						$this->_configManager->setConfig($this->config)
+						->createConfig();
+						/** end insert into module config */
+
+						/** insert into installation config */
+						$_config = ROOT . DS . 'etc' . DS. 'Config.php';
+						if(file_exists($_config)){
+							$_config = include($_config);
+
+							$vm = $this->vendor_name."_".$this->module_name;
+							if(isset($_config['controllers'][$vm])){
+								$_config['controllers'][$vm][] = $routerInfo;
+
+								$data = '<?php' . PHP_EOL;
+								$data .= 'return ' . var_export($_config, true) . PHP_EOL;
+								$data .= '?>';
+
+								$_writer = new \Of\File\Writer();
+								$_writer->setDirPath(ROOT . DS . 'etc' . DS)
+								->setData($data)
+								->setFilename('Config')
+								->setFileextension('php')
+								->write();
+							}
+						}
+						/** end insert into installation config */
+						$response = [];
+						$response['error'] = 0;
+						$response['message'] = 'New conroller created.';
+						$this->jsonEncode($response);
 					}
 				}
 			} else {
