@@ -105,15 +105,13 @@ class Migrate {
         $databaseName = $this->_connection->getConfig('database');
         $tableName = $this->_connection->getTablename($tableName);
 
-        $r = $this->fetchTableName($databaseName, $tableName);
-
-        if($r['count'] == 0 || $r['count'] == '0') {
-            
-            $columns = [];
-            if(isset($fields['fields']) ){
-                $columns = $fields['fields'];
-            }
-            
+        $isExist = $this->fetchTableName($tableName);
+ 
+        $columns = [];
+        if(isset($fields['fields']) ){
+            $columns = $fields['fields'];
+        }
+        if(!$isExist) {
             if(count($columns)){
                 $_columns = new Columns();
                 foreach ($columns as $keyColumn => $valueColumn) {
@@ -139,27 +137,69 @@ class Migrate {
              * so we have to check each field if existing or not 
              * if the field is not exist we have to do altering the table
              */
+            foreach ($columns as $key => $column) {
+                if(isset($column['name'])){
+                    $isColumnExist = $this->fetchColumnName($tableName, $column['name']);
+                    if(!$isColumnExist){
+                        $_columns = new Columns();
+                        $_columns->addColumn($column, $_file);
+                        $cols = implode(', ', $_columns->getColumns());
+
+                        $sql = "ALTER TABLE `".$tableName."` ";
+                        $sql .= "ADD " . $cols . ";";
+
+                        $connection = $this->_connection->getConnection()->getConnection();
+                        $connection->exec($sql);
+
+                        return $tableName;
+                    }
+                } else {
+                    throw new \Exception("Invalid column: name is required " . json_encode($column));
+                }
+            }
         }
     }
 
     /**
-     * get the table name in information schema
+     * instad of trying to execute query to alter tale
+     * this will query the column into the table first to
+     * check if it is exist or not
+     * @param $tableName string
+     * @param $columnName string
      */
-    public function fetchTableName($databaseName, $tableName){
+    public function fetchColumnName($tableName, $columnName){
         $connection = $this->_connection->getConnection()->getConnection();
-        $sql = "SELECT COUNT(*) AS `count` FROM `information_schema`.`tables` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?";
-        $unsecured = [
-            $databaseName,
-            $tableName
-        ];
+        $sql = "SELECT `".$columnName."` FROM `".$tableName."` limit 1";
 
-        $sth = $connection->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-        $sth->execute($unsecured);
-        $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
-
-        return $result[0];
+        $isExist = $this->executeQuery($connection, $sql);
+        return $isExist;
     }
 
+    /**
+     * try to query the table name to check if it is exist or not
+     * return boolean
+     * @param $tableName string the table name to be checked
+     */
+    public function fetchTableName($tableName){
+        $connection = $this->_connection->getConnection()->getConnection();
+        $sql = "SELECT * FROM `".$tableName."` limit 1";
+        
+        $isExist = $this->executeQuery($connection, $sql);
+        return $isExist;
+    }
+
+    private function executeQuery($connection, $sql){
+        $isExist = false;
+        try {
+            $sth = $connection->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            $sth->execute([]);
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+            $isExist = true;
+        } catch (\Exception $e) {
+            $isExist = false;
+        }
+        return $isExist;
+    }
 
     /**
      * return the files inside dir

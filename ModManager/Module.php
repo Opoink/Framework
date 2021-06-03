@@ -171,13 +171,6 @@ class Module {
 							}
 							/** end old schema */
 
-							$this->_extensionEntity->setDatas([
-								'vendor' => $vendor,
-								'extension' => $module,
-								'version' => $moduleConfig['version'],
-								'status' => \Of\Std\Status::ENABLED
-							])->__save();
-
 							/**
 							 * this schema will be the new migration
 							 */
@@ -187,11 +180,18 @@ class Module {
 								/** init() return a table name that was just intalled or updated */
 								$tableNames = $migration->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
 								$result['schema_table_installed_or_update'] = $tableNames;
+
+								$this->_extensionEntity->setDatas([
+									'vendor' => $vendor,
+									'extension' => $module,
+									'version' => $moduleConfig['version'],
+									'status' => \Of\Std\Status::ENABLED
+								])->__save();
+								
+								$installedModule[] = $result;
 							} catch(\Exception $e){
 								$result['error_messages'][] = $e->getMessage();
 							}
-							
-							$installedModule[] = $result;
 						}
 					// }
 				}
@@ -256,13 +256,30 @@ class Module {
 				$fullName = $v . '_' . $m;
 				$result['error'] = 0;
 				try {
+					/** 
+					 * this old schema type will going to be depricated on the future release 
+					 * encourage the dev to use the new type of schema instead
+					 */
 					$upgradeSchema = $this->_di->make($v.'\\'.$m.'\\Schema\\Upgrade');
 					$upgradeSchema->setAdapter()->upgradeSchema($savedModule->getData('version'), $config['version']);
 
-					$result['message'][] = [
-						'type' => 'success',
-						'message' => 'Database schema upgraded.'
-					];
+					/**
+					 * this schema will be the new migration
+					 */
+					try {
+						$migration = $this->_di->make("Of\Database\Migration\Migrate");
+
+						/** init() return a table name that was just intalled or updated */
+						$tableNames = $migration->setConfig($this->_config)->setVendorName($v)->setModuleName($m)->init();
+						$result['schema_table_installed_or_update'] = $tableNames;
+
+						$result['message'][] = [
+							'type' => 'success',
+							'message' => 'Database schema upgraded.'
+						];
+					} catch(\Exception $e){
+						$result['error_messages'][] = $e->getMessage();
+					}
 				} catch(\Exception $e) {
 					$result['message'][] = [
 						'type' => 'success',
