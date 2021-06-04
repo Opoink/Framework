@@ -12,16 +12,25 @@ class Migrate {
     protected $vendorName;
     protected $moduleName;
     protected $_config;
+    protected $_di;
 
     /**
      * instance of \Of\Database\Connection
      */
     protected $_connection;
+    protected $_entity;
     
     public function __construct(
-        \Of\Database\Connection $Connection
+        \Of\Database\Connection $Connection,
+        \Of\Database\Entity $Entity
     ){
         $this->_connection = $Connection;
+        $this->_entity = $Entity;
+    }
+
+    public function setDi($di) {
+        $this->_di = $di;
+        return $this;
     }
 
     /**
@@ -68,7 +77,7 @@ class Migrate {
 
                         $fields = json_decode(file_get_contents($_file), true);
                         if(json_last_error() == JSON_ERROR_NONE){ /** to make sure that the json file was no error */
-                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file);
+                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir);
                         } else {
                             throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 1);
                         }
@@ -100,7 +109,7 @@ class Migrate {
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema
      */
-    protected function createTable($tableName, $fields, $_file){
+    protected function createTable($tableName, $fields, $_file, $targetDir){
 
         $databaseName = $this->_connection->getConfig('database');
         $tableName = $this->_connection->getTablename($tableName);
@@ -129,7 +138,9 @@ class Migrate {
                 $connection = $this->_connection->getConnection()->getConnection();
                 $connection->exec($sql);
 
-                return $tableName;
+                $_GET['module_install_result'][] = [
+                    'message' => $tableName.': Database created.',
+                ];
             }
         } else {
             /** 
@@ -151,13 +162,17 @@ class Migrate {
                         $connection = $this->_connection->getConnection()->getConnection();
                         $connection->exec($sql);
 
-                        return $tableName;
+                        $_GET['module_install_result'][] = [
+                            'message' => $column['name'].': added into '.$tableName.' .',
+                        ];
                     }
                 } else {
                     throw new \Exception("Invalid column: name is required " . json_encode($column));
                 }
             }
         }
+        $this->saveData($tableName, $targetDir);
+        return $tableName;
     }
 
     /**
@@ -188,17 +203,52 @@ class Migrate {
         return $isExist;
     }
 
-    private function executeQuery($connection, $sql){
+    private function executeQuery($connection, $sql, $unsecureValue=[]){
         $isExist = false;
         try {
             $sth = $connection->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-            $sth->execute([]);
+            $sth->execute($unsecureValue);
             $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
             $isExist = true;
         } catch (\Exception $e) {
             $isExist = false;
         }
         return $isExist;
+    }
+
+    /**
+     * try to save preinstalled data id the JSON data exist
+     * if he data exist check if it is already saved before or not
+     * @param $tableName string
+     * @param $targetDir string
+     */
+    private function saveData($tableName, $targetDir){
+        $dataJSONFile = $targetDir.DS.$tableName.'_data.json';
+        if(file_exists($dataJSONFile)){
+            $_data = file_get_contents($dataJSONFile);
+            $_data = json_decode($_data, true);
+
+            foreach ($_data as $key => $data) {
+                try {
+                    $saveSrc = null;
+                    foreach ($data as $key => $value) {
+                        if(!is_string($value)){
+                            if($key == '_migration_data_save_'){
+                                $saveSrc = $value;
+                            }
+                        }
+                    }
+
+                    if($saveSrc){
+                        $src = $this->_di->get($saveSrc['source']);
+                        $method = $value['method'];
+                        $src->$method($data);
+                    }
+                } catch (\Exception $e) {
+                    /** do error message here */
+                }
+            }
+        }
     }
 
     /**

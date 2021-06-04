@@ -32,6 +32,15 @@ class Entity {
     }
 
     /**
+     * set the primarykey of the table
+     * @param $primaryKey string
+     */
+    public function setPrimaryKey($primaryKey){
+        $this->primaryKey = $primaryKey;
+        return $this;
+    }
+
+    /**
      * return the current connect
      */
     public function getConnection(){
@@ -107,6 +116,15 @@ class Entity {
         $_select->count($col, $alias);
         $count = $this->fetchAll($_select);
         return $count->getData($alias);
+    }
+
+    /**
+     * set the table name
+     * @param $tablename string without prefix
+     */
+    public function setTablename($tablename){
+        $this->tablename = $tablename;
+        return $this;
     }
 
     /**

@@ -33,6 +33,9 @@ class SystemModuleAction extends Sys {
 			$intalledModule = $this->_request->getParam('intalledModule');
 			$upgradeds = $this->_modManager->setDi($this->_di)->moduleAction();
 
+			/** we will use this global variable to easily get the installation result */
+			$_GET['module_install_result'] = [];
+
 			$response = [];
 			foreach($upgradeds as $key => $val){
 				$response['message'] = [];
@@ -47,6 +50,8 @@ class SystemModuleAction extends Sys {
 					$response['message'][] = $val['vendor'] . '_' . $val['module'] . ' module successfully uninstalled';
 				}
 			}
+			
+			$response['module_install_result'] = $_GET['module_install_result'];
 			$this->jsonEncode($response);
 		} else {
 			$this->returnError('400', 'Invalid request.');

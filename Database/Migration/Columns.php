@@ -136,6 +136,8 @@ class Columns {
 		$this->attributes = null;
         if (array_key_exists('attributes', $column)) {
             $attr = $column['attributes'];
+            
+            $this->attributes = $attr;
             if(in_array($attr, self::ATTR)){
                 switch ($attr) {
                     case self::ATTR['BINARY']:

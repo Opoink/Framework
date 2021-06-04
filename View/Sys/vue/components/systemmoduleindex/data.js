@@ -160,7 +160,11 @@ class systemmoduleindex {
 						.then(a => {
 							setTimeout(f => {
 								if(!a.error && a.result){
-									this.installTasks.push(mods[index] + ' successfully installed...');
+									console.log('installation result', a.result);
+									this.installTasks.push(a.result.message);
+									a.result.module_install_result.forEach(res => {
+										this.installTasks.push(res['message']);
+									});
 								} else {
 									this.installTasks.push('Failed to install ' + mods[index] + '...');
 									this.installTasks.push('Check this module if already saved on your database, if it is you may want to delete it first.');
@@ -173,7 +177,7 @@ class systemmoduleindex {
 								} else {
 									install(true);
 								}
-							}, 3000);
+							}, 2000);
 						});
 					} else {
 						this.installTasks.push('Failed, can\'t get a form key...');

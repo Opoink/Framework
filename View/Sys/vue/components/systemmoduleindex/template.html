@@ -48,13 +48,18 @@
 									<td>
 										<div class="MH-150 of-auto">
 											<template v-for="con in module.value.controllers">
-												<template v-if="con.isRegex">
+												<!-- <template v-if="con.isRegex">
 													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
 														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
 														<code>{{con.value.class}}</code>
 													</p>
+												</template> -->
+												<template v-if="con.pattern">
+													<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+														<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+													</p>
 												</template>
-												<template v-if="!con.isRegex">
+												<template v-if="!con.pattern">
 													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
 														<code>{{con.key}}</code> : <code>{{con.value}}</code>
 													</p>
@@ -125,13 +130,24 @@
 									<td>
 										<div class="MH-150 of-auto">
 											<template v-for="con in module.value.controllers">
-												<template v-if="con.isRegex">
+												<!-- <template v-if="con.isRegex">
 													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
 														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
 														<code>{{con.value.class}}</code>
 													</p>
 												</template>
 												<template v-if="!con.isRegex">
+													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+														<code>{{con.key}}</code> : <code>{{con.value}}</code>
+													</p>
+												</template> -->
+
+												<template v-if="con.pattern">
+													<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+														<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+													</p>
+												</template>
+												<template v-if="!con.pattern">
 													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
 														<code>{{con.key}}</code> : <code>{{con.value}}</code>
 													</p>

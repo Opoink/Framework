@@ -29,15 +29,25 @@ class SystemModuleInstall extends Sys {
 		$validate = $this->validateFormKey();
 		if($validate){
 			$availableModules = $this->_request->getParam('availableModule');
+
+			/** we will use this global variable to easily get the installation result */
+			$_GET['module_install_result'] = [];
+
 			$installed = $this->_modManager->setDi($this->_di)->installModule($availableModules);
+			
 			if($installed){
 				$installedCount = count($installed);
 				$s = ($installedCount > 1) ? 's' : '';
 	
 				$response['error'] = 0;
 				$response['message'] = $installedCount.' Module' . $s . ' successfully installed';
-				$this->jsonEncode($response);
+			} else {
+				$response['error'] = 1;
+				$response['message'] = 'No module was installed';
 			}
+
+			$response['module_install_result'] = $_GET['module_install_result'];
+			$this->jsonEncode($response);
 		} else {
 			$this->returnError('400', 'Invalid formkey request');
 		}
