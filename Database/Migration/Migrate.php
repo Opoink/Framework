@@ -135,6 +135,7 @@ class Migrate {
     
                 /** in this part the table is not exist so we have to create it */
                 $sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+
                 $connection = $this->_connection->getConnection()->getConnection();
                 $connection->exec($sql);
 

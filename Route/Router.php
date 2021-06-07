@@ -376,7 +376,7 @@ class Router {
 	public function getCurrentRoute(){
 		return [
 			'route' => $this->requestRoute ? $this->requestRoute : $this->route,
-			'route' => $this->requestController ? $this->requestController : $this->controller,
+			'controller' => $this->requestController ? $this->requestController : $this->controller,
 			'action' => $this->requestAction ? $this->requestAction : $this->action
 		];
 	}

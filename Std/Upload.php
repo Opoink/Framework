@@ -25,6 +25,34 @@ class Upload Extends \Of\File\Dirmanager {
 	    8 => 'A PHP extension stopped the file upload.',
 	];
 
+	/**
+	 * re-arrange the files then set it same as per single file upload
+	 * @param $key string, the name of the file from the form field
+	 * return self instance
+	 */
+	public function setFiles($key){
+		$files = [];
+
+        if(isset($_FILES[$key])){
+            $attach = $_FILES[$key];
+
+            if(is_array($attach['name'] )){
+                foreach ($attach['name'] as $key => $value) {
+                    $files[$key] = [
+                        'name' => $attach['name'][$key],
+                        'type' => $attach['type'][$key],
+                        'tmp_name' => $attach['tmp_name'][$key],
+                        'error' => $attach['error'][$key],
+                        'size' => $attach['size'][$key],
+                    ];
+                }
+            } else {
+                $files[] = $attach;
+            }
+        }
+        return $files;
+	}
+
 	public function setFile($file){
 		$this->file = $file;
 		return $this;
