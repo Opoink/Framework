@@ -7,11 +7,50 @@ namespace Of\Std;
 
 class Upload Extends \Of\File\Dirmanager {
 	
+
+	/**
+	 * the that is being uploaded to to server
+	 * came from form field 
+	 * array $_FILES
+	 */
 	protected $file;
+
+	/**
+	 * the location of the file to be uloaded
+	 * string
+	 */
 	protected $path;
+
+	/**
+	 * tells either to save the file into Vendor/Module/ directory
+	 * or use the full path that is set
+	 * boolean 
+	 */
+	protected $isFullPath;
+	
+	/**
+	 * the name that will be used as an alias of the file
+	 * because the file name will be generated
+	 * string
+	 */
 	protected $newName;
+
+	/**
+	 * this will be the file name when it is saved on the server
+	 * this is being generated upon upload
+	 * string
+	 */
 	protected $orignalName;
+
+	/**
+	 * the file extension
+	 * string
+	 */
 	protected $ext;
+
+	/**
+	 * accepted file type for the upload
+	 */
 	protected $accepted = [];
 
 	protected $phpFileUploadErrors = [
@@ -58,8 +97,23 @@ class Upload Extends \Of\File\Dirmanager {
 		return $this;
 	}
 
-	public function setPath($path){
+	public function setPath($path, $isFullPath=false, $isAddDate=true){
+		$this->isFullPath = $isFullPath;
+
+		$path = ltrim($path, '/');
+		$path = ltrim($path, '\\');
+		$path = rtrim($path, '/');
+		$path = rtrim($path, '\\');
+
+		$time = time();
+		$year = date("Y", $time);  
+		$month = date("m", $time);  
+		$day = date("d", $time);  
+
 		$this->path = $path;
+		if($isAddDate){
+			$this->path = $path . '/' . $year . '/' . $month . '/' . $day;
+		}
 		return $this;
 	}
 
@@ -91,7 +145,11 @@ class Upload Extends \Of\File\Dirmanager {
 
 			if($result['error'] == 0){
 				$tmp_name = $this->file['tmp_name'];
+
 				$destinationPath = ROOT . DS . 'App' . DS . 'Ext' . DS .  $this->path;
+				if($this->isFullPath){
+					$destinationPath = ROOT . DS . $this->path;
+				}
 
 				$this->createDir($destinationPath);
 				$this->checkExists($destinationPath, $this->newName);
