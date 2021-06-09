@@ -224,7 +224,12 @@ class Migrate {
      * @param $targetDir string
      */
     private function saveData($tableName, $targetDir){
-        $dataJSONFile = $targetDir.DS.$tableName.'_data.json';
+        $prefix = $this->_connection->getConfig('table_prefix');
+        $dataFilename = str_replace($prefix, '', $tableName);
+        $dataFilename .= '_data.json';
+
+        $dataJSONFile = $targetDir.DS.$dataFilename;
+
         if(file_exists($dataJSONFile)){
             $_data = file_get_contents($dataJSONFile);
             $_data = json_decode($_data, true);
