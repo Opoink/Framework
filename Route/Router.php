@@ -211,6 +211,7 @@ class Router {
 			$sysRoute.'_cache_action' => 'Of\\Controller\\Sys\\SystemCacheAction',
 			$sysRoute.'_static_vue' => 'Of\\Controller\\Sys\\SystemStaticVue',
 			$sysRoute.'_static_css' => 'Of\\Controller\\Sys\\SystemStaticCss',
+			$sysRoute.'_database_addforeignkey' => 'Of\\Controller\\Sys\\SystemDbAddForeignkey',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

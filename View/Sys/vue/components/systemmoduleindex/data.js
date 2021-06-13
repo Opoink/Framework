@@ -76,7 +76,6 @@ class systemmoduleindex {
 						con['isRegex'] = true;
 					}
 				});
-				
 			}
 		});
 		
@@ -160,7 +159,6 @@ class systemmoduleindex {
 						.then(a => {
 							setTimeout(f => {
 								if(!a.error && a.result){
-									console.log('installation result', a.result);
 									this.installTasks.push(a.result.message);
 									a.result.module_install_result.forEach(res => {
 										this.installTasks.push(res['message']);
@@ -260,6 +258,31 @@ class systemmoduleindex {
 				});
 			} else {
 				install(false);
+			}
+		});
+	}
+
+	/**
+	 * insall the database relationship for the tables
+	 * this will call the API for foreignkeys
+	 * the API will only add foreignkeys for the installed modules
+	 */
+	installDBRelationship(){
+		_vue.request.getFormKey().then(formkey => {
+			if(formkey){
+				let jsonData = {
+					'form_key': formkey
+				}
+				let url = '/' + _vue.url.getRoute() + '/database/addforeignkey';
+				_vue.request.makeRequest(url, jsonData, 'POST').then(res => {
+					if(res.result && !res.error){
+						_vue.toast.add(res.result.message);
+					} else {
+						_vue.toast.add(res.error.responseText, 'Failed');
+					}
+				});
+			} else {
+				_vue.toast.add('Failed, can\'t get a form key...', 'Failed');
 			}
 		});
 	}

@@ -272,5 +272,20 @@ class Migrate {
             return $files;
         }
     }
+
+    /**
+     * add foreignkey to the table
+     */
+	public function addForeignKey($tableName, $column, $referenceTableName, $referenceColumn, $onDelete='ON DELETE CASCADE'){	
+        $tableName = $this->_connection->getTablename($tableName);
+        $referenceTableName = $this->_connection->getTablename($referenceTableName);
+
+		$query = "ALTER TABLE `".$tableName."` ";
+		$query .= "ADD FOREIGN KEY (`".$column."`) REFERENCES ".$referenceTableName."(`".$referenceColumn."`) ";
+		$query .= ' '.$onDelete.';';
+
+        $connection = $this->_connection->getConnection()->getConnection();
+        $connection->exec($query);
+	}
 }
 ?>
