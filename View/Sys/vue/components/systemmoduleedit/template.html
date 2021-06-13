@@ -28,91 +28,114 @@
 					<h5 class="m-0">Add Controller</h5>
 				</div>
 				<div class="card-body">
-					<div class="form-group">
-						<label for="controller_type">Controller For</label>
-						<select class="select2 form-control custom-select" id="controller_type" v-model="systemmoduleedit.controllerForm.controller_type">
-							<option value="public">Public</option>
-							<option value="admin">Admin</option>
-						</select>
-					</div>
-					<div class="form-group">
-						<label for="controller_route">Route</label>
-						<div class="form-check">
-							<input 
-								type="checkbox" 
-								class="form-check-input" 
-								id="controller_route_regex" 
-								v-model="systemmoduleedit.controllerForm.controller_route_regex"
+					<nav>
+						<div class="nav nav-tabs" id="nav-tab" role="tablist">
+							<a 
+								class="nav-item nav-link active" 
+								id="nav-home-tab" 
+								data-toggle="tab" 
+								href="#nav-home" 
+								role="tab" 
+								aria-controls="nav-home" 
+								aria-selected="true"
+								v-on:click="systemmoduleedit.setControllerType('RCA')"
 							>
-							<label class="form-check-label" for="controller_route_regex">Use route regex <small class="text-muted">use regular expression for route.</small></label>
-						</div>
-						<input 
-							id="controller_route" 
-							name="controller_route" 
-							type="text" 
-							class="form-control"
-							v-model="systemmoduleedit.controllerForm.controller_route"
-						>
-						<template v-if="systemmoduleedit.controllerForm.controller_route_regex">
-							<small class="text-muted">If using route regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
-							<br>
-							<small class="text-muted">The URL will be <code>http://domain.com/string.html</code></small>
-						</template>
-					</div>
-
-
-					<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route">
-						<label for="controller_controller">Controller</label>
-						<div class="form-check">
-							<input 
-								type="checkbox" 
-								class="form-check-input" 
-								id="controller_controller_regex" 
-								v-model="systemmoduleedit.controllerForm.controller_controller_regex"
+								Route/Controller/Action Type
+							</a>
+							<a 
+								class="nav-item nav-link" 
+								id="nav-pattern-tab" 
+								data-toggle="tab" 
+								href="#nav-pattern" 
+								role="tab" 
+								aria-controls="nav-pattern" 
+								aria-selected="false"
+								v-on:click="systemmoduleedit.setControllerType('PATTERN')"
 							>
-							<label class="form-check-label" for="controller_controller_regex">Use controller regex <small class="text-muted">use regular expression for controller.</small></label>
+								Full Pattern Type
+							</a>
 						</div>
-						<input 
-							id="controller_controller" 
-							name="controller_controller" 
-							type="text" 
-							class="form-control"
-							v-model="systemmoduleedit.controllerForm.controller_controller"
-						>
-						<template v-if="systemmoduleedit.controllerForm.controller_controller_regex">
-							<small class="text-muted">If using controller regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
-							<br>
-							<small class="text-muted">The URL will be <code>http://domain.com/route/string.html</code></small>
-						</template>
-					</div>
+					</nav>
+					<div class="tab-content" id="nav-tabContent">
+						<div class="tab-pane fade show active pT-15" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+							<p>
+								This type of controller uses the Opoink route/controller/action for your module. <br/>
+								Ex: is http://domain.com/user/edit/save. <br/>
+								Route: user <br/>
+								Controller: edit <br/>
+								Action: save <br/>
+								This will create a file User/Edit/Save.php under your module Controller directory.
+							</p>
 
+							<div class="form-group">
+								<label for="controller_type">Controller For</label>
+								<select class="select2 form-control custom-select" id="controller_type" v-model="systemmoduleedit.controllerForm.controller_type">
+									<option value="public">Public</option>
+									<option value="admin">Admin</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="controller_route">Route</label>
+								<input 
+									id="controller_route" 
+									name="controller_route" 
+									type="text" 
+									class="form-control"
+									v-model="systemmoduleedit.controllerForm.controller_route"
+								>
+							</div>
+							<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route">
+								<label for="controller_controller">Controller</label>
+								<input 
+									id="controller_controller" 
+									name="controller_controller" 
+									type="text" 
+									class="form-control"
+									v-model="systemmoduleedit.controllerForm.controller_controller"
+								>
+							</div>
+							<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route && systemmoduleedit.controllerForm.controller_controller">
+								<label for="controller_action">Action</label>
+								<input 
+									id="controller_action" 
+									name="controller_action" 
+									type="text" 
+									class="form-control"
+									v-model="systemmoduleedit.controllerForm.controller_action"
+								>
+							</div>
+						</div>
+						<div class="tab-pane fade pT-15" id="nav-pattern" role="tabpanel" aria-labelledby="nav-pattern-tab">
+							<p>
+								This type of controller type uses the full regular expression matching of the URL.<br />
+								Ex: /user/edit/:id/save where the id will be a $_GET variable parameter. <br />
+								<small class="text-muted">If you are using the Opoink XML layout, please use the route/controller/action type.</small>
+							</p>
+							<div class="form-group">
+								<label for="controller_pattern">Pattern</label>
+								<input 
+									id="controller_pattern" 
+									name="controller_pattern" 
+									type="text" 
+									class="form-control"
+									v-model="systemmoduleedit.controllerForm.controller_pattern"
+								>
+							</div>
+							
+							<div class="form-group">
+								<label for="controller_request_method">Method</label>
+								<select class="select2 form-control custom-select" id="controller_request_method" v-model="systemmoduleedit.controllerForm.controller_request_method">
+									<option value="*">Any</option>
+									<option value="GET">GET</option>
+									<option value="POST">POST</option>
+									<option value="PUT">PUT</option>
+									<option value="PATCH">PATCH</option>
+									<option value="DELETE">DELETE</option>
+								</select>
+							</div>
+						</div>
+					</div>
 					
-
-					<div class="form-group" v-if="systemmoduleedit.controllerForm.controller_route && systemmoduleedit.controllerForm.controller_controller">
-						<label for="controller_action">Action</label>
-						<div class="form-check">
-							<input 
-								type="checkbox" 
-								class="form-check-input" 
-								id="controller_action_regex" 
-								v-model="systemmoduleedit.controllerForm.controller_action_regex"
-							>
-							<label class="form-check-label" for="controller_action_regex">Use action regex <small class="text-muted">use regular expression for controller.</small></label>
-						</div>
-						<input 
-							id="controller_action" 
-							name="controller_action" 
-							type="text" 
-							class="form-control"
-							v-model="systemmoduleedit.controllerForm.controller_action"
-						>
-						<template v-if="systemmoduleedit.controllerForm.controller_action_regex">
-							<small class="text-muted">If using action regex, you should enter your pattern in the field. ex: <code>/^([a-zA-Z0-9_\\-\\.]+)\\.html?$/i</code></small>
-							<br>
-							<small class="text-muted">The URL will be <code>http://domain.com/route/controller/string.html</code></small>
-						</template>
-					</div>
-
 					<div class="form-group">
 						<label for="extend_to_class">Extend To Class</label>
 						<input 

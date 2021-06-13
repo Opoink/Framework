@@ -57,6 +57,21 @@ class Connection {
     }
 
     /**
+     * return all config if the param is not set,
+     * if the param is set return the value of the param
+     * else return null
+     */
+    public function getConfig($param=null){
+        if($param){
+            if(isset($this->config[$param])){
+                return $this->config[$param];
+            }
+        } else {
+            return $this->config;
+        }
+    }
+
+    /**
      * connect to database depends on the set driver
      * opoink currently suported driver is "Pdo_Mysql"
      * other driver will be added on the future updates

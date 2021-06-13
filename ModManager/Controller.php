@@ -64,7 +64,7 @@ class Controller {
 	}
 
 	/**
-	 * create the controller file
+	 * create the controller file the Route/Controller/Action(RCA) type
 	 */
 	public function create($type='public'){
 		$target = ROOT.DS.'App'.DS.'Ext'.DS.$this->vendor.DS.$this->module.DS.'Controller';
@@ -118,6 +118,65 @@ class Controller {
 			$_writer->setDirPath($target)
 			->setData($data)
 			->setFilename($action)
+			->setFileextension('php')
+			->write();
+
+			return true;
+		}
+	}
+
+	/**
+	 * create a pattern type controller
+	 */
+	public function createPattern($patternRegex, $patternForFileCreate, $target){	
+		$data = "<?php" . PHP_EOL;
+
+		$nSpace = $patternForFileCreate;
+		array_pop($nSpace);
+		$data .= "namespace ".$this->vendor."\\".$this->module."\\Controller\\".implode('\\', $nSpace).";" . PHP_EOL . PHP_EOL;
+
+		$className = end($patternForFileCreate); 
+		$data .= "class ".$className." extends ".$this->extends." {" . PHP_EOL . PHP_EOL;
+			$data .= "\tprotected \$pageTitle = '';" . PHP_EOL;
+			$data .= "\tprotected \$_url;" . PHP_EOL;
+			$data .= "\tprotected \$_message;" . PHP_EOL . PHP_EOL;
+
+			$data .= "\tpublic function __construct(" . PHP_EOL;
+				$data .= "\t\t\Of\Http\Url \$Url," . PHP_EOL;
+				$data .= "\t\t\Of\Std\Message \$Message" . PHP_EOL;
+			$data .= "\t){" . PHP_EOL . PHP_EOL;
+				$data .= "\t\t\$this->_url = \$Url;" . PHP_EOL;
+				$data .= "\t\t\$this->_message = \$Message;" . PHP_EOL;
+			$data .= "\t}" . PHP_EOL . PHP_EOL;
+
+			$data .= "\tpublic function run(){" . PHP_EOL;
+				
+				$data .= "\t\t\$this->toJson(\$this->getParam());" . PHP_EOL;
+				$data .= "\t\t/** this is used when using the XML template */" . PHP_EOL;
+				$data .= "\t\t/**return parent::run();*/" . PHP_EOL;
+			$data .= "\t}" . PHP_EOL . PHP_EOL;
+
+			$data .= "\tpublic function setLayout(\$router){" . PHP_EOL;
+				$data .= "\t\t\$this->_url->setRouter(\$router);" . PHP_EOL;
+				$data .= "\t\treturn parent::setLayout(\$router);" . PHP_EOL;
+			$data .= "\t}" . PHP_EOL;
+
+		$data .= "}" . PHP_EOL;
+		$data .= "?>" . PHP_EOL;
+
+		$dirPath = dirname($target);
+
+		return $this->writeClass($target, $dirPath, $data, $className);
+	}
+
+	private function writeClass($file, $dirPath, $data, $fileName){
+		if(file_exists($file) && is_file($file)){
+			return false;
+		} else {
+			$_writer = new \Of\File\Writer();
+			$_writer->setDirPath($dirPath)
+			->setData($data)
+			->setFilename($fileName)
 			->setFileextension('php')
 			->write();
 

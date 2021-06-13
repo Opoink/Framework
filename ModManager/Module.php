@@ -134,9 +134,9 @@ class Module {
 				if(file_exists($target)){
 					$moduleConfig = include($target);
 					
-					$saveModule = $this->_extensionEntity->getByColumn(['vendor' => $vendor, 'extension' => $module]);
+					// $saveModule = $this->_extensionEntity->getByColumn(['vendor' => $vendor, 'extension' => $module]);
 
-					if(!$saveModule){
+					// if(!$saveModule){
 						$result = [
 							'vendor' => $vendor,
 							'module' => $module
@@ -150,32 +150,66 @@ class Module {
 							$this->_config['modules'][$vendor][] = $module;
 						
 							if(isset($moduleConfig['controllers'])){
-								/*$controllerCount = 0;*/
 								$this->_config['controllers'][$fullName] = $moduleConfig['controllers'];
-								/*foreach($moduleConfig['controllers'] as $route => $controller){
-									$this->_config['controllers'][$fullName][$route] = $controller;
-									$controllerCount++;
-								}
-								$result['controller_count'] = $controllerCount;*/
 							}
 							
+							/** 
+							 * this old schema type will going to be depricated on the future release 
+							 * encourage the dev to use the new type of schema instead
+							 */
 							$installSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Install.php';
 							if(file_exists($installSchema)){
 								$installSchema = $this->_di->make("$vendor\\$module\Schema\Install");
 								$installSchema->setAdapter()->createSchema();
 								$result['schema_installed'] = true;
 							}
-							$this->_extensionEntity->setDatas([
-								'vendor' => $vendor,
-								'extension' => $module,
-								'version' => $moduleConfig['version'],
-								'status' => \Of\Std\Status::ENABLED
-							])->__save();
-							
-							$installedModule[] = $result;
+							$UpgradeSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Upgrade.php';
+							if(file_exists($UpgradeSchema)){
+								$UpgradeSchema = $this->_di->make("$vendor\\$module\Schema\Upgrade");
+								$UpgradeSchema->setAdapter()->upgradeSchema("0.0.0", $moduleConfig['version']);
+								$result['upgrade_schema_installed'] = true;
+							}
+							/** end old schema */
+
+							/**
+							 * this schema will be the new migration
+							 */
+							try {
+								$migration = $this->_di->make("Of\Database\Migration\Migrate");
+
+								/** init() return a table name that was just intalled or updated */
+								$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+								$result['schema_table_installed_or_update'] = $tableNames;
+
+								$this->_extensionEntity->setDatas([
+									'vendor' => $vendor,
+									'extension' => $module,
+									'version' => $moduleConfig['version'],
+									'status' => \Of\Std\Status::ENABLED
+								])->__save();
+								
+								$installedModule[] = $result;
+								
+								$_GET['module_install_result'][] = [
+									'message' => $vendor.'_' .$module.': Installed successully.',
+								];
+							} catch(\Exception $e){
+								$result['error_messages'][] = $e->getMessage();
+								$_GET['module_install_result'][] = [
+									'message' => $module . ': ' . $e->getMessage()
+								];
+							}
 						}
-					}
+					// }
+				} else {
+					$_GET['module_install_result'][] = [
+						'message' => $module . ': Config.php file does not exist.'
+					];
 				}
+			} else {
+				$_GET['module_install_result'][] = [
+					'message' => $module . ': is invalid module name'
+				];
 			}
 		}
 
@@ -237,13 +271,30 @@ class Module {
 				$fullName = $v . '_' . $m;
 				$result['error'] = 0;
 				try {
+					/** 
+					 * this old schema type will going to be depricated on the future release 
+					 * encourage the dev to use the new type of schema instead
+					 */
 					$upgradeSchema = $this->_di->make($v.'\\'.$m.'\\Schema\\Upgrade');
 					$upgradeSchema->setAdapter()->upgradeSchema($savedModule->getData('version'), $config['version']);
 
-					$result['message'][] = [
-						'type' => 'success',
-						'message' => 'Database schema upgraded.'
-					];
+					/**
+					 * this schema will be the new migration
+					 */
+					try {
+						$migration = $this->_di->make("Of\Database\Migration\Migrate");
+
+						/** init() return a table name that was just intalled or updated */
+						$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($v)->setModuleName($m)->init();
+						$result['schema_table_installed_or_update'] = $tableNames;
+
+						$result['message'][] = [
+							'type' => 'success',
+							'message' => 'Database schema upgraded.'
+						];
+					} catch(\Exception $e){
+						$result['error_messages'][] = $e->getMessage();
+					}
 				} catch(\Exception $e) {
 					$result['message'][] = [
 						'type' => 'success',

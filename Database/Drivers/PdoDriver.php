@@ -16,7 +16,7 @@ class PdoDriver {
         try {
             $connectionStr = "mysql:host=" . $config['host'] . ";dbname=" . $config['database'];
             $this->connection = new \PDO( $connectionStr, $config['username'], $config['password'], array(
-                \PDO::ATTR_PERSISTENT => true
+                \PDO::ATTR_PERSISTENT => isset($config['ATTR_PERSISTENT']) ? $config['ATTR_PERSISTENT'] : false
             ));
             $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $pe) {

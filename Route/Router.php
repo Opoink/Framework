@@ -15,6 +15,7 @@ class Router {
 	protected $isAdmin  = false;
 	protected $config;
 	protected $_url;
+	protected $opoinkRouter = null;
 	
 	/*
 	 *	determine whether the path is a regex or not
@@ -33,6 +34,7 @@ class Router {
 			$this->setConfig($config);
 		}
 		$this->_url = new \Of\Http\Url();
+		$this->opoinkRouter = new \Opoink\Router\Router();
 		$this->init();
 	}
 	
@@ -96,28 +98,52 @@ class Router {
 				$this->matchedRoute = $_val;
 				$controllerClass = $_val[$key];
 			} else {
-				foreach ($_val as $routKey => $routValue) {
-					if(is_array($routValue)){
-						/** 
-						 * in this part the router is using a regular expresion
-						 * on either route or controller or action
-						 */
-						$this->requestRoute = $this->getRoute(false);
-						$this->requestController = $this->getController(false);
-						$this->requestAction = $this->getAction(false);
-
-						$r = $this->doCompare($this->requestRoute, $routValue['route'], $routValue['route_regex']);
-						$c = $this->doCompare($this->requestController, $routValue['controller'], $routValue['controller_regex']);
-						$a = $this->doCompare($this->requestAction, $routValue['action'], $routValue['action_regex']);
-
-						$this->route_regex = $r;
-						$this->controller_regex = $c;
-						$this->action_regex = $a;
-
-						if($r && $c && $a) {
-							$this->matchedRoute = $routValue;
-							$controllerClass = $routValue['class'];
-							break;
+				foreach ($_val as $routeKey => $routeValue) {
+					if(is_array($routeValue)){
+						if(isset($routeValue['route'])){
+							/** 
+							 * in this part the router is using a regular expresion
+							 * on either route or controller or action
+							 * this is the 2nd type of routing of opoink
+							 * 
+							 * this type will be deprectated soon as we will be using 
+							 * the third type instead
+							 */
+							$this->requestRoute = $this->getRoute(false);
+							$this->requestController = $this->getController(false);
+							$this->requestAction = $this->getAction(false);
+	
+							$r = $this->doCompare($this->requestRoute, $routeValue['route'], $routeValue['route_regex']);
+							$c = $this->doCompare($this->requestController, $routeValue['controller'], $routeValue['controller_regex']);
+							$a = $this->doCompare($this->requestAction, $routeValue['action'], $routeValue['action_regex']);
+	
+							$this->route_regex = $r;
+							$this->controller_regex = $c;
+							$this->action_regex = $a;
+	
+							if($r && $c && $a) {
+								$this->matchedRoute = $routeValue;
+								$controllerClass = $routeValue['class'];
+								break;
+							}
+						}
+						elseif(isset($routeValue['pattern'])){
+							/** 
+							 * in this part the router is using the full regex
+							 * pattern ex: /user/edit/:id/save
+							 * this is the third type of routing
+							 * currently this type wont work on the xml templating of opoink framework
+							 * this can be usefull for rest API request
+							 */
+							$params = $this->opoinkRouter->getMatch($routeValue);
+								
+							if(is_array($params)){
+								foreach($params as $key => $value){
+									$_GET[$key] = $value;
+								}
+								$controllerClass = $routeValue['class'];
+								break;
+							}
 						}
 					}
 				}
@@ -185,6 +211,7 @@ class Router {
 			$sysRoute.'_cache_action' => 'Of\\Controller\\Sys\\SystemCacheAction',
 			$sysRoute.'_static_vue' => 'Of\\Controller\\Sys\\SystemStaticVue',
 			$sysRoute.'_static_css' => 'Of\\Controller\\Sys\\SystemStaticCss',
+			$sysRoute.'_database_addforeignkey' => 'Of\\Controller\\Sys\\SystemDbAddForeignkey',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}
@@ -286,7 +313,7 @@ class Router {
 			}
 		}
 		
-		$this->setQuery($paths);
+		// $this->setQuery($paths);
 		$this->phpInput($paths);
 	}
 	
@@ -350,7 +377,7 @@ class Router {
 	public function getCurrentRoute(){
 		return [
 			'route' => $this->requestRoute ? $this->requestRoute : $this->route,
-			'route' => $this->requestController ? $this->requestController : $this->controller,
+			'controller' => $this->requestController ? $this->requestController : $this->controller,
 			'action' => $this->requestAction ? $this->requestAction : $this->action
 		];
 	}

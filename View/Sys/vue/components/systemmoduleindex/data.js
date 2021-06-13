@@ -76,7 +76,6 @@ class systemmoduleindex {
 						con['isRegex'] = true;
 					}
 				});
-				
 			}
 		});
 		
@@ -160,7 +159,10 @@ class systemmoduleindex {
 						.then(a => {
 							setTimeout(f => {
 								if(!a.error && a.result){
-									this.installTasks.push(mods[index] + ' successfully installed...');
+									this.installTasks.push(a.result.message);
+									a.result.module_install_result.forEach(res => {
+										this.installTasks.push(res['message']);
+									});
 								} else {
 									this.installTasks.push('Failed to install ' + mods[index] + '...');
 									this.installTasks.push('Check this module if already saved on your database, if it is you may want to delete it first.');
@@ -173,7 +175,7 @@ class systemmoduleindex {
 								} else {
 									install(true);
 								}
-							}, 3000);
+							}, 2000);
 						});
 					} else {
 						this.installTasks.push('Failed, can\'t get a form key...');
@@ -256,6 +258,31 @@ class systemmoduleindex {
 				});
 			} else {
 				install(false);
+			}
+		});
+	}
+
+	/**
+	 * insall the database relationship for the tables
+	 * this will call the API for foreignkeys
+	 * the API will only add foreignkeys for the installed modules
+	 */
+	installDBRelationship(){
+		_vue.request.getFormKey().then(formkey => {
+			if(formkey){
+				let jsonData = {
+					'form_key': formkey
+				}
+				let url = '/' + _vue.url.getRoute() + '/database/addforeignkey';
+				_vue.request.makeRequest(url, jsonData, 'POST').then(res => {
+					if(res.result && !res.error){
+						_vue.toast.add(res.result.message);
+					} else {
+						_vue.toast.add(res.error.responseText, 'Failed');
+					}
+				});
+			} else {
+				_vue.toast.add('Failed, can\'t get a form key...', 'Failed');
 			}
 		});
 	}

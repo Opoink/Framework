@@ -32,6 +32,15 @@ class Entity {
     }
 
     /**
+     * set the primarykey of the table
+     * @param $primaryKey string
+     */
+    public function setPrimaryKey($primaryKey){
+        $this->primaryKey = $primaryKey;
+        return $this;
+    }
+
+    /**
      * return the current connect
      */
     public function getConnection(){
@@ -110,6 +119,15 @@ class Entity {
     }
 
     /**
+     * set the table name
+     * @param $tablename string without prefix
+     */
+    public function setTablename($tablename){
+        $this->tablename = $tablename;
+        return $this;
+    }
+
+    /**
      * return table name
      * with prefix if set 
      */
@@ -127,7 +145,7 @@ class Entity {
      * return value of data if available
      * @param $params array key value pair
      */
-    public function getByColumn($params, $limit=1){
+    public function getByColumn($params, $limit=1, $isReturnInstance=true, $by=null, $criterion='ASC'){
         $mainTable = $this->getTablename();
         $s = $this->getSelect()
         ->select()
@@ -136,11 +154,19 @@ class Entity {
         if($limit){
             $s->limit($limit);
         }
+        if($by){
+            $s->orderBy($by, $criterion);
+        }
+
         foreach ($params as $key => $value) {
-            $s->where($key)->eq($value);
+            if($value == null){
+                $s->where($key)->isnull(true);
+            } else {
+                $s->where($key)->eq($value);
+            }
         }
         
-        $data = $this->fetchAll($s);
+        $data = $this->fetchAll($s, $isReturnInstance);
         return $data;
     }
 

@@ -68,6 +68,28 @@ class Controller {
 			}
 		}
 	}
+
+	/**
+	 * render as a json object
+	 */
+	public function toJson($data){
+		$j = json_encode($data);
+		header("Content-Type: application/json; charset=UTF-8");
+		echo $j;
+		exit;
+		die;
+	}
+
+	/**
+	 * stop the request and make output error
+	 */
+	public function returnError($code, $msg=''){
+		$codes = $this->_di->get('Of\Http\Codes');
+		header("HTTP/1.0 " . $code . " " . $codes->getCode($code));
+		echo $msg;
+		exit;
+		die;
+	}
 }
 
 ?>

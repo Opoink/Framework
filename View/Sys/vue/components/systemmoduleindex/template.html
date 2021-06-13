@@ -48,16 +48,28 @@
 									<td>
 										<div class="MH-150 of-auto">
 											<template v-for="con in module.value.controllers">
-												<template v-if="con.isRegex">
+												<!-- <template v-if="con.isRegex">
 													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
 														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
 														<code>{{con.value.class}}</code>
 													</p>
+												</template> -->
+												<template v-if="con.isRegex && con.value.pattern">
+													<p class="ellipsis MW-400" v-bind:title="con.value.pattern + ' : ' + con.value.class">
+														<code>{{con.value.pattern}}</code> : <code>{{con.value.class}}</code>
+													</p>
 												</template>
 												<template v-if="!con.isRegex">
-													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
-														<code>{{con.key}}</code> : <code>{{con.value}}</code>
-													</p>
+													<template v-if="con.pattern">
+														<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+															<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+														</p>
+													</template>
+													<template v-if="!con.pattern">
+														<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+															<code>{{con.key}}</code> : <code>{{con.value}}</code>
+														</p>
+													</template>
 												</template>
 											</template>
 										</div>
@@ -74,6 +86,7 @@
 				</div>
 				<div class="card-footer">
 					<button class="btn btn-primary" v-on:click="systemmoduleindex.openModal('upgrade')">Upgrade</button>
+					<button class="btn btn-outline-primary mL-15" v-on:click="systemmoduleindex.installDBRelationship()">Install Database Relation</button>
 					<button class="btn btn-outline-danger mL-15" v-on:click="systemmoduleindex.openModal('uninstall')">Uninstall</button>
 				</div>
 			</div>
@@ -125,16 +138,23 @@
 									<td>
 										<div class="MH-150 of-auto">
 											<template v-for="con in module.value.controllers">
-												<template v-if="con.isRegex">
-													<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
-														<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
-														<code>{{con.value.class}}</code>
+												
+												<template v-if="con.isRegex && con.value.pattern">
+													<p class="ellipsis MW-400" v-bind:title="con.value.pattern + ' : ' + con.value.class">
+														<code>{{con.value.pattern}}</code> : <code>{{con.value.class}}</code>
 													</p>
 												</template>
 												<template v-if="!con.isRegex">
-													<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
-														<code>{{con.key}}</code> : <code>{{con.value}}</code>
-													</p>
+													<template v-if="con.pattern">
+														<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+															<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+														</p>
+													</template>
+													<template v-if="!con.pattern">
+														<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+															<code>{{con.key}}</code> : <code>{{con.value}}</code>
+														</p>
+													</template>
 												</template>
 											</template>
 										</div>
