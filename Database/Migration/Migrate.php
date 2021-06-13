@@ -275,6 +275,11 @@ class Migrate {
 
     /**
      * add foreignkey to the table
+     * @param $tableName string
+     * @param $column string
+     * @param $referenceTableName string
+     * @param $referenceColumn string
+     * @param $onDelete string
      */
 	public function addForeignKey($tableName, $column, $referenceTableName, $referenceColumn, $onDelete='ON DELETE CASCADE'){	
         $tableName = $this->_connection->getTablename($tableName);
