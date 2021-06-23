@@ -45,6 +45,13 @@ class SystemModuleAction extends Sys {
 					foreach($val['message'] as $msg){
 						$response['message'][] = $msg['message'];
 					}
+					if(isset($val['error_messages'])){
+						if( is_array($val['error_messages']) ){
+							foreach($val['error_messages'] as $msg){
+								$response['message'][] = $msg;
+							}
+						}
+					}
 				}
 				if($action == 'uninstall'){
 					$response['message'][] = $val['vendor'] . '_' . $val['module'] . ' module successfully uninstalled';

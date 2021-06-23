@@ -161,7 +161,7 @@ class Columns {
      * new column for database table
      * this will generate an SQL string code to add a column
      */
-    public function addColumn($column, $_file) {
+    public function addColumn($column, $_file, $prevColumn=null) {
         if(!isset($column['name'])){
             throw new \Exception("Field name is required: " . json_encode($column) . ' --- ' . $_file, 1);
 		}
@@ -176,6 +176,8 @@ class Columns {
             $this->setDefault($column, $_file);
             $this->setNullable($column, $_file);
             $this->setAttributes($column, $_file);
+            $this->setComment($column, $_file);
+            
 
             $column = "`".$this->name."` " . $this->type;
             if($this->length){
@@ -192,6 +194,12 @@ class Columns {
             if($this->default){
 				$column .= " DEFAULT ".$this->default." ";
 			}
+            if($this->comment){
+				$column .= " COMMENT '".$this->comment."' ";
+			}
+            if($prevColumn){
+                $column .= ' AFTER `'.$prevColumn['name'].'` ';
+            }
             $this->columns[] = $column;
         }
     }
