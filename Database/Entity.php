@@ -66,7 +66,8 @@ class Entity {
      * return new instance of DeleteStatement
      */
     public function getDelete(){
-        return $this->_di->make('\Of\Database\Sql\DeleteStatement');
+		$di = new \Of\Std\Di();
+		return $di->get('\Of\Database\Sql\DeleteStatement');
     }
 
     /**
