@@ -123,6 +123,9 @@ class Upload Extends \Of\File\Dirmanager {
 	}
 
 	public function setAcceptedFile($accepted){
+		foreach ($accepted as $key => $value) {
+			$accepted[$key] = strtolower($value);
+		}
 		$this->accepted = $accepted;
 		return $this;
 	}
@@ -137,7 +140,7 @@ class Upload Extends \Of\File\Dirmanager {
 			$result['error'] = 0;
 
 			$this->getExtractName();
-
+			
 			if(!in_array($this->ext, $this->accepted)){
 				$result['error'] = 1;
 				$result['message'] = 'Invalid file, try uploading file with ext ' . implode(', ', $this->accepted) . '.';
@@ -171,7 +174,7 @@ class Upload Extends \Of\File\Dirmanager {
 			}
 		} else {
 			$result['error'] = 1;
-			$result['message'] = $phpFileUploadErrors[$this->file['error']];
+			$result['message'] = $this->phpFileUploadErrors[$this->file['error']];
 		}
 
 		$result['file'] = $this->file;

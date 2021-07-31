@@ -149,24 +149,31 @@ class Migrate {
              * so we have to check each field if existing or not 
              * if the field is not exist we have to do altering the table
              */
+            $prevColumn = null;
             foreach ($columns as $key => $column) {
                 if(isset($column['name'])){
                     $isColumnExist = $this->fetchColumnName($tableName, $column['name']);
                     if(!$isColumnExist){
                         $_columns = new Columns();
-                        $_columns->addColumn($column, $_file);
+                        $_columns->addColumn($column, $_file, $prevColumn);
                         $cols = implode(', ', $_columns->getColumns());
 
                         $sql = "ALTER TABLE `".$tableName."` ";
                         $sql .= "ADD " . $cols . ";";
 
-                        $connection = $this->_connection->getConnection()->getConnection();
-                        $connection->exec($sql);
+                        try {
+                            $connection = $this->_connection->getConnection()->getConnection();
+                            $connection->exec($sql);
+                        } catch (\PDOException $pe) {
+                            throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
+                        }
 
                         $_GET['module_install_result'][] = [
                             'message' => $column['name'].': added into '.$tableName.' .',
                         ];
                     }
+
+                    $prevColumn = $column;
                 } else {
                     throw new \Exception("Invalid column: name is required " . json_encode($column));
                 }
@@ -275,6 +282,11 @@ class Migrate {
 
     /**
      * add foreignkey to the table
+     * @param $tableName string
+     * @param $column string
+     * @param $referenceTableName string
+     * @param $referenceColumn string
+     * @param $onDelete string
      */
 	public function addForeignKey($tableName, $column, $referenceTableName, $referenceColumn, $onDelete='ON DELETE CASCADE'){	
         $tableName = $this->_connection->getTablename($tableName);

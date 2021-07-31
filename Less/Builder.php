@@ -51,28 +51,52 @@ class Builder extends \Less_Parser {
 		
 			$less_files = $this->getCssFiles($path, $lessFileName, $cssFileName);
 
-			$isMinmified = $this->isMinmified($cssFileName);
-			
-			if($isMinmified){
-				$cssContent = '';
-				foreach ($less_files as $lKey => $lFile) {
-					$cssContent .= file_get_contents($lKey);
-				}
-				return $cssContent;
-			} else {
-				$options = ['cache_dir' => $cache_dir];
-				
-				$this->makeDir($cache_dir);
-				
-				$css_file_name = \Less_Cache::Get($less_files, $options);
+			$cssOnly = '';
+			foreach ($less_files as $key => $val) {
+				$ext = explode('.', $key);
+				$ext = strtolower(end($ext));
 
-				$deploy = '/public/deploy';
-				if(file_exists(ROOT.DS.'public'.DS.'generation.php')){
-					$deploy .= include(ROOT.DS.'public'.DS.'generation.php');
+				if($ext == 'css'){
+					if(file_exists($key)){
+						$cssOnly .= file_get_contents($key);
+						unset($less_files[$key]);
+					}
 				}
-
-				return $this->changeVar('public_url', $deploy, $cache_dir, $css_file_name, $path, $file);
 			}
+			
+			$cssContent = '';
+			
+			$options = ['cache_dir' => $cache_dir];
+			$this->makeDir($cache_dir);
+			$css_file_name = \Less_Cache::Get($less_files, $options);
+			$deploy = '/public/deploy';
+			if(file_exists(ROOT.DS.'public'.DS.'generation.php')){
+				$deploy .= include(ROOT.DS.'public'.DS.'generation.php');
+			}
+			$cssContent .=  $this->changeVar('public_url', $deploy, $cache_dir, $css_file_name, $path, $file);
+			$cssContent .= $cssOnly;
+
+			// $isMinmified = $this->isMinmified($cssFileName);
+			// if($isMinmified){
+			// 	foreach ($less_files as $lKey => $lFile) {
+			// 		$cssContent .= file_get_contents($lKey);
+			// 	}
+			// } else {
+			// 	$options = ['cache_dir' => $cache_dir];
+				
+			// 	$this->makeDir($cache_dir);
+				
+			// 	$css_file_name = \Less_Cache::Get($less_files, $options);
+
+			// 	$deploy = '/public/deploy';
+			// 	if(file_exists(ROOT.DS.'public'.DS.'generation.php')){
+			// 		$deploy .= include(ROOT.DS.'public'.DS.'generation.php');
+			// 	}
+
+			// 	$cssContent .=  $this->changeVar('public_url', $deploy, $cache_dir, $css_file_name, $path, $file);
+			// }
+
+			return $cssContent;
 		}
 	}
 
