@@ -17,7 +17,7 @@
         "php-di/php-di": "^5.4",
         "matthiasmullie/minify": "^1.3",
         "opoink/router": ">=1.0.0",
-        "opoink/template": ">=1.0.0",
+        "opoink/template": ">1.0.1",
         "opoink/cli": ">=1.0.0"
     },
     "authors": [
