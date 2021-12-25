@@ -75,7 +75,7 @@ class Columns {
 	public function setLength($column){
         $this->length = null;
         if(isset($column['length'])){
-            $this->length = (int)$column['length'];
+            $this->length = $column['length'];
         }
 	}
 
