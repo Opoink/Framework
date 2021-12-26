@@ -84,6 +84,25 @@ function opoink_b64decode($data) {
     return base64_decode(strtr($data, '-_', '+/'));
 }
 
+function opoinkGetArrayValue($keys, $haystack) {
+	$keys = explode('/', $keys);
+
+	$valResult = $haystack;
+	foreach ($keys as $key => $value) {
+		if(isset($valResult[$value])){
+			$valResult = $valResult[$value];
+			if(!is_array($valResult)){
+				break;
+			}
+		}
+		else {
+			$valResult = null;
+			break;
+		}
+	}
+	return is_string($valResult) ? trim($valResult) : $valResult;
+}
+
 register_shutdown_function( "opoink_check_for_fatal" );
 set_error_handler( "opoink_log_error" );
 set_exception_handler( "opoink_log_exception" );
