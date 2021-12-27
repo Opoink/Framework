@@ -203,9 +203,9 @@ class Entity {
         if(!$key){
             $this->data = [];
         } else {
-            if(isset($this->data[$key])){
-                unset($this->data[$key]);
-            }
+			if(array_key_exists($key , $this->data)){
+				unset($this->data[$key]);
+			}
         }
     }
 

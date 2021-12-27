@@ -48,15 +48,16 @@ class Request {
 
 	public function getPost($param=null){
 		if($param){
-			if(isset($_POST[$param])){
-				if(is_array($_POST[$param])){
-					return $_POST[$param];
-				} else {
-					return trim($_POST[$param]);
-				}
-			} else {
-				return null;
-			}
+			return opoinkGetArrayValue($param, $_POST);
+			// if(isset($_POST[$param])){
+			// 	if(is_array($_POST[$param])){
+			// 		return $_POST[$param];
+			// 	} else {
+			// 		return trim($_POST[$param]);
+			// 	}
+			// } else {
+			// 	return null;
+			// }
 		} else {
 			return $_POST;
 		}
@@ -64,15 +65,16 @@ class Request {
 	
 	public function getParam($param=null){
 		if($param){
-			if(isset($_GET[$param])){
-				if(is_array($_GET[$param])){
-					return $_GET[$param];
-				} else {
-					return trim($_GET[$param]);
-				}
-			} else {
-				return null;
-			}
+			return opoinkGetArrayValue($param, $_GET);
+			// if(isset($_GET[$param])){
+			// 	if(is_array($_GET[$param])){
+			// 		return $_GET[$param];
+			// 	} else {
+			// 		return trim($_GET[$param]);
+			// 	}
+			// } else {
+			// 	return null;
+			// }
 		} else {
 			return $_GET;
 		}
@@ -80,11 +82,12 @@ class Request {
 	
 	public function getServer($param=null){
 		if($param){
-			if(isset($this->server[$param])){
-				return $this->server[$param];
-			} else {
-				return null;
-			}
+			return opoinkGetArrayValue($param, $this->server);
+			// if(isset($this->server[$param])){
+			// 	return $this->server[$param];
+			// } else {
+			// 	return null;
+			// }
 		} else {
 			return $this->server;
 		}
