@@ -133,34 +133,40 @@ class Jwt {
 	*/
 	public function validateToken($token){
 		$this->token = $token;
-		
-		list($header, $payload, $signature) = explode('.', $this->token);
 
-		$dataEncoded = $header . '.' . $payload;
-		$rawSignature = $this->getHash($dataEncoded);
-		
-		$isValid = hash_equals($rawSignature, $signature);
-		
-		if($isValid){
-			$this->payload = json_decode($this->base64UrlDecode($payload), true);
+		$tkn = explode('.', $this->token);
+		if(count($tkn) == 3){
+			list($header, $payload, $signature) = $tkn;
+	
+			$dataEncoded = $header . '.' . $payload;
+			$rawSignature = $this->getHash($dataEncoded);
 			
-			if(isset($this->payload['nbf'])){
-				if($this->payload['nbf'] > time()){
-					$this->validationMessage = 'To early for this token.';
-					return false;
+			$isValid = hash_equals($rawSignature, $signature);
+			
+			if($isValid){
+				$this->payload = json_decode($this->base64UrlDecode($payload), true);
+				
+				if(isset($this->payload['nbf'])){
+					if($this->payload['nbf'] > time()){
+						$this->validationMessage = 'To early for this token.';
+						return false;
+					}
 				}
-			}
-			if(isset($this->payload['exp'])){
-				if($this->payload['exp'] < time()){
-					$this->validationMessage = 'Token expired.';
-					return false;
+				if(isset($this->payload['exp'])){
+					if($this->payload['exp'] < time()){
+						$this->validationMessage = 'Token expired.';
+						return false;
+					}
 				}
+				
+				return $this->payload;
 			}
 			
-			return $this->payload;
+			return $isValid;
+		} else {
+			$this->validationMessage = 'Invalid token.';
+			return false;
 		}
-		
-		return $isValid;
 	}
 	
 	/*
