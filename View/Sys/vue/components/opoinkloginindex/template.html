@@ -43,12 +43,21 @@
 					Back to Login
 				</a>
 				<button 
-					v-if="opoinkloginindex.formView == 'lost-password'" 
+					v-if="opoinkloginindex.formView == 'lost-password' && !opoinkloginindex.sendingForgotPasswordEmail" 
 					class="btn btn-success float-right" 
 					type="submit"
 					v-on:click="opoinkloginindex.lostPassword()"
 				>
 					Send Email
+				</button>
+				
+				<button 
+					v-if="opoinkloginindex.formView == 'lost-password' && opoinkloginindex.sendingForgotPasswordEmail" 
+					class="btn btn-success float-right" 
+					type="submit"
+					disabled="1"
+				>
+					Sending Email <i class="fas fa-spinner fa-spin mL-15"></i>
 				</button>
 			</div>
 		</div>

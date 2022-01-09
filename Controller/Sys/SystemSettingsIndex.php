@@ -78,6 +78,14 @@ class SystemSettingsIndex extends Sys {
 			
 			$auth = $this->_request->getParam('auth');
 			$this->_config['auth'] = $auth;
+
+			$mailer = $this->_request->getParam('mailer');
+			$mailer['use_phpmailer'] = (int)$mailer['use_phpmailer'];
+			$mailer['debug'] = (int)$mailer['debug'];
+			$mailer['auth'] = (int)$mailer['auth'];
+			$mailer['smpt_secure'] = (int)$mailer['smpt_secure'];
+			$mailer['port'] = (int)$mailer['port'];
+			$this->_config['mailer'] = $mailer;
 			
 			$sys_g_recaptcha = (int)$this->_request->getParam('sys_g_recaptcha');
 			$this->_config['sys_g_recaptcha'] = [

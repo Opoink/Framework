@@ -4,6 +4,9 @@ class opoinkloginindex {
 		email: '',
 		password: ''
 	};
+
+	sendingForgotPasswordEmail = false;
+
 	changeView(view){
 		this.formView = view
 	};
@@ -54,13 +57,17 @@ class opoinkloginindex {
 			let jsonData = {
 				email: this.form.email
 			}
+
+			this.sendingForgotPasswordEmail = true;
 			_vue.request.makeRequest('/'+_vue.url.getRoute()+'/login/forgetpassword', jsonData)
 			.then(fp => {
 				if(!fp.error && fp.result){
 					_vue.toast.add(fp.result.message, 'Email Sent');
+					this.changeView('login');
 				} else {
 					_vue.toast.add(fp.error.responseText, 'Error');
 				}
+				this.sendingForgotPasswordEmail = false;
 			});
 		} else {
 			_vue.toast.add('Invalid email address format.', 'Error');
