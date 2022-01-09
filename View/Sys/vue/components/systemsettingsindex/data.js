@@ -27,6 +27,7 @@ class systemsettingsindex {
 		this.settings.cache = settings.cache;
 		this.settings.images = settings.images.join(', ');
 		this.settings.auth = settings.auth;
+		this.settings.mailer = settings.mailer;
 		this.settings.sys_g_recaptcha = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.status : 0;
 		this.settings.g_recaptcha_key = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.key : '';
 		this.settings.g_recaptcha_secret = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.secret : '';
