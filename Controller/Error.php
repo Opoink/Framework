@@ -32,23 +32,26 @@ class Error {
 		}
 
 		header("HTTP/1.0 " . $code . " " . $title);
-		$sysDir = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS;
-
-		$layoutFile = $sysDir.'Layout'.DS.'error.phtml';
-		$tplFile = $sysDir.'Templates'.DS.'error'.DS.'error'.$code.'.phtml';
-		$template = '';
-		if(file_exists($tplFile)){
-			ob_start();
-				include($tplFile);
-				$template = ob_get_contents();
-			ob_end_clean();
+		if(file_exists(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html')){
+			include(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html');
+		} else {
+			$sysDir = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS;
+	
+			$layoutFile = $sysDir.'Layout'.DS.'error.phtml';
+			$tplFile = $sysDir.'Templates'.DS.'error'.DS.'error'.$code.'.phtml';
+			$template = '';
+			if(file_exists($tplFile)){
+				ob_start();
+					include($tplFile);
+					$template = ob_get_contents();
+				ob_end_clean();
+			}
+	
+			if(file_exists($layoutFile)){
+				include($layoutFile);
+			}
+			die;
 		}
-
-		if(file_exists($layoutFile)){
-			include($layoutFile);
-		}
-		/*echo $code . ' ' . $msg;*/
-		die;
 	}
 }
 

@@ -112,7 +112,12 @@ class Application {
 				$controller = $this->isSupportedFile();
 				if(!$controller){
 					if(file_exists(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html')){
-						include(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html');
+						if(isset($_GET['opoink-vue-not-found'])){
+							$this->error(404);
+						}
+						else {
+							include(ROOT.DS.'public'.DS.'vuedist'.DS.'index.html');
+						}
 					} else {
 						$this->error(404);
 					}
