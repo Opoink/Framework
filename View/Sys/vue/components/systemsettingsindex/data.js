@@ -28,6 +28,18 @@ class systemsettingsindex {
 		this.settings.images = settings.images.join(', ');
 		this.settings.auth = settings.auth;
 		this.settings.mailer = settings.mailer;
+		if(!settings.mailer){
+			this.settings.mailer = {
+				use_phpmailer: "0",
+				debug: "0",
+				host: "",
+				auth: "",
+				username: "",
+				password: "",
+				smpt_secure: "",
+				port: "",
+			}
+		}
 		this.settings.sys_g_recaptcha = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.status : 0;
 		this.settings.g_recaptcha_key = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.key : '';
 		this.settings.g_recaptcha_secret = settings.sys_g_recaptcha ? settings.sys_g_recaptcha.secret : '';
