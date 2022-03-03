@@ -1,5 +1,5 @@
 03-03-2022 -- Throw an error during installation of Opoink/Bmodule if file not found currenty the Opoink/Bmodule is under construction
 03-03-2022 -- We will now add support for SCSS using "scssphp/scssphp": "^1.10.1" now added in composer.json file
 03-03-2022 -- for xml layout, a new attribute "type" is added the value should be "less" or "scss" since Opoink use less css first, "less" is the default if type is not defined
-03-03-2022 -- ScssBuilder class is add to parse scss files in all installed module.
+03-03-2022 -- ScssBuilder class is added to parse scss files in all installed module.
 03-03-2022 -- if scss is used as type "<css src='css/admin/<filesname>' type='scss' media='all' />" then opoink will look in all installed modules for the files  <filesname>.scss and compile it into 1 css result.
