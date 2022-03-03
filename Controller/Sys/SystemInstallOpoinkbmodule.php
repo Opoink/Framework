@@ -25,36 +25,42 @@ class SystemInstallOpoinkbmodule extends Sys {
 			try {
 				$target = ROOT.DS.'vendor'.DS.'opoink'.DS.'bmodule';
 				$dst = ROOT.DS.'App'.DS.'Ext'.DS.'Opoink'.DS.'Bmodule';
-				if(is_dir($target) && !is_dir($dst)){
-					$dirmanager = $this->_di->get('Of\File\Dirmanager');
-					$dirmanager->copyDir($target, $dst);
-
-					if(is_dir($dst)){
-						$modManager = $this->_di->get('\Of\ModManager\Module');
-
-						$availableModules = [
-							'Opoink_Bmodule'
-						];
-						$installed = $modManager->setDi($this->_di)->installModule($availableModules);
-						$installedCount = count($installed);
-
-						if($installedCount == 1){
-							$response['error'] = 0;
-							$response['message'] = 'Opoink/Bmodule successfully installed';
+				if(!is_dir($target)){
+					header("HTTP/1.0 406 Not Acceptable");
+					echo 'Opoink/Bmodule not found';
+					die;
+				} else {
+					if(is_dir($target) && !is_dir($dst)){
+						$dirmanager = $this->_di->get('Of\File\Dirmanager');
+						$dirmanager->copyDir($target, $dst);
+	
+						if(is_dir($dst)){
+							$modManager = $this->_di->get('\Of\ModManager\Module');
+	
+							$availableModules = [
+								'Opoink_Bmodule'
+							];
+							$installed = $modManager->setDi($this->_di)->installModule($availableModules);
+							$installedCount = count($installed);
+	
+							if($installedCount == 1){
+								$response['error'] = 0;
+								$response['message'] = 'Opoink/Bmodule successfully installed';
+							} else {
+								header("HTTP/1.0 406 Not Acceptable");
+								echo 'Failed to install Opoink/Bmodule';
+								die;
+							}
 						} else {
 							header("HTTP/1.0 406 Not Acceptable");
-							echo 'Failed to install Opoink/Bmodule';
+							echo 'Failed to copy Opoink/Bmodule to App/Ext directory';
 							die;
 						}
 					} else {
 						header("HTTP/1.0 406 Not Acceptable");
-						echo 'Failed to copy Opoink/Bmodule to App/Ext directory';
+						echo 'Opoink/Bmodule already installed';
 						die;
 					}
-				} else {
-					header("HTTP/1.0 406 Not Acceptable");
-					echo 'Opoink/Bmodule already installed';
-					die;
 				}
 			} catch (\Exception $e) {
 				header("HTTP/1.0 400 Bad Request");
