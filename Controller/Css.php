@@ -14,7 +14,7 @@ class Css {
 	public function __construct(
 		\Of\Config $Config,
 		\Of\Less\Builder $LessBuilder,
-		\ScssPhp\ScssPhp\Compiler $ScssBuilder
+		\Of\File\ScssBuilder $ScssBuilder
 	){
 		
 		$this->_config = $Config;
@@ -28,10 +28,7 @@ class Css {
 
 		$fArray = explode('.', $file);
 		if(in_array('scss', $fArray)){
-			$css = $this->_scssBuilder->compileString('
-				$color: #abc;
-				div { color: lighten($color, 20%); }
-			')->getCss();
+			$css = $this->_scssBuilder->setConfig($this->_config)->build($file);
 		}
 		else {
 			$css = $this->_lessBuilder
