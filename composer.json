@@ -19,7 +19,8 @@
         "opoink/router": ">=1.0.0",
         "opoink/template": ">1.0.1",
         "opoink/cli": ">=1.0.0",
-		"phpmailer/phpmailer": "^6.5"
+		"phpmailer/phpmailer": "^6.5",
+		"scssphp/scssphp": "^1.10.1"
     },
     "authors": [
         {

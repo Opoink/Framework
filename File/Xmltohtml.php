@@ -369,9 +369,14 @@ class Xmltohtml {
 		return false;
 	}
 	
-	/*
-	*	create css tag
-	*/
+	/**
+	 * create css html element
+	 * vlaid xml attributes are 
+	 *  - src: the src of less or scss file
+	 *  - type: less or scss the default type is less, if type is not set then less parser will be used
+	 *  - external: if the xml has attribute external then the src should be a valid css link and type is ignored
+	 *  - media
+	 */
 	protected function createCssTag($node){
 		if(!$node->hasAttribute('src')){
 			$error = 'CSS src is required from xml ID: ' . $node->getAttribute('xml:id');
@@ -385,6 +390,9 @@ class Xmltohtml {
 		} else {
 			$deployTIme = 'deploy'.$this->getDeployTime();
 			$src = $this->_url->getUrl('/public/'.$deployTIme.'/'.ltrim($node->getAttribute('src'), '/'));
+			if($node->hasAttribute('type')){
+				$src .= '.' . $node->getAttribute('type');
+			}
 			$src .= '.css';
 			$tag .= ' href="'.$src.'" ';
 		}
