@@ -35,7 +35,6 @@ function opoink_renderError(){
 		$firstLine = $e->getLine() - 3;
 		$lastLine = $e->getLine() + 3;
 		include(ROOT . '/vendor/opoink/framework/View/errortrace.phtml');
-        die;
 	} else {
 		$dir = new \Of\File\Dirmanager();
 		$logDir = ROOT . DS . 'Var' .DS . 'logs';
