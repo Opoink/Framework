@@ -1,3 +1,5 @@
+03-11-2022 -- change on how the \Of\Controller\Filecontroller getRealPath method is looking for the file. instead of looking for specific Vendor_Module we will now scan in all installed module. but this is only if the Vendor_Module is not defined. it is still recommended to use include vendor/module in your URL to prevent loading time issue. sample URL with https://yourdomain.com/public/deploy1646964026/<vendor>/<module>/css/fontawesome/webfonts/fa-regular-400.woff2
+03-11-2022 -- Fix copying files while in developer mode
 03-10-2022 -- Change the error trace layout
 
 03-03-2022 -- Throw an error during installation of Opoink/Bmodule if file not found currenty the Opoink/Bmodule is under construction
