@@ -7,13 +7,13 @@
 <style type="text/css">
 .error-info-container {
 	position: fixed;
-	top: 0px;
+	bottom: 0px;
 	left: 0px;
 	z-index: 9999999999;
 	width: 100%;
-	height: 100%;
+	height: 350px;
 	padding: 15px;
-	background: #000;
+	background: rgba(0,0,0,0.5);
 	overflow: auto;
 	font-family: sans-serif;
 }
@@ -79,6 +79,8 @@
 		<div class="">
 			<div class="error-info">
 				<h4>Error occurred:</h4>
+				<p>This error will trace will only show during development mode. You can check the logs, if in production mode.</p>
+				<br><br>
 				<p>Type: <?= get_class($e) ?></p>
 				<p>Message: <?= $e->getMessage() ?></p>
 				<p>File: <?= $e->getFile() ?></p>

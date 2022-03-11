@@ -196,11 +196,12 @@ class Application {
 	}
 	
 	public function run(){
-    	if (opoink_hasError()) {
-    		opoink_renderError();
-    	} else {
-			echo $this->content;
-    	}
+    	// if (opoink_hasError()) {
+    	// 	opoink_renderError();
+    	// } else {
+		// 	echo $this->content;
+    	// }
+		echo $this->content;
 	}
 	
 	public function getConfig(){
