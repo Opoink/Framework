@@ -30,9 +30,9 @@ class SystemModuleIndex extends Sys {
 
 		$modules = $this->_request->getParam('modules');
 		if($modules){
-			$this->getModules();
+			// $this->getModules();
 		} else {
-			$this->addInlineJs();
+			// $this->addInlineJs();
 			return $this->renderHtml();
 		}
 	}

@@ -135,24 +135,24 @@ class Sys implements SysInterface {
 		$systemLayout = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Layout';
 		
 		$layout = $systemLayout.DS.$layout;
-		$template = '';
+		// $template = '';
 		
-		$systemTemplate = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Templates';
-		if($templateFile){
-			$tpl = $systemTemplate.DS.$templateFile;
-		} else {
-			$currentRoute = 'system';
-			$currentRoute .=  '_'.$this->_router->getController(false);
-			$currentRoute .=  '_'.$this->_router->getAction(false);
+		// $systemTemplate = ROOT.DS.'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'Templates';
+		// if($templateFile){
+		// 	$tpl = $systemTemplate.DS.$templateFile;
+		// } else {
+		// 	$currentRoute = 'system';
+		// 	$currentRoute .=  '_'.$this->_router->getController(false);
+		// 	$currentRoute .=  '_'.$this->_router->getAction(false);
 			
-			$tpl = $systemTemplate.DS.$currentRoute.'.phtml';
-		}
-		if(file_exists($tpl)){
-			ob_start();
-				include($tpl);
-				$template = ob_get_contents();
-			ob_end_clean();
-		}
+		// 	$tpl = $systemTemplate.DS.$currentRoute.'.phtml';
+		// }
+		// if(file_exists($tpl)){
+		// 	ob_start();
+		// 		include($tpl);
+		// 		$template = ob_get_contents();
+		// 	ob_end_clean();
+		// }
 		
 		if(file_exists($layout)){
 			include($layout);

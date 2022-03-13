@@ -1,0 +1,67 @@
+<div class="login-index-index">
+	<div class="v-height d-flex justify-content-center align-items-center">
+		<form v-on:submit.prevent="vue.onSubmit($event)">
+			<div class="card W-400">
+				<div class="card-header">
+					<img src="/public/sys/assets/images/logo_and_text.png">
+				</div>
+				<div class="card-body">
+					<p v-if="vue.formView == 'lost-password'" class="">
+						Enter your e-mail address below and we will send you instructions how to recover your password.
+					</p>
+					<div class="form-group mB-15">
+						<label for="input_email">Email <span class="fc-red">*</span></label>
+						<input type="email" class="form-control" id="input_email" v-model="vue.form.email" required="required"/>
+					</div>
+					<div class="form-group mB-15" v-if="vue.formView == 'login'">
+						<label for="input_password">Password <span class="fc-red">*</span></label>
+						<input type="password" class="form-control" id="input_password" v-model="vue.form.password" required="required"/>
+					</div>
+				</div>
+				<div class="card-footer">
+					<a 
+						v-if="vue.formView == 'login'" 
+						class="btn float-start" 
+						type="submit" 
+						v-on:click="vue.changeView('lost-password')"
+					>
+						Lost password?
+					</a>
+					<button 
+						v-if="vue.formView == 'login'" 
+						class="btn btn-success float-end" 
+						type="submit"
+						v-on:click="vue.login()"
+					>
+						Login
+					</button>
+					<a 
+						v-if="vue.formView == 'lost-password'" 
+						class="btn float-start" 
+						type="submit" 
+						v-on:click="vue.changeView('login')"
+					>
+						Back to Login
+					</a>
+					<button 
+						v-if="vue.formView == 'lost-password' && !vue.sendingForgotPasswordEmail" 
+						class="btn btn-success float-end" 
+						type="submit"
+						v-on:click="vue.lostPassword()"
+					>
+						Send Email
+					</button>
+					
+					<button 
+						v-if="vue.formView == 'lost-password' && vue.sendingForgotPasswordEmail" 
+						class="btn btn-success float-end" 
+						type="submit"
+						disabled="1"
+					>
+						Sending Email <i class="fas fa-spinner fa-spin mL-15"></i>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

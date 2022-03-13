@@ -1,0 +1,65 @@
+<div class="v-height d-flex justify-content-center align-items-center">
+	<form v-on:submit.prevent="opoinkloginindex.onSubmit($event)">
+		<div class="card W-400">
+			<div class="card-header">
+				<img src="/public/sys/assets/images/logo_and_text.png">
+			</div>
+			<div class="card-body">
+				<p v-if="opoinkloginindex.formView == 'lost-password'" class="">
+					Enter your e-mail address below and we will send you instructions how to recover your password.
+				</p>
+				<div class="form-group">
+					<label for="input_email">Email <span class="fc-red">*</span></label>
+					<input type="email" class="form-control" id="input_email" v-model="opoinkloginindex.form.email"/>
+				</div>
+				<div class="form-group" v-if="opoinkloginindex.formView == 'login'">
+					<label for="input_password">Password <span class="fc-red">*</span></label>
+					<input type="password" class="form-control" id="input_password" v-model="opoinkloginindex.form.password"/>
+				</div>
+			</div>
+			<div class="card-footer">
+				<a 
+					v-if="opoinkloginindex.formView == 'login'" 
+					class="btn float-left" 
+					type="submit" 
+					v-on:click="opoinkloginindex.changeView('lost-password')"
+				>
+					Lost password?
+				</a>
+				<button 
+					v-if="opoinkloginindex.formView == 'login'" 
+					class="btn btn-success float-right" 
+					type="submit"
+					v-on:click="opoinkloginindex.login()"
+				>
+					Login
+				</button>
+				<a 
+					v-if="opoinkloginindex.formView == 'lost-password'" 
+					class="btn float-left" 
+					type="submit" 
+					v-on:click="opoinkloginindex.changeView('login')"
+				>
+					Back to Login
+				</a>
+				<button 
+					v-if="opoinkloginindex.formView == 'lost-password' && !opoinkloginindex.sendingForgotPasswordEmail" 
+					class="btn btn-success float-right" 
+					type="submit"
+					v-on:click="opoinkloginindex.lostPassword()"
+				>
+					Send Email
+				</button>
+				
+				<button 
+					v-if="opoinkloginindex.formView == 'lost-password' && opoinkloginindex.sendingForgotPasswordEmail" 
+					class="btn btn-success float-right" 
+					type="submit"
+					disabled="1"
+				>
+					Sending Email <i class="fas fa-spinner fa-spin mL-15"></i>
+				</button>
+			</div>
+		</div>
+	</form>
+</div>

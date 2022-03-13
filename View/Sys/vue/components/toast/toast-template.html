@@ -1,0 +1,11 @@
+<div class="toast-container">
+	<div v-for="(message, index) in toast.messages" class="toast show" role="alert">
+		<div class="toast-header">
+			<strong class="me-auto">{{message.type}}</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+		</div>
+		<div class="toast-body">
+			{{message.message}}
+		</div>
+	</div>
+</div>
