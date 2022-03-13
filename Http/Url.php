@@ -129,5 +129,41 @@ class Url {
 		exit;
 		die;
 	}
+
+	/**
+	 * check if the link if an active link or partially active link
+	 * return string link-active or link-part-active or link-not-active
+	 * @param $path string sample is /users/profile/index
+	 */
+	public function linkActive($path){
+		$path = ltrim($path, '/');
+		$path = rtrim($path, '/');
+		$path = explode('/', $path);
+		if(count($path) < 3){
+			$toAdd = 3 - count($path);
+			for ($i=0; $i < $toAdd; $i++) { 
+				$path[] = 'index';
+			}
+		}
+		
+		$currentRoute = $this->_router->getCurrentRoute();
+
+		if($currentRoute['route'] == $path[0]){
+			if($currentRoute['controller'] == $path[1]){
+				if($currentRoute['action'] == $path[2]){
+					return 'link-active';
+				}
+				else {
+					return 'link-part-active';
+				}
+			}
+			else {
+				return 'link-part-active';
+			}
+		}
+		else {
+			return 'link-not-active';
+		}
+	}
 }
 ?>

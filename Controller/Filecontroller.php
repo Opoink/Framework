@@ -33,6 +33,15 @@ class Filecontroller {
 		}
 	}
 	
+	/**
+	 * return absolute path 
+	 * if vendorname modulename is defined in the url we can prevent the scann in all installed modules
+	 * sample URL is https://yourdomain.com/public/deploy<deployment_time>/<vendor>/<module>/css/fontawesome/webfonts/fa-regular-400.woff2
+	 * it is highl recommended to add vendorname and modulename in the URL 
+	 * @param $path this is the path that came from the URL right after /public/deploy<deployment_time> 
+	 * 
+	 * return string or array
+	 */
 	public function getRealPath($path){
 		$targetFile = ROOT.DS.'public'.DS.'generation.php';
 		$deployPath = '/public/deploy' . include($targetFile);
@@ -44,12 +53,22 @@ class Filecontroller {
 		if($vendor) {
 			$module = $this->getModule($path);
 			if($module) {
-				$pathFromUrl = $this->getPathFromUrl($path);
-				
+				$pathFromUrl = str_replace('/', DS, $this->getPathFromUrl($path));
 				$realPath = ROOT.DS.'App'.DS.'Ext'.DS.$vendor.DS.$module.DS.'View'.DS.$pathFromUrl.DS;
-				
 				return $realPath;
 			}
+		}
+		else {
+			$vendors = $this->_config->getConfig('modules');
+
+			$realPaths = [];
+			foreach ($vendors as $vendor => $modules) {
+				foreach ($modules as $module) {
+					$pathFromUrl = str_replace('/', DS, $path);
+					$realPaths[] = ROOT.DS.'App'.DS.'Ext'.DS.$vendor.DS.$module.DS.'View'.DS.$pathFromUrl.DS;
+				}
+			}
+			return $realPaths;
 		}
 	}
 	

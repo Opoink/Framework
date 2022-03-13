@@ -1,3 +1,10 @@
+03-13-2022 -- Change laminas version requirements
+03-11-2022 -- change on how the \Of\Controller\Filecontroller getRealPath method is looking for the file. instead of looking for specific Vendor_Module we will now scan in all installed module. but this is only if the Vendor_Module is not defined. it is still recommended to use include vendor/module in your URL to prevent loading time issue. sample URL with https://yourdomain.com/public/deploy1646964026/<vendor>/<module>/css/fontawesome/webfonts/fa-regular-400.woff2
+03-11-2022 -- Fix copying files while in developer mode
+03-11-2022 -- On \Of\Html\Context add method getPageName() this will return the current page name
+03-11-2022 -- On \Of\Html\Context and in \Of\Http\Url add method linkActive($path) this will return link-active or link-part-active
+03-10-2022 -- Change the error trace layout
+
 03-03-2022 -- Throw an error during installation of Opoink/Bmodule if file not found currenty the Opoink/Bmodule is under construction
 03-03-2022 -- We will now add support for SCSS using "scssphp/scssphp": "^1.10.1" now added in composer.json file
 03-03-2022 -- for xml layout, a new attribute "type" is added the value should be "less" or "scss" since Opoink use less css first, "less" is the default if type is not defined

@@ -225,5 +225,21 @@ class Context {
 		
 		return true;
 	}
+
+	/**
+	 * return string the current page name
+	 */
+	public function getPageName(){
+		return $this->_controller->getPageName();
+	}
+
+	/**
+	 * check if the link if an active link or partially active link
+	 * return string link-active or link-part-active or link-not-active
+	 * @param $path string sample is /users/profile/index
+	 */
+	public function linkActive($path){
+		return $this->_url->linkActive($path);
+	}
 }
 ?>
