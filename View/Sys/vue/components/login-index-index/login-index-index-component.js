@@ -3,8 +3,9 @@ if(typeof window['_vue'] == 'undefined'){
 }
 
 class loginIndexIndex {
-	url = window['_url'];
-	request = window['_request'];
+	url;
+	request;
+	toast;
 
 	formView = 'login'; /* either login || lost-password */
 	form = {
@@ -12,6 +13,14 @@ class loginIndexIndex {
 		password: ''
 	};
 	sendingForgotPasswordEmail = false;
+
+	constructor(){
+		this.url = window['opoink_system']['_url'];
+		this.request = window['opoink_system']['_request'];
+		setTimeout(f => {
+			this.toast = window._vue["toast-component"];
+		}, 500);
+	}
 
 	changeView(view){
 		this.formView = view
@@ -31,12 +40,10 @@ class loginIndexIndex {
 					if(route){
 						_route = route;
 					}
-					console.log('qureyParams qureyParams', qureyParams);
-
 					this.request.makeRequest('/'+_route+'/login' + qureyParams, this.form)
 					.then(login => {
 						if(!login.error && login.result){
-							window._vue['toast-component'].add(login.result.message, 'Login Success');
+							this.toast.add(login.result.message, 'Login Success');
 							if(redirect){
 								this.url.redirect('/');
 							}
@@ -45,41 +52,41 @@ class loginIndexIndex {
 							if(login.error.responseText == "You’re already logged in."){
 								login_result(true);
 							} else {
-								window._vue['toast-component'].add(login.error.responseText, 'Error');
+								this.toast.add(login.error.responseText, 'Error');
 								login_result(false);
 							}
 						}
 					});
 				} else {
-					window._vue['toast-component'].add('Please enter your password.', 'Error');
+					this.toast.add('Please enter your password.', 'Error');
 					login_result(false);
 				}
 			} else {
-				window._vue['toast-component'].add('Invalid email address format.', 'Error',8000000);
+				this.toast.add('Invalid email address format.', 'Error');
 				login_result(false);
 			}
 		});
 	};
 	lostPassword(){
-		// if(this.validateEmail(this.form.email)){
-		// 	let jsonData = {
-		// 		email: this.form.email
-		// 	}
+		if(this.validateEmail(this.form.email)){
+			let jsonData = {
+				email: this.form.email
+			}
 
-		// 	this.sendingForgotPasswordEmail = true;
-		// 	_vue.request.makeRequest('/'+_vue.url.getRoute()+'/login/forgetpassword', jsonData)
-		// 	.then(fp => {
-		// 		if(!fp.error && fp.result){
-		// 			_vue.toast.add(fp.result.message, 'Email Sent');
-		// 			this.changeView('login');
-		// 		} else {
-		// 			_vue.toast.add(fp.error.responseText, 'Error');
-		// 		}
-		// 		this.sendingForgotPasswordEmail = false;
-		// 	});
-		// } else {
-		// 	_vue.toast.add('Invalid email address format.', 'Error');
-		// }
+			this.sendingForgotPasswordEmail = true;
+			this.request.makeRequest('/'+this.url.getRoute()+'/login/forgetpassword', jsonData)
+			.then(fp => {
+				if(!fp.error && fp.result){
+					this.toast.add(fp.result.message, 'Email Sent');
+					this.changeView('login');
+				} else {
+					this.toast.add(fp.error.responseText, 'Error');
+				}
+				this.sendingForgotPasswordEmail = false;
+			});
+		} else {
+			this.toast.add('Invalid email address format.', 'Error');
+		}
 	};
 	validateEmail(email) {
 	  const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -99,9 +106,7 @@ let loginIndexIndexComponent = Vue.component('login-index-index-component', {
 });
 
 vueRouter.addRoutes([{ 
-	path: '/system/login', 
+	path: '/'+sysUrl+'/login', 
 	component: loginIndexIndexComponent, 
 	name: 'login-index-index' 
 }]);
-
-console.log('window', Vue);

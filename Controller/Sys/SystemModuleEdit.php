@@ -34,18 +34,20 @@ class SystemModuleEdit extends Sys {
 		$this->requireInstalled();
 		$this->requireLogin();
 
-		$mod = $this->getParam('mod');  
-		$mod = explode('_', $mod);
+		$mod = $this->getParam('mod'); 
+		if($mod){
+			$mod = explode('_', $mod);
 
-		if(count($mod) == 2){
-		    $vendorName = ucfirst($mod[0]);
-		    $moduleName = ucfirst($mod[1]);
+			if(count($mod) == 2){
+				$vendorName = ucfirst($mod[0]);
+				$moduleName = ucfirst($mod[1]);
 
-		    $this->config = $this->_validator->checkExist($vendorName, $moduleName);
+				$this->config = $this->_validator->checkExist($vendorName, $moduleName);
 
-		    if(!$this->config){
-		    	$this->_message->setMessage('Module '.$vendorName.'_'.$moduleName.' is not exist.', 'danger');
-		    }
+				if(!$this->config){
+					$this->_message->setMessage('Module '.$vendorName.'_'.$moduleName.' is not exist.', 'danger');
+				}
+			}
 		}
 
 		return $this->renderHtml();

@@ -1,3 +1,20 @@
+Object.byString = function(o, s) {
+	s = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+	s = s.replace(/^\./, '');           // strip a leading dot
+	var a = s.split('.');
+	for (var i = 0, n = a.length; i < n; ++i) {
+		var k = a[i];
+		if (k in o) {
+			o = o[k];
+		} else {
+			return;
+		}
+	}
+	return o;
+}
+
+var opoink_system = {};
+
 class url {
 	/** opoink official domain website  */
 	opoinkBaseUrl = 'https://www.opoink.com';
@@ -89,19 +106,45 @@ class url {
 	 * @param {*} param 
 	 */
 	getParam(param){
-		if(typeof this.query[param] != 'undefined'){
-			return this.query[param];
-		}
+		// if(typeof this.query[param] != 'undefined'){
+		// 	return this.query[param];
+		// }
+		if(param){
+            if(typeof window.vueRouter.currentRoute.params[param] != 'undefined'){
+                return window.vueRouter.currentRoute.params[param];
+            } else {
+                return null;
+            }
+        } else {
+            return window.vueRouter.currentRoute.params;
+        }
 	}
+	getQuery(param){
+        if(param){
+            if(typeof window.vueRouter.currentRoute.query[param] != 'undefined'){
+                return window.vueRouter.currentRoute.query[param];
+            } else {
+                return null;
+            }
+        } else {
+            return window.vueRouter.currentRoute.query;
+        }
+    }
+
+	navigateTo(path){
+        if(window.vueRouter.currentRoute != path){
+            window.vueRouter.push(path);
+        }
+    }
 }
-var _url = new url();
+opoink_system['_url'] = new url();
 
 class request {
 	contentType = 'application/json; charset=utf-8';
 	dataType = 'json';
 	getFormKey(){
 		return new Promise(fk => {
-			this.makeRequest('/'+_vue.url.getRoute()+'/install/formkey', '', 'GET')
+			this.makeRequest('/'+window.opoink_system['_url'].getRoute()+'/install/formkey', '', 'GET')
 			.then(formkey => {
 				if(!formkey.error && formkey.result){
 					fk(formkey.result.formKey);
@@ -169,11 +212,10 @@ class request {
 		});
 	};
 }
+opoink_system['_request'] = new request();
 
-var _request = new request();
 
-
-vueRouter = new VueRouter({
+var vueRouter = new VueRouter({
 	mode: 'history',
 	routes: []
 });

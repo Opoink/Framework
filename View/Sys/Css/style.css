@@ -559,3 +559,7 @@ code {
 #main-footer {
 	background: #141619;
 }
+
+.form-group {
+	margin-bottom: 1rem;
+}

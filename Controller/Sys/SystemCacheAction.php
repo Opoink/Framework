@@ -40,8 +40,14 @@ class SystemCacheAction extends Sys {
 	}
 
 	protected function getStatus(){
-		$cache = include(ROOT.DS.'etc'.DS.'CacheStatus.php');
-		$this->jsonEncode($cache);
+		$target = ROOT.DS.'etc'.DS.'CacheStatus.php';
+		if(file_exists($target)){
+			$cache = include($target);
+			$this->jsonEncode($cache);
+		}
+		else {
+			$this->returnError('404', 'No cache status found');
+		}
 	}
 
 	protected function purgeCache(){

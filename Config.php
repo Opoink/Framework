@@ -11,7 +11,12 @@ class Config {
 	
 	public function __construct(){
 		$config = ROOT.DS.'etc'.DS.'Config.php';
-		$this->config = include($config);
+		if(file_exists($config)){
+			$this->config = include($config);
+		}
+		else {
+			$this->config = [];
+		}
 	}
 	
 	public function getConfig($keys=null){

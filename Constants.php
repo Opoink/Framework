@@ -18,5 +18,7 @@ class Constants {
 	
 	/* form key duration in sec */
 	const FORM_KEY_DURATION = 30;
+
+	const BASE_SYS_URL = 'system';
 }
 ?>

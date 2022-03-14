@@ -1,0 +1,218 @@
+<div class="index-index-index">
+	<sidenav-component></sidenav-component>
+	<div class="container-wrapper">
+		<mainheader-component></mainheader-component>
+
+
+		<div class="p-15">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="m-0">Installed Modules</h4>
+						</div>
+						<div class="card-body pL-0 pR-0">
+							<table class="table">
+								<thead class="thead-light">
+									<tr>
+										<th style="width: 10px;">
+											<!-- <label class="customcheckbox mB-0">
+												<input class="multiCheboxSelect" type="checkbox" >
+												<span class="checkmark"></span>
+											</label> -->
+										</th>
+										<th scope="col" style="width: 250px;">Name</th>
+										<th scope="col">Installed Version</th>
+										<th scope="col">Config Version</th>
+										<th scope="col">Routes and Controllers</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody class="customtable">
+									<!-- empty state -->
+									<template v-if="!vue.modules.installed.length">
+										<tr>
+											<td colspan="5">
+												No installed module
+											</td>
+										</tr>
+									</template>
+									<!-- empty state -->
+
+									
+									<template v-if="vue.modules.installed.length">
+										<tr v-for="module in vue.modules.installed">
+											<td>
+												<label class="customcheckbox mB-0">
+													<input class="multiCheboxSelect" type="checkbox" v-bind:value="module.key" v-model="vue.modForm.installed" >
+													<span class="checkmark"></span>
+												</label>
+											</td>
+											<td style="width: 250px;" class="fs-14">{{module.key}}</th>
+											<td class="fs-14">{{module.value.installed_version}}</th>
+											<td class="fs-14">{{module.value.version}}</th>
+											<td>
+												<div class="MH-150 of-auto">
+													<template v-for="con in module.value.controllers">
+														<!-- <template v-if="con.isRegex">
+															<p class="ellipsis MW-400" v-bind:title="con.value.route + '_' + con.value.controller + '_' + con.value.action + ' : ' + con.value.class">
+																<code>{{con.value.route}}_{{con.value.controller}}_{{con.value.action}}</code> : 
+																<code>{{con.value.class}}</code>
+															</p>
+														</template> -->
+														<template v-if="con.isRegex && con.value.pattern">
+															<p class="ellipsis MW-400" v-bind:title="con.value.pattern + ' : ' + con.value.class">
+																<code>{{con.value.pattern}}</code> : <code>{{con.value.class}}</code>
+															</p>
+														</template>
+														<template v-if="!con.isRegex">
+															<template v-if="con.pattern">
+																<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+																	<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+																</p>
+															</template>
+															<template v-if="!con.pattern">
+																<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+																	<code>{{con.key}}</code> : <code>{{con.value}}</code>
+																</p>
+															</template>
+														</template>
+													</template>
+												</div>
+											</th>
+											<td class="fs-14">
+												<router-link v-bind:to="vue.url.getUrl('/module/edit?vendor=' + module.value.vendor + '&module=' + module.value.module + '&version=' + module.value.version)">
+													<i class="far fa-edit"></i><span class="mL-5">Edit</span>
+												</router-link>
+											</th>
+										</tr>
+									</template>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+							<button class="btn btn-primary" v-on:click="vue.openModal('upgrade')">Upgrade</button>
+							<button class="btn btn-outline-primary mL-15" v-on:click="vue.installDBRelationship()">Install Database Relation</button>
+							<button class="btn btn-outline-danger mL-15" v-on:click="vue.openModal('uninstall')">Uninstall</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row mT-30">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-header">
+							<h4 class="m-0">Available Modules</h4>
+						</div>
+						<div class="card-body pL-0 pR-0">
+							<table class="table">
+								<thead class="thead-light">
+									<tr>
+										<th style="width: 10px;">
+											<!-- <label class="customcheckbox mB-0">
+												<input class="multiCheboxSelect" type="checkbox" >
+												<span class="checkmark"></span>
+											</label> -->
+										</th>
+										<th scope="col" style="width: 250px;">Name</th>
+										<th scope="col">Version</th>
+										<th scope="col">Routes And Controllers</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody class="customtable">
+									<!-- empty state -->
+									<template v-if="!vue.modules.uninstalled.length">
+										<tr>
+											<td colspan="5">
+												No available module
+											</td>
+										</tr>
+									</template>
+									<!-- empty state -->
+
+									<template v-if="vue.modules.uninstalled.length">
+										<tr v-for="module in vue.modules.uninstalled">
+											<td>
+												<label class="customcheckbox mB-0">
+													<input class="multiCheboxSelect" type="checkbox"  v-bind:value="module.key" v-model="vue.modForm.uninstalled">
+													<span class="checkmark"></span>
+												</label>
+											</td>
+											<td style="width: 250px;" class="fs-14">{{module.key}}</th>
+											<td class="fs-14">{{module.value.version}}</th>
+											<td>
+												<div class="MH-150 of-auto">
+													<template v-for="con in module.value.controllers">
+														
+														<template v-if="con.isRegex && con.value.pattern">
+															<p class="ellipsis MW-400" v-bind:title="con.value.pattern + ' : ' + con.value.class">
+																<code>{{con.value.pattern}}</code> : <code>{{con.value.class}}</code>
+															</p>
+														</template>
+														<template v-if="!con.isRegex">
+															<template v-if="con.pattern">
+																<p class="ellipsis MW-400" v-bind:title="con.pattern + ' : ' + con.class">
+																	<code>{{con.pattern}}</code> : <code>{{con.class}}</code>
+																</p>
+															</template>
+															<template v-if="!con.pattern">
+																<p class="ellipsis MW-400" v-bind:title="con.key + ' : ' + con.value">
+																	<code>{{con.key}}</code> : <code>{{con.value}}</code>
+																</p>
+															</template>
+														</template>
+													</template>
+												</div>
+											</th>
+											<td class="fs-14">
+												<router-link v-bind:to="vue.url.getUrl('/module/edit?vendor=' + module.value.vendor + '&module=' + module.value.module + '&version=' + module.value.version)">
+													<i class="far fa-edit"></i><span class="mL-5">Edit</span>
+												</router-link>
+											</th>
+										</tr>
+									</template>
+								</tbody>
+							</table>
+						</div>
+						<div class="card-footer">
+							<button class="btn btn-primary" v-on:click="vue.openModal('install')">Install</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="modInstallModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="card">
+							<div class="card-header">
+								Module {{vue.modalAction}} tasks
+							</div>
+							<div class="card-body MH-400 of-auto">
+								<template v-if="!vue.initializing">
+									<p class="fs-14 mb-30" v-if="vue.modalAction == 'upgrade'">
+										If you are sure to upgrade all selected module click <button class="btn btn-outline-primary" v-on:click="vue.upgradeModules('upgrade')">Upgrade now</button>
+									</p>
+									<p class="fs-14 mb-30" v-if="vue.modalAction == 'uninstall'">
+										If you are sure to uninstall all selected module click <button class="btn btn-outline-danger" v-on:click="vue.upgradeModules('uninstall')">Uninstall now</button>
+									</p>
+									<p class="fs-14 mb-30" v-if="vue.modalAction == 'install'">
+										If you are sure to install all selected module click <button class="btn btn-outline-primary" v-on:click="vue.installModules('uninstall')">Install now</button>
+									</p>
+								</template>
+								<p class="fs-14 mb-0" v-for="task of vue.installTasks">{{task}}</p>
+							</div>
+							<div class="card-footer text-right" v-if="vue.moduleTaskFinishButton">
+								<button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Finish</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<mainfooter-component></mainfooter-component>
+	</div>
+</div>
+

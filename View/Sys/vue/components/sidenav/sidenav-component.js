@@ -12,7 +12,7 @@ Vue.component('sidenav-component', {
 	data: function(){
 		return {
 			vue: window['_vue']['sidenav-component'],
-			url: window['_url'],
+			url: window['opoink_system']['_url'],
 			isShowChildNav: false,
 			childToDisplay: '',
 			showChildNav: function(childToDisplay){

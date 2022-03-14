@@ -24,11 +24,27 @@ class SystemStaticVue extends Sys {
 	}
 
 	public function run(){
-		$this->_sysVueRenderer->getComponents();
+		$referrer = $this->_request->getServer('HTTP_REFERER');
 
-		echo header("Content-type: application/javascript", true);
-		echo $this->_sysVueRenderer->toJs();
-		exit;
-		die;
+		/**
+		 * this javascript should run only if called in system pages
+		 */
+		if($referrer){
+			$referrer = parse_url($referrer);
+			if(isset($referrer['host']) && $referrer['host'] == $this->_url->getDomain()){
+				$this->_sysVueRenderer->getComponents();
+				$js = $this->_sysVueRenderer->toJs();
+				echo header("Content-type: application/javascript", true);
+				echo $js;
+				exit;
+				die;
+			}
+			else {
+				$this->returnError('404', 'Page Not Found.');
+			}
+		}
+		else {
+			$this->returnError('404', 'Page Not Found.');
+		}
 	}
 }

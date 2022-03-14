@@ -26,13 +26,17 @@ class SysVueRenderer {
 	protected $targetFilename = '';
 	protected $targetFilenameExt = '';
 
+	protected $_config;
+
 	public function __construct(
-		\Of\File\Writer $Writer
+		\Of\File\Writer $Writer,
+		\Of\Config $Config
 	){
 		$this->_fileWriter = $Writer;
 		$this->targetDir = ROOT . DS . 'Var' . DS . 'Sys' . DS . 'Js';
 		$this->targetFilename = 'sysvuecomponents';
 		$this->targetFilenameExt = 'js';
+		$this->_config = $Config;
 	}
 
 	/**
@@ -156,9 +160,11 @@ class SysVueRenderer {
 	 * and return minified js content
 	 */
 	public function toJs(){
-		$main = dirname(self::COMPONENT_DIR) . DS . 'main.js';
-		if(file_exists($main)){
-			$main = file_get_contents($main);
+		$main = '';
+		$main .= 'var sysUrl = "'.\Of\Constants::BASE_SYS_URL.$this->_config->getConfig('system_url').'";';
+		$mainTarget = dirname(self::COMPONENT_DIR) . DS . 'main.js';
+		if(file_exists($mainTarget)){
+			$main .= file_get_contents($mainTarget);
 		}
 		return $main . ' ' . $this->components;
 
