@@ -16,6 +16,11 @@ class databaseIndexIndex {
 	 */
 	alltables = [];
 
+	/**
+	 * the current selected table fields
+	 */
+	selectedTableFiels = null;
+
 
 	constructor(){
 		this.request = window['opoink_system']['_request'];
@@ -53,8 +58,19 @@ class databaseIndexIndex {
 		});
 	}
 
-	setTableRows($fields){
-		console.log('setTableRows setTableRows', $fields);
+	setTableRows(module, tablename){
+		console.log('setTableRows setTableRows', module, tablename);
+
+		let url = '/' + this.url.getRoute() + '/database?module=' + module + '&tablename=' + tablename;
+		this.request.makeRequest(url, '', 'GET', true)
+		.then(result => {
+			if(!result.error && result.result){
+				console.log('setTableRows setTableRows', result.result.fields);
+				this.selectedTableFiels = result.result;
+			} else if(result.error && !result.result){
+				this.toast.add(result.error.responseText, 'Error');
+			}
+		});
 	}
 }
 

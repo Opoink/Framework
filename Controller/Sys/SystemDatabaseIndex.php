@@ -28,10 +28,29 @@ class SystemDatabaseIndex extends Sys {
 		$this->requireLogin();
 
 		$alltables = (int)$this->_request->getParam('alltables');
-		if($alltables == 1){
+		$_module = $this->_request->getParam('module');
+		$tablename = $this->_request->getParam('tablename');
 
+		if($alltables == 1){
 			$allTables = $this->_moduleAvailableTables->setConfig($this->_config)->getAllInstalledAvailableStable();
 			$this->jsonEncode($allTables);
+		}
+		elseif($_module && $tablename){
+			$_module = explode('_', $_module);
+			if(count($_module) == 2){
+				list($vendor, $module) = $_module;
+
+				$fields = $this->_moduleAvailableTables->setConfig($this->_config)->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
+				if($fields){
+					$this->jsonEncode($fields);
+				}
+				else {
+					$this->returnError('406', 'Invalid JSON format, or the file not exist.');
+				}
+			}
+			else {
+				$this->returnError('406', 'Invalid module');
+			}
 		}
 		else {
 			return $this->renderHtml();
