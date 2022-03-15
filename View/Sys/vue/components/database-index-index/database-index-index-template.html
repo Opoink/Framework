@@ -1,0 +1,48 @@
+<div class="database-index-index">
+	<sidenav-component></sidenav-component>
+	<div class="container-wrapper">
+		<mainheader-component></mainheader-component>
+
+
+		<div class="p-15">
+			
+
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-sm-3 col-md-3">
+							<h5>Tables</h5>
+							<div class="tablenames">
+								<ul class="no-bullets p-0">
+									<li v-for="(tables, module) in vue.alltables">
+										<p class="mb-0 c-pointer" data-bs-toggle="collapse" v-bind:data-bs-target="'#' + module + '_tables'" aria-expanded="false" v-bind:aria-controls="module + '_tables'">
+											{{module}}
+										</p>
+										<ul class="no-bullets collapse elbow" v-bind:id="module + '_tables'" data-bs-parent="#accordion">
+											<li class="c-pointer" v-for="(tableValue, tablename) in tables">
+												<p class="mb-0" v-on:click="vue.setTableRows(tableValue)">
+													<span class="fs-12 badge rounded-pill bg-success" v-if="tableValue.is_installed">
+														{{tablename}}
+													</span>
+													<span class="fs-12 badge rounded-pill bg-danger" v-if="!tableValue.is_installed">
+														{{tablename}}
+													</span>
+												</p>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="9">
+						
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<mainfooter-component></mainfooter-component>
+	</div>
+</div>
+

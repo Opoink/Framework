@@ -282,25 +282,28 @@ class moduleIndexIndex {
 	 * this will call the API for foreignkeys
 	 * the API will only add foreignkeys for the installed modules
 	 */
-	// installDBRelationship(){
-	// 	_vue.request.getFormKey().then(formkey => {
-	// 		if(formkey){
-	// 			let jsonData = {
-	// 				'form_key': formkey
-	// 			}
-	// 			let url = '/' + _vue.url.getRoute() + '/database/addforeignkey';
-	// 			_vue.request.makeRequest(url, jsonData, 'POST').then(res => {
-	// 				if(res.result && !res.error){
-	// 					_vue.toast.add(res.result.message);
-	// 				} else {
-	// 					_vue.toast.add(res.error.responseText, 'Failed');
-	// 				}
-	// 			});
-	// 		} else {
-	// 			_vue.toast.add('Failed, can\'t get a form key...', 'Failed');
-	// 		}
-	// 	});
-	// }
+	installDBRelationship(){
+		this.loader.setLoader(true, 'Installing database relation...');
+
+		this.request.getFormKey().then(formkey => {
+			if(formkey){
+				let jsonData = {
+					'form_key': formkey
+				}
+				let url = '/' + this.url.getRoute() + '/database/addforeignkey';
+				this.request.makeRequest(url, jsonData, 'POST').then(res => {
+					if(res.result && !res.error){
+						this.toast.add(res.result.message);
+					} else {
+						this.toast.add(res.error.responseText, 'Failed');
+					}
+					this.loader.setLoader(false);
+				});
+			} else {
+				this.toast.add('Failed, can\'t get a form key...', 'Failed');
+			}
+		});
+	}
 }
 
 window['_vue']['module-index-index-component'] = new moduleIndexIndex();

@@ -1,7 +1,9 @@
-03-13-2022 -- changing the layout to use single page of VueJS
-03-13-2022 -- changes to support PHP 8XX
-03-13-2022 -- Change phpdi version requirements
-03-13-2022 -- Change laminas version requirements
+03-15-2022 -- add new system UI page database index
+03-15-2022 -- changing the layout to use single page of VueJS
+03-14-2022 -- changing the layout to use single page of VueJS
+03-14-2022 -- changes to support PHP 8XX
+03-14-2022 -- Change phpdi version requirements
+03-14-2022 -- Change laminas version requirements
 
 03-11-2022 -- change on how the \Of\Controller\Filecontroller getRealPath method is looking for the file. instead of looking for specific Vendor_Module we will now scan in all installed module. but this is only if the Vendor_Module is not defined. it is still recommended to use include vendor/module in your URL to prevent loading time issue. sample URL with https://yourdomain.com/public/deploy1646964026/<vendor>/<module>/css/fontawesome/webfonts/fa-regular-400.woff2
 03-11-2022 -- Fix copying files while in developer mode

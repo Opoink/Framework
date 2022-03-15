@@ -192,7 +192,7 @@ class Application {
 	}	
 	
 	protected function error($code=404){
-		return $this->_di->get('Of\Controller\Error')->run($code);
+		return $this->_di->get('Of\Controller\Error')->_run($code);
 	}
 	
 	public function run(){

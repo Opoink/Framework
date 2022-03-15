@@ -6,6 +6,10 @@ class loaderComponent {
 	isLoading = false;
 	text = 'Loading...';
 
+	setLoader(isLoading, text='Loading...'){
+		this.isLoading = isLoading;
+		this.text = text;
+	}
 	reset(){
 		this.isLoading = false;
 		this.text = 'Loading...';
