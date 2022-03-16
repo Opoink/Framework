@@ -35,7 +35,9 @@ class databaseIndexIndex {
 		attributes: '',
 		collation: '',
 		old_name: '',
-		primary: false
+		primary: false,
+		comment: '',
+		after: ''
 	}
 	formFieldSaveAndInstall = false;
 
@@ -137,16 +139,21 @@ class databaseIndexIndex {
 			save_and_install: this.formFieldSaveAndInstall,
 			fields: [this.formField]
 		}
+
+		this.loader.setLoader(true, 'Saving field...');
+
 		this.request.getFormKey().then(formkey => {
 			jsonData['form_key'] = formkey;
 
 			let url = '/' + this.url.getRoute() + '/database/savefield';
 			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
 				if(!result.error && result.result){
-					console.log('saveField saveField', result.result);
 					this.selectedTableFields = result.result;
+					this.toast.add('Field successfully saved.', 'Sucess');
+					this.loader.reset();
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
+					this.loader.reset();
 				}
 			});
 		});

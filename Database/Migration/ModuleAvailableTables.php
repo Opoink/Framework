@@ -141,19 +141,25 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					else {
 						foreach ($tableContent['fields'] as $key => &$tableContentField) {
 							if($tableContentField['name'] == $field['old_name']){
-								$tableContentField = $this->setFieldValue($field);
 
-								$fieldsToSaveData = $tableContentField;
+								if(isset($field['after'])){
+									unset($tableContent['fields'][$key]);
+									$fieldsToSaveData = $this->setFieldValue($field);
+								}
+								else {
+									$tableContentField = $this->setFieldValue($field);
+									$fieldsToSaveData = $tableContentField;
+								}
+
 								$fieldsToSaveData['old_name'] = $field['old_name'];
 								$fieldsToSave[] = $fieldsToSaveData;
 							}
 						}
 					}
 				}
-				
-				/**
-				 * TODO: look for primary field
-				 */
+
+				$tableContent['fields'] = $this->reArrangeFields($tableContent['fields'], $fieldsToSave);
+
 				foreach ($tableContent['fields'] as $key => $field) {
 					if(isset($field['primary']) && $field['primary'] == true){
 						$tableContent['primary_key'] = $field['name'];
@@ -256,6 +262,21 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 		}
 
 		return $_value;
+	}
+
+	protected function reArrangeFields($tableContentFields, $fieldsToSave){
+
+		foreach ($fieldsToSave as $key => $value) {
+			if(isset($value['after'])){
+				foreach ($tableContentFields as $_key => $_value) {
+					if($value['after'] == $_value['name']){
+						array_splice( $tableContentFields, $_key + 1, 0, [$value] );
+					}
+				}
+			}
+		}
+
+		return $tableContentFields;
 	}
 }
 ?>

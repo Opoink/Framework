@@ -183,35 +183,38 @@ class Columns {
 				$collate = " COLLATE " . $column['collation'] . " ";
 			}
 
-            $column = "`".$this->name."` " . $this->type;
+            $columnString = "`".$this->name."` " . $this->type;
             if($this->length){
-				$column .= "(".$this->length.")";
+				$columnString .= "(".$this->length.")";
 			}
 
             if($this->attributes){
-				$column .= " ".$this->attributes." ";
+				$columnString .= " ".$this->attributes." ";
 			}
 
-			$column .= $collate;
+			$columnString .= $collate;
 
             if($this->nullable){
-				$column .= " NULL ";
+				$columnString .= " NULL ";
 			} else {
-				$column .= " NOT NULL ";
+				$columnString .= " NOT NULL ";
 			}
 
             if($this->default){
-				$column .= " DEFAULT ".$this->default." ";
+				$columnString .= " DEFAULT ".$this->default." ";
 			}
 
             if($this->comment){
-				$column .= " COMMENT '".$this->comment."' ";
+				$columnString .= " COMMENT '".$this->comment."' ";
 			}
 
             if($prevColumn){ /** this part is used in upgrade module */
-                $column .= ' AFTER `'.$prevColumn['name'].'` ';
+                $columnString .= ' AFTER `'.$prevColumn['name'].'` ';
             }
-            $this->columns[] = $column;
+			else if(isset($column['after'])){
+				$columnString .= ' AFTER `'.$column['after'].'` ';
+			}
+            $this->columns[] = $columnString;
         }
     }
 

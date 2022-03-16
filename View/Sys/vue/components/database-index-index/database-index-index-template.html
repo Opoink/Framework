@@ -514,6 +514,13 @@
 						</div>
 
 						<div class="form-group row">
+							<label for="tabel-field-comment" class="col-sm-4 col-form-label text-end">Comments</label>
+							<div class="col-sm-8">
+								<textarea class="form-control" id="tabel-field-comment" rows="3" v-model="vue.formField.comment" maxlength="255"></textarea>
+							</div>
+						</div>
+
+						<div class="form-group row">
 							<label for="tabel-field-attributes" class="col-sm-4 col-form-label text-end">Attributes</label>
 							<div class="col-sm-8">
 								<select class="form-select" id="tabel-field-attributes" v-model="vue.formField.attributes">
@@ -523,6 +530,18 @@
 									<option value="UNSIGNED">UNSIGNED</option>
 									<option value="UNSIGNED ZEROFILL">UNSIGNED ZEROFILL</option>
 									<option value="on update CURRENT_TIMESTAMP">on update CURRENT_TIMESTAMP</option>
+								</select>
+							</div>							
+						</div>
+
+						<div class="form-group row">
+							<label for="tabel-field-after" class="col-sm-4 col-form-label text-end">After</label>
+							<div class="col-sm-8">
+								<select class="form-select" id="tabel-field-after" v-model="vue.formField.after">
+									<option value=""></option>
+									<template v-for="field in vue.selectedTableFields.fields">
+										<option v-bind:value="field.name">{{field.name}}</option>
+									</template>
 								</select>
 							</div>							
 						</div>
