@@ -30,7 +30,7 @@ let indexIndexIndexComponent = Vue.component('index-index-index-component', {
 		data.init();
 		next();
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 

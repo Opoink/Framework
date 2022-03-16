@@ -319,7 +319,7 @@ let moduleIndexIndexComponent = Vue.component('module-index-index-component', {
 		data.init();
 		next();
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 

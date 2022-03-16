@@ -28,5 +28,5 @@ Vue.component('toast-component', {
 			toast: window['_vue']['toast-component'] 
 		}
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });

@@ -25,5 +25,5 @@ Vue.component('sidenav-component', {
 			}
 		}
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });

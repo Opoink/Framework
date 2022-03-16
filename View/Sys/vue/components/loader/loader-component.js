@@ -24,5 +24,5 @@ Vue.component('loader-component', {
 			vue: window['_vue']['loader-component']
 		}
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });

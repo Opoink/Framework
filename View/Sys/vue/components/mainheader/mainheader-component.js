@@ -20,5 +20,5 @@ Vue.component('mainheader-component', {
 			vue: window['_vue']['mainheader-component']
 		}
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });

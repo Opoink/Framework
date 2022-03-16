@@ -102,7 +102,7 @@ let loginIndexIndexComponent = Vue.component('login-index-index-component', {
 			vue: window['_vue']['login-index-index-component'] 
 		}
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 

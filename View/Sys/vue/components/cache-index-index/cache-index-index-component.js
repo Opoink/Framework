@@ -121,7 +121,7 @@ let cacheIndexIndexComponent = Vue.component('cache-index-index-component', {
 		data.init();
 		next();
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 

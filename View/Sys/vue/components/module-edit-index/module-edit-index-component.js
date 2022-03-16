@@ -187,7 +187,7 @@ let moduleEditIndexComponent = Vue.component('module-edit-index-component', {
 		data.init();
 		next();
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 

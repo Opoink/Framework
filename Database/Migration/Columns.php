@@ -178,26 +178,37 @@ class Columns {
             $this->setAttributes($column, $_file);
             $this->setComment($column, $_file);
             
+			$collate = '';
+			if(array_key_exists('collation', $column)){
+				$collate = " COLLATE " . $column['collation'] . " ";
+			}
 
             $column = "`".$this->name."` " . $this->type;
             if($this->length){
 				$column .= "(".$this->length.")";
 			}
+
             if($this->attributes){
 				$column .= " ".$this->attributes." ";
 			}
+
+			$column .= $collate;
+
             if($this->nullable){
 				$column .= " NULL ";
 			} else {
 				$column .= " NOT NULL ";
 			}
+
             if($this->default){
 				$column .= " DEFAULT ".$this->default." ";
 			}
+
             if($this->comment){
 				$column .= " COMMENT '".$this->comment."' ";
 			}
-            if($prevColumn){
+
+            if($prevColumn){ /** this part is used in upgrade module */
                 $column .= ' AFTER `'.$prevColumn['name'].'` ';
             }
             $this->columns[] = $column;

@@ -213,6 +213,7 @@ class Router {
 			$sysRoute.'_static_css' => 'Of\\Controller\\Sys\\SystemStaticCss',
 			$sysRoute.'_database_addforeignkey' => 'Of\\Controller\\Sys\\SystemDbAddForeignkey',
 			$sysRoute.'_database_index' => 'Of\\Controller\\Sys\\SystemDatabaseIndex',
+			$sysRoute.'_database_savefield' => 'Of\\Controller\\Sys\\SystemDatabaseSavefield',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

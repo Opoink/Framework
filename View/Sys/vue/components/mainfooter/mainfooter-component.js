@@ -45,5 +45,5 @@ Vue.component('mainfooter-component', {
 	},
 	beforeMount: function(){
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });

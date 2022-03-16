@@ -68,7 +68,7 @@ let moduleCreateIndexComponent = Vue.component('module-create-index-component', 
 	beforeRouteEnter: function(to, from, next) {
 		next();
 	},
-	template: '{{template}}'
+	template: `{{template}}`
 });
 
 vueRouter.addRoutes([{ 
