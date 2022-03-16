@@ -60,6 +60,22 @@ class databaseIndexIndex {
 		}, 500);
 	}
 
+	resetForm(){
+		this.formField = {
+			name: '',
+			type: '',
+			length: '',
+			default: '',
+			default_value: '',
+			attributes: '',
+			collation: '',
+			old_name: '',
+			primary: false,
+			comment: '',
+			after: ''
+		}
+	}
+
 	/**
 	 * this method will call an API
 	 * the result all table from the instable modules
@@ -100,7 +116,11 @@ class databaseIndexIndex {
 	setField(field){
 		this.selectedTableField = field;
 		this.formFieldSaveAndInstall = false;
-		this.setFormField();
+		if(field){
+			this.setFormField();
+		} else {
+			this.resetForm();
+		}
 	}
 
 	setFormField(){

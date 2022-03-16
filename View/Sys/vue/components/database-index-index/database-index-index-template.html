@@ -83,6 +83,14 @@
 									</tr>
 								</tbody>
 							</table>
+
+							<div class="row" v-if="vue.selectedTableFields">
+								<div class="col-12">
+									<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
+										Add New Field
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -95,10 +103,16 @@
 
 	<!-- modal to save database field -->
 	<div class="modal fade" id="databaseSaveFieldModal" tabindex="-1" role="dialog" aria-labelledby="databaseSaveFieldModalLabel" aria-hidden="true">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content" v-if="vue.selectedTableField">
+		<div class="modal-dialog" role="document" v-if="vue.selectedTableFields">
+			<div class="modal-content">
 				<div class="modal-header">
-					<h5 class="modal-title" id="databaseSaveFieldModalLabel">{{vue.selectedTableName}} > {{vue.selectedTableField.name}}</h5>
+					<!-- <h5 class="modal-title" id="databaseSaveFieldModalLabel">{{vue.selectedTableName}} > {{vue.selectedTableField.name}}</h5> -->
+					<h5 v-if="vue.selectedTableField" class="modal-title" id="databaseSaveFieldModalLabel">
+						{{vue.selectedTableName}} > {{vue.selectedTableField.name}}
+					</h5>
+					<h5 v-if="!vue.selectedTableField" class="modal-title" id="databaseSaveFieldModalLabel">
+						Add New Field
+					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
 				<form v-on:submit="vue.saveField($event)">

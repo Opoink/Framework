@@ -139,7 +139,13 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 						];
 					}
 					else {
+						$isUpdate = false;
 						foreach ($tableContent['fields'] as $key => &$tableContentField) {
+
+							/**
+							 * add new bug can add same field name
+							 */
+
 							if($tableContentField['name'] == $field['old_name']){
 
 								if(isset($field['after'])){
@@ -153,6 +159,19 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 								$fieldsToSaveData['old_name'] = $field['old_name'];
 								$fieldsToSave[] = $fieldsToSaveData;
+
+								$isUpdate = true;
+							}
+						}
+
+						if(!$isUpdate){
+							$fieldsToSaveData = $this->setFieldValue($field);
+							$fieldsToSaveData['old_name'] = $fieldsToSaveData['name'];
+							$fieldsToSave[] = $fieldsToSaveData;
+
+							/** if has after the filled will e inserted dring the reArrangeFields() method */
+							if(!isset($fieldsToSaveData['after'])){
+								$tableContent['fields'][] = $fieldsToSaveData;
 							}
 						}
 					}
