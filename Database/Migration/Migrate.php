@@ -105,6 +105,88 @@ class Migrate {
         return $name;
     }
 
+	/**
+	 * this will create database table including all column 
+	 * in the JSON file
+	 */
+	protected function createDatabaseTableWithColumns($tableName, $columns, $filePath){
+		$_columns = new Columns();
+
+		$primaryKey = '';
+		foreach ($columns as $keyColumn => $valueColumn) {
+			/** 
+			 * since this is new table creation must not be here 
+			 * so we have to unset after if it is declared in the JSON file
+			 */
+			if(isset($valueColumn['after'])){
+				unset($valueColumn['after']);
+			}
+			$_columns->addColumn($valueColumn, $filePath);
+
+			if (array_key_exists('primary', $valueColumn) && $valueColumn['primary'] == true) {
+				$primaryKey = ' , PRIMARY KEY (`'.$valueColumn['name'].'`) ';
+			}
+		}
+		$cols = implode(', ', $_columns->getColumns());
+		
+		$collate = "COLLATE='utf8_general_ci'";
+		$charset = 'DEFAULT CHARSET=utf8';
+
+		if(isset($tableContent['collate']) && !empty($tableContent['collate'])){
+			$collate = "COLLATE='".$tableContent['collate']."'";
+			$charset = explode('_', $tableContent['collate']);
+			$charset = 'DEFAULT CHARSET='.$charset[0];
+		}
+
+		$engine = 'ENGINE=InnoDB';
+		if(isset($tableContent['engine']) && !empty($tableContent['engine'])){
+			$engine = "ENGINE='".$tableContent['engine']."'";
+		}
+		$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
+
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$connection->exec($sql);
+			return true;
+		} catch (\PDOException $pe) {
+			throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
+		}
+	}
+
+	/**
+	 * save the column into an existing table
+	 * @param $column array the column info
+	 * @param $tableName string
+	 * @param $filePath string the absolute path of JSON file
+	 */
+	public function saveColumnIntoTable($column, $tableName, $filePath, $prevColumn=null){
+		$name = $column['name'];
+		if(isset($column['old_name'])){
+			$name = $column['old_name'];
+		}
+
+		$isColumnExist = $this->fetchColumnName($tableName, $name);
+
+		$_columns = new Columns();
+		$_columns->addColumn($column, $filePath, $prevColumn);
+		$cols = implode(', ', $_columns->getColumns());
+
+		$sql = '';
+		if(!$isColumnExist){
+			$sql .= "ALTER TABLE `".$tableName."` ADD " . $cols . ";";
+		}
+		else {
+			$sql .= "ALTER TABLE `".$tableName."` CHANGE `".$name."` " . $cols . ";";
+		}
+
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$connection->exec($sql);
+		} catch (\PDOException $pe) {
+			throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
+		}
+	}
+
     /**
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema
@@ -122,38 +204,7 @@ class Migrate {
         }
         if(!$isExist) {
             if(count($columns)){
-                $_columns = new Columns();
-                foreach ($columns as $keyColumn => $valueColumn) {
-                    $_columns->addColumn($valueColumn, $_file);
-                }
-                $cols = implode(', ', $_columns->getColumns());
-
-                $primaryKey = '';
-                if (array_key_exists('primary_key', $fields)) {
-                    $primaryKey = ' , PRIMARY KEY (`'.$fields['primary_key'].'`) ';
-                }
-				
-				$collate = "COLLATE='utf8_general_ci'";
-				$charset = 'DEFAULT CHARSET=utf8';
-				if(isset($fields['collate']) && !empty($fields['collate'])){
-					$collate = "COLLATE='".$fields['collate']."'";
-					$charset = explode('_', $fields['collate']);
-					$charset = 'DEFAULT CHARSET='.$charset[0];
-				}
-				
-				$engine = 'ENGINE=InnoDB';
-				if(isset($fields['engine']) && !empty($fields['engine'])){
-					$engine = "ENGINE='".$fields['engine']."'";
-				}
-				$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
-
-				try {
-					$connection = $this->_connection->getConnection()->getConnection();
-					$connection->exec($sql);
-				} catch (\PDOException $pe) {
-					throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
-				}
-
+				$this->createDatabaseTableWithColumns($tableName, $columns, $_file);
                 $_GET['module_install_result'][] = [
                     'message' => $tableName.': Database created.',
                 ];
@@ -169,19 +220,21 @@ class Migrate {
                 if(isset($column['name'])){
                     $isColumnExist = $this->fetchColumnName($tableName, $column['name']);
                     if(!$isColumnExist){
-                        $_columns = new Columns();
-                        $_columns->addColumn($column, $_file, $prevColumn);
-                        $cols = implode(', ', $_columns->getColumns());
+						$this->saveColumnIntoTable($column, $tableName, $_file, $prevColumn);
 
-                        $sql = "ALTER TABLE `".$tableName."` ";
-                        $sql .= "ADD " . $cols . ";";
+                        // $_columns = new Columns();
+                        // $_columns->addColumn($column, $_file, $prevColumn);
+                        // $cols = implode(', ', $_columns->getColumns());
 
-                        try {
-                            $connection = $this->_connection->getConnection()->getConnection();
-                            $connection->exec($sql);
-                        } catch (\PDOException $pe) {
-                            throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
-                        }
+                        // $sql = "ALTER TABLE `".$tableName."` ";
+                        // $sql .= "ADD " . $cols . ";";
+
+                        // try {
+                        //     $connection = $this->_connection->getConnection()->getConnection();
+                        //     $connection->exec($sql);
+                        // } catch (\PDOException $pe) {
+                        //     throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
+                        // }
 
                         $_GET['module_install_result'][] = [
                             'message' => $column['name'].': added into '.$tableName.' .',

@@ -89,9 +89,11 @@
 
 							<div class="row" v-if="vue.selectedTableFields">
 								<div class="col-12">
-									<button class="btn btn btn-primary btn-sm mR-10" title="Edit" data-bs-toggle="modal" data-bs-target="#saveDatabaseTableFieldsModal">
-										Install All Fields
-									</button>
+									<template v-if="vue.selectedTableValue && !vue.selectedTableValue.is_installed">
+										<button class="btn btn btn-primary btn-sm mR-10" title="Edit" data-bs-toggle="modal" data-bs-target="#saveDatabaseTableFieldsModal">
+											Install All Fields
+										</button>
+									</template>
 									<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
 										Add New Field
 									</button>
@@ -305,7 +307,7 @@
 					<h5 class="modal-title" id="databaseDropFieldModalLabel">
 						Drop: {{vue.selectedTableField.name}}
 					</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetForm()"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetDropFields()"></button>
 				</div>
 				<form v-on:submit="vue.dropField($event)" v-if="vue.selectedTableField">
 					<div class="modal-body">
@@ -332,7 +334,7 @@
 					</div>
 					<div class="modal-footer">
 						<button class="btn btn-outline-secondary">Drop {{vue.selectedTableField.name}}</button>
-						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetForm()">Cancel</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetDropFields()">Cancel</button>
 					</div>
 				</form>
 			</div>

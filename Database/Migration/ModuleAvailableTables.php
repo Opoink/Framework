@@ -189,70 +189,11 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					$_tableName = $this->_connection->getTablename($tablename);
         			$isExist = $this->fetchTableName($_tableName);
 					if(!$isExist){
-						$_columns = new Columns();
-
-						$primaryKey = '';
-						foreach ($fieldsToSave as $keyColumn => $valueColumn) {
-							$_columns->addColumn($valueColumn, $targetFile);
-
-							if (array_key_exists('primary', $valueColumn) && $valueColumn['primary'] == true) {
-								$primaryKey = ' , PRIMARY KEY (`'.$valueColumn['name'].'`) ';
-							}
-						}
-						$cols = implode(', ', $_columns->getColumns());
-						
-						/** in this part the table is not exist so we have to create it */
-						
-						$collate = "COLLATE='utf8_general_ci'";
-						$charset = 'DEFAULT CHARSET=utf8';
-						if(isset($tableContent['collate']) && !empty($tableContent['collate'])){
-							$collate = "COLLATE='".$tableContent['collate']."'";
-							$charset = explode('_', $tableContent['collate']);
-							$charset = 'DEFAULT CHARSET='.$charset[0];
-						}
-
-						$engine = 'ENGINE=InnoDB';
-						if(isset($tableContent['engine']) && !empty($tableContent['engine'])){
-							$engine = "ENGINE='".$tableContent['engine']."'";
-						}
-						$sql = "CREATE TABLE IF NOT EXISTS `".$_tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
-
-						try {
-							$connection = $this->_connection->getConnection()->getConnection();
-							$connection->exec($sql);
-						} catch (\PDOException $pe) {
-							throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
-						}
+						$this->createDatabaseTableWithColumns($_tableName, $fieldsToSave);
 					}
 					else {
 						foreach ($fieldsToSave as $key => $column) {
-							$name = $column['name'];
-							if(isset($column['old_name'])){
-								$name = $column['old_name'];
-							}
-
-							$isColumnExist = $this->fetchColumnName($_tableName, $name);
-
-							$_columns = new Columns();
-							$_columns->addColumn($column, $targetFile);
-							$cols = implode(', ', $_columns->getColumns());
-
-							$sql = '';
-							if(!$isColumnExist){
-								$sql .= "ALTER TABLE `".$_tableName."` ";
-								$sql .= "ADD " . $cols . ";";
-							}
-							else {
-								$sql .= "ALTER TABLE `".$_tableName."` ";
-								$sql .= "CHANGE `".$name."` " . $cols . ";";
-							}
-
-							try {
-								$connection = $this->_connection->getConnection()->getConnection();
-								$connection->exec($sql);
-							} catch (\PDOException $pe) {
-								throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
-							}
+							$this->saveColumnIntoTable($column, $_tableName, $targetFile);
 						}
 					}
 				}
@@ -503,12 +444,16 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			if(isset($tableContentFields[$_prevKey])){
 				$field['after'] = $tableContentFields[$_prevKey]['name'];
 			}
+			if(isset($field['old_name'])){
+				unset($field['old_name']);
+			}
 		}
 		return $tableContentFields;
 	}
 
 	/**
-	 * create table
+	 * this is called on \Of\Controller\Sys\SystemDatabaseSavefield
+	 * this is in page //domain.com/system<suffix>/database
 	 */
 	public function _createTable($vendor, $module, $tablename) {
 		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tablename.'.json';

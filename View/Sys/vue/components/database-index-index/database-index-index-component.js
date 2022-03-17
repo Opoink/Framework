@@ -54,7 +54,7 @@ class databaseIndexIndex {
 		tablename: '',
 		primary_key: '',
 		collation: 'utf8_general_ci',
-		storage_engine: ''
+		storage_engine: 'InnoDB'
 	}
 
 	constructor(){
@@ -66,6 +66,10 @@ class databaseIndexIndex {
 		this.selectedTableFields = null;
 		this.selectedTableName = null;
 		this.selectedTableValue = null;
+
+		this.resetForm();
+		this.resetDropFields();
+		this.resetNewTableForm();
 
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
@@ -92,12 +96,17 @@ class databaseIndexIndex {
 		}
 	}
 
+	resetDropFields(){
+		this.formFieldDropCheck = false;
+		this.formFieldRemoveOnJson = false;
+	}
+
 	resetNewTableForm(){
-		newTableForm = {
+		this.newTableForm = {
 			tablename: '',
 			primary_key: '',
 			collation: 'utf8_general_ci',
-			storage_engine: ''
+			storage_engine: 'InnoDB'
 		}
 	}
 
@@ -124,9 +133,10 @@ class databaseIndexIndex {
 	 */
 	setTableRows(module, tablename, tableValue=null){
 		this.selectedTableName = tablename;
-		this.selectedTableValue = tablename;
+		this.selectedTableValue = tableValue;
 		this.selectedModule = module;
-		this.selectedTableValue = null;
+
+		console.log('this.selectedTableValue this.selectedTableValue', this.selectedTableValue);
 
 		let url = '/' + this.url.getRoute() + '/database?module=' + module + '&tablename=' + tablename;
 		this.request.makeRequest(url, '', 'GET', true)
@@ -181,29 +191,32 @@ class databaseIndexIndex {
 
 	saveAllFields(e){
 		e.preventDefault();
+		if(!this.selectedTableValue.is_installed){
+			let jsonData = {
+				module: this.selectedModule,
+				tablename: this.selectedTableName,
+				install_table: true
+			}
+			this.request.getFormKey().then(formkey => {
+				jsonData['form_key'] = formkey;
 
-		let jsonData = {
-			module: this.selectedModule,
-			tablename: this.selectedTableName,
-			install_table: true
-		}
-		this.request.getFormKey().then(formkey => {
-			jsonData['form_key'] = formkey;
+				let url = '/' + this.url.getRoute() + '/database/savefield';
+				this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+					if(!result.error && result.result){	
+						this.selectedTableFields = result.result;
+						this.getModuleTables();
+						this.toast.add('Field successfully saved.', 'Sucess');
+						this.loader.reset();
+						this.selectedTableValue.is_installed = true;
 
-			let url = '/' + this.url.getRoute() + '/database/savefield';
-			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
-				if(!result.error && result.result){	
-					this.selectedTableFields = result.result;
-					this.getModuleTables();
-
-					this.toast.add('Field successfully saved.', 'Sucess');
-					this.loader.reset();
-				} else if(result.error && !result.result){
-					this.toast.add(result.error.responseText, 'Error');
-					this.loader.reset();
-				}
+						$('#saveDatabaseTableFieldsModal').modal('hide');
+					} else if(result.error && !result.result){
+						this.toast.add(result.error.responseText, 'Error');
+						this.loader.reset();
+					}
+				});
 			});
-		});
+		}
 	}
 
 	saveField(e){
@@ -236,6 +249,7 @@ class databaseIndexIndex {
 
 					this.toast.add('Field successfully saved.', 'Sucess');
 					this.loader.reset();
+					$('#databaseSaveFieldModal').modal('hide');
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
 					this.loader.reset();
@@ -283,8 +297,9 @@ class databaseIndexIndex {
 						});
 					}
 					
-					this.setTableRows(this.selectedModule, this.selectedTableName);
+					this.setTableRows(this.selectedModule, this.selectedTableName, this.selectedTableValue);
 					this.loader.reset();
+					$('#databaseDropFieldModal').modal('hide');
 
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
