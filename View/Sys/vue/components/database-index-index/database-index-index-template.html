@@ -52,7 +52,7 @@
 								<tbody class="customtable" v-if="vue.selectedTableFields">
 									<tr v-for="field in vue.selectedTableFields.fields">
 										<td>
-											<span v-if="field.name">{{field.name}}</span>
+											<span v-if="field.name">{{field.name}}</span><span v-if="field.primary" class="mL-5 text-warning"><i class="fas fa-key"></i></span>
 										</td>
 										<td>
 											<span v-if="field.type">{{field.type}}</span> <span v-if="field.length">({{field.length}})</span>
@@ -282,7 +282,7 @@
 								</div>
 								<small class="form-text text-danger">
 									Note: If checked, Opoink will try to save the column into the database. 
-									If this column was already installed and changed, then the column will be altered. 
+									If this column was already installed, then the column will be altered. 
 									You may lose or break your database. 
 									We suggest inserting a new column instead.
 								</small>

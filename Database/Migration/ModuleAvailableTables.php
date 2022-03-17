@@ -386,7 +386,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 		// $newValue['name'] = str_replace(' ', '_', $newValue['name']);
 		// $newValue['name'] = preg_replace("/[^a-zA-Z0-9_]+/", "", $newValue['name']);
-		$this->cleanName($newValue['name']);
+		$newValue['name'] = $this->cleanName($newValue['name']);
 
 		foreach ($newValue as $key => $value) {
 			if($key == 'default'){
