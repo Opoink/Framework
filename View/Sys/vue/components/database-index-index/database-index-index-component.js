@@ -165,7 +165,6 @@ class databaseIndexIndex {
 					else {
 						this.formField.default = 'USER_DEFINED';
 						this.formFieldDefaultValue = this.selectedTableField.default;
-						console.log('formField formField formField', this.formFieldDefaultValue, this.selectedTableField.default);
 					}
 				}
 			}
