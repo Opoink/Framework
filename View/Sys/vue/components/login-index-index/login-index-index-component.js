@@ -6,6 +6,7 @@ class loginIndexIndex {
 	url;
 	request;
 	toast;
+	loader;
 
 	formView = 'login'; /* either login || lost-password */
 	form = {
@@ -19,6 +20,7 @@ class loginIndexIndex {
 		this.request = window['opoink_system']['_request'];
 		setTimeout(f => {
 			this.toast = window._vue["toast-component"];
+			this.loader = window._vue["loader-component"];
 		}, 500);
 	}
 
@@ -40,12 +42,13 @@ class loginIndexIndex {
 					if(route){
 						_route = route;
 					}
+					this.loader.setLoader(true, 'Logging in...');
 					this.request.makeRequest('/'+_route+'/login' + qureyParams, this.form)
 					.then(login => {
 						if(!login.error && login.result){
 							this.toast.add(login.result.message, 'Login Success');
 							if(redirect){
-								this.url.redirect('/');
+								this.url.navigateTo('/'+window.sysUrl);
 							}
 							login_result(true);
 						} else {
@@ -56,6 +59,7 @@ class loginIndexIndex {
 								login_result(false);
 							}
 						}
+						this.loader.reset();
 					});
 				} else {
 					this.toast.add('Please enter your password.', 'Error');

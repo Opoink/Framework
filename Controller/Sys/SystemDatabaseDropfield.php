@@ -6,7 +6,7 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseSavefield extends Sys {
+class SystemDatabaseDropfield extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
@@ -43,20 +43,39 @@ class SystemDatabaseSavefield extends Sys {
 
 					$fields = $this->_request->getParam('fields');
 					if(is_array($fields)){
+						$allResult = [
+							"database_drop" => [],
+							"json_remove" => []
+						];
+
 						$this->_moduleAvailableTables->setConfig($this->_config);
 						try {	
-							$this->_moduleAvailableTables->saveFieldsByVendorModuleTablename($vendor, $module, $tablename, $fields, $save_and_install);
+							$drop_check = $this->_request->getParam('drop_check');
+							if($drop_check){
+								$allResult["database_drop"] = $this->_moduleAvailableTables->dropFieldsFromoDatabase($tablename, $fields);
+							}
 						} catch (\Exception $e) {
-							$this->returnError('406', $e->getMessage());
+							$this->returnError('500', $e->getMessage());
 						}
 
-						$fields = $this->_moduleAvailableTables->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
-						if($fields){
-							$this->jsonEncode($fields);
+						try {	
+							$remove_on_json = $this->_request->getParam('remove_on_json');
+							if($remove_on_json){
+								$allResult["json_remove"] = $this->_moduleAvailableTables->removeFieldsFromoJsonFile($vendor, $module, $tablename, $fields);
+							}
+						} catch (\Exception $e) {
+							$this->returnError('500', $e->getMessage());
 						}
-						else {
-							$this->returnError('406', 'Invalid JSON format, or the file not exist.');
-						}
+
+						$this->jsonEncode($allResult);
+
+						// $fields = $this->_moduleAvailableTables->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
+						// if($fields){
+						// 	$this->jsonEncode($fields);
+						// }
+						// else {
+						// 	$this->returnError('406', 'Invalid JSON format, or the file not exist.');
+						// }
 					}
 					else {
 						$this->returnError('406', 'Fields should be an array');
@@ -75,33 +94,5 @@ class SystemDatabaseSavefield extends Sys {
 			echo 'Invalid request';
 			die;
 		}
-
-		// $alltables = (int)$this->_request->getParam('alltables');
-		// $_module = $this->_request->getParam('module');
-
-		// if($alltables == 1){
-		// 	$allTables = $this->_moduleAvailableTables->setConfig($this->_config)->getAllInstalledAvailableStable();
-		// 	$this->jsonEncode($allTables);
-		// }
-		// elseif($_module && $tablename){
-		// 	$_module = explode('_', $_module);
-		// 	if(count($_module) == 2){
-		// 		list($vendor, $module) = $_module;
-
-		// 		$fields = $this->_moduleAvailableTables->setConfig($this->_config)->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
-		// 		if($fields){
-		// 			$this->jsonEncode($fields);
-		// 		}
-		// 		else {
-		// 			$this->returnError('406', 'Invalid JSON format, or the file not exist.');
-		// 		}
-		// 	}
-		// 	else {
-		// 		$this->returnError('406', 'Invalid module');
-		// 	}
-		// }
-		// else {
-		// 	return $this->renderHtml();
-		// }
 	}
 }
