@@ -178,6 +178,10 @@ class moduleIndexIndex {
 									a.result.module_install_result.forEach(res => {
 										this.installTasks.push(res['message']);
 									});
+									
+									a.result.installed_module.error_messages.forEach(res => {
+										this.installTasks.push(res);
+									});
 								} else {
 									this.installTasks.push('Failed to install ' + mods[index] + '...');
 									this.installTasks.push('Check this module if already saved on your database, if it is you may want to delete it first.');

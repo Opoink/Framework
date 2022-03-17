@@ -204,7 +204,7 @@
 								<p class="fs-14 mb-0" v-for="task of vue.installTasks">{{task}}</p>
 							</div>
 							<div class="card-footer text-right" v-if="vue.moduleTaskFinishButton">
-								<button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close">Finish</button>
+								<button class="btn btn-outline-primary" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.getModules()">Finish</button>
 							</div>
 						</div>
 					</div>

@@ -72,14 +72,14 @@ class Migrate {
                     if(file_exists($_file)){
                         $tableName = $this->getTableNameFromFileName($_file);
                         if(!$tableName){
-                            throw new \Exception("Invalid JSON schema: " . $_file, 1);
+                            throw new \Exception("Invalid JSON schema: " . $_file, 406);
                         }
 
                         $fields = json_decode(file_get_contents($_file), true);
                         if(json_last_error() == JSON_ERROR_NONE){ /** to make sure that the json file was no error */
                             $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir);
                         } else {
-                            throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 1);
+                            throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 406);
                         }
                     }
                 }
@@ -132,12 +132,26 @@ class Migrate {
                 if (array_key_exists('primary_key', $fields)) {
                     $primaryKey = ' , PRIMARY KEY (`'.$fields['primary_key'].'`) ';
                 }
-    
-                /** in this part the table is not exist so we have to create it */
-                $sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				
+				$collate = "COLLATE='utf8_general_ci'";
+				$charset = 'CHARSET=utf8';
+				if(isset($fields['collate']) && !empty($fields['collate'])){
+					$collate = "COLLATE='".$fields['collate']."'";
+					$charset = explode('_', $fields['collate']);
+					$charset = 'CHARSET='.$charset[0];
+				}
+				$engine = 'ENGINE=InnoDB';
+				if(isset($fields['engine']) && !empty($fields['engine'])){
+					$engine = "ENGINE='".$fields['engine']."'";
+				}
+				$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." DEFAULT ".$charset." ".$collate.";";
 
-                $connection = $this->_connection->getConnection()->getConnection();
-                $connection->exec($sql);
+				try {
+					$connection = $this->_connection->getConnection()->getConnection();
+					$connection->exec($sql);
+				} catch (\PDOException $pe) {
+					throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
+				}
 
                 $_GET['module_install_result'][] = [
                     'message' => $tableName.': Database created.',
