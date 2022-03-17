@@ -212,6 +212,10 @@ class Router {
 			$sysRoute.'_static_vue' => 'Of\\Controller\\Sys\\SystemStaticVue',
 			$sysRoute.'_static_css' => 'Of\\Controller\\Sys\\SystemStaticCss',
 			$sysRoute.'_database_addforeignkey' => 'Of\\Controller\\Sys\\SystemDbAddForeignkey',
+			$sysRoute.'_database_index' => 'Of\\Controller\\Sys\\SystemDatabaseIndex',
+			$sysRoute.'_database_savefield' => 'Of\\Controller\\Sys\\SystemDatabaseSavefield',
+			$sysRoute.'_database_dropfield' => 'Of\\Controller\\Sys\\SystemDatabaseDropfield',
+			$sysRoute.'_database_newtablejsonschema' => 'Of\\Controller\\Sys\\SystemDatabaseNewTableJsonSchema',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

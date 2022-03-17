@@ -2,37 +2,19 @@
 <html dir="ltr">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="/public/sys/assets/images/favicon.ico">
-    <title><?= $title ?></title>
-    
-    <!-- Custom CSS -->
-    <link href="/public/sys/assets/libs/flot/css/float-chart.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/public/sys/assets/extra-libs/multicheck/multicheck.css">
-    <link href="/public/sys/assets/libs/datatables.net-bs4/css/dataTables.bootstrap4.css" rel="stylesheet">
-    
-    <!-- Custom CSS -->
-    <link href="/public/sys/dist/css/style.min.css" rel="stylesheet">
-    
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-<![endif]-->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" type="image/png" sizes="16x16" href="/public/sys/assets/images/favicon.ico">
+	<title>Error: <?= $code ?> <?= $title ?></title>
 
-    <link href="/public/sys/dist/css/opoink.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	
+	<link href="<?= $this->getUrl('/system/static/css/style.css') ?>" rel="stylesheet">
+	<link href="/public/sys/dist/css/icons/font-awesome/css/fontawesome-all.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="opoink-error-page">
     <div class="main-wrapper">
         <div class="preloader">
             <div class="lds-ripple">
@@ -44,15 +26,6 @@
             <?= $template ?>
         </div>
     </div>
-
-    <script src="/public/sys/assets/libs/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap tether Core JavaScript -->
-    <script src="/public/sys/assets/libs/popper.js/dist/umd/popper.min.js"></script>
-    <script src="/public/sys/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script>
-    $('[data-toggle="tooltip"]').tooltip();
-    $(".preloader").fadeOut();
-    </script>
 </body>
 
 </html>

@@ -41,9 +41,11 @@ class SystemModuleInstall extends Sys {
 	
 				$response['error'] = 0;
 				$response['message'] = $installedCount.' Module' . $s . ' successfully installed';
+				$response['installed_module'] = $installed[0];
 			} else {
 				$response['error'] = 1;
 				$response['message'] = 'No module was installed';
+				$response['installed_module'] = null;
 			}
 
 			$response['module_install_result'] = $_GET['module_install_result'];

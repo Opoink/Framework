@@ -68,18 +68,20 @@ class Password {
 		return $this->verify();
 	}	
 	
+	/**
+	 * generate password with default length of 10 character long
+	 * this generator came from 
+	 * https://stackoverflow.com/questions/6101956/generating-a-random-password-in-php
+	 */
 	public static function generate($length=10) {
-		$key = '';
-		list($usec, $sec) = explode(' ', microtime());
-		mt_srand((float) $sec + ((float) $usec * 100000));
-		
-		$inputs = array_merge(range('z','a'),range(0,9),range('A','Z'));
-
-		for($i=0; $i<$length; $i++)
-		{
-			$key .= $inputs[mt_rand(0,61)];
+		$alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+		$pass = array();
+		$alphaLength = strlen($alphabet) - 1;
+		for ($i = 0; $i < $length; $i++) {
+			$n = rand(0, $alphaLength);
+			$pass[] = $alphabet[$n];
 		}
-		return $key;
+		return implode($pass);
 	}
 }
 ?>

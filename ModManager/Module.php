@@ -5,6 +5,8 @@
 */
 namespace Of\ModManager;
 
+use \Of\Constants;
+
 class Module {
 	
 	protected $moduleDir;
@@ -133,74 +135,72 @@ class Module {
 				$target = $moduleDir . DS . $vendor . DS . $module . DS . 'Config.php';
 				if(file_exists($target)){
 					$moduleConfig = include($target);
+
+					$result = [
+						'vendor' => $vendor,
+						'module' => $module
+					];
+
+					if(!isset($this->_config['modules'][$vendor])){
+						$this->_config['modules'][$vendor] = [];
+					} 
+						
+					if(!isset($this->_config['modules'][$vendor][$module])){
+						$this->_config['modules'][$vendor][] = $module;
 					
-					// $saveModule = $this->_extensionEntity->getByColumn(['vendor' => $vendor, 'extension' => $module]);
-
-					// if(!$saveModule){
-						$result = [
-							'vendor' => $vendor,
-							'module' => $module
-						];
-
-						if(!isset($this->_config['modules'][$vendor])){
-							$this->_config['modules'][$vendor] = [];
-						} 
-						
-						if(!isset($this->_config['modules'][$vendor][$module])){
-							$this->_config['modules'][$vendor][] = $module;
-						
-							if(isset($moduleConfig['controllers'])){
-								$this->_config['controllers'][$fullName] = $moduleConfig['controllers'];
-							}
-							
-							/** 
-							 * this old schema type will going to be depricated on the future release 
-							 * encourage the dev to use the new type of schema instead
-							 */
-							$installSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Install.php';
-							if(file_exists($installSchema)){
-								$installSchema = $this->_di->make("$vendor\\$module\Schema\Install");
-								$installSchema->setAdapter()->createSchema();
-								$result['schema_installed'] = true;
-							}
-							$UpgradeSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Upgrade.php';
-							if(file_exists($UpgradeSchema)){
-								$UpgradeSchema = $this->_di->make("$vendor\\$module\Schema\Upgrade");
-								$UpgradeSchema->setAdapter()->upgradeSchema("0.0.0", $moduleConfig['version']);
-								$result['upgrade_schema_installed'] = true;
-							}
-							/** end old schema */
-
-							/**
-							 * this schema will be the new migration
-							 */
-							try {
-								$migration = $this->_di->make("Of\Database\Migration\Migrate");
-
-								/** init() return a table name that was just intalled or updated */
-								$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
-								$result['schema_table_installed_or_update'] = $tableNames;
-
-								$this->_extensionEntity->setDatas([
-									'vendor' => $vendor,
-									'extension' => $module,
-									'version' => $moduleConfig['version'],
-									'status' => \Of\Std\Status::ENABLED
-								])->__save();
-								
-								$installedModule[] = $result;
-								
-								$_GET['module_install_result'][] = [
-									'message' => $vendor.'_' .$module.': Installed successully.',
-								];
-							} catch(\Exception $e){
-								$result['error_messages'][] = $e->getMessage();
-								$_GET['module_install_result'][] = [
-									'message' => $module . ': ' . $e->getMessage()
-								];
-							}
+						if(isset($moduleConfig['controllers'])){
+							$this->_config['controllers'][$fullName] = $moduleConfig['controllers'];
 						}
-					// }
+						
+						/** 
+						 * this old schema type will going to be depricated on the future release 
+						 * encourage the dev to use the new type of schema instead
+						 */
+						$installSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Install.php';
+						if(file_exists($installSchema)){
+							$installSchema = $this->_di->make("$vendor\\$module\Schema\Install");
+							$installSchema->setAdapter()->createSchema();
+							$result['schema_installed'] = true;
+							$result['error_messages'][] = 'The usage of the old install schema is deprecated and will be removed on a future release around 2023. please use the new JSON type schema';
+						}
+						$UpgradeSchema = $moduleDir . DS . $vendor . DS . $module . DS . 'Schema' . DS . 'Upgrade.php';
+						if(file_exists($UpgradeSchema)){
+							$UpgradeSchema = $this->_di->make("$vendor\\$module\Schema\Upgrade");
+							$UpgradeSchema->setAdapter()->upgradeSchema("0.0.0", $moduleConfig['version']);
+							$result['upgrade_schema_installed'] = true;
+							$result['error_messages'][] = 'The usage of the old upgrade schema is deprecated and will be removed on a future release around 2023. please use the new JSON type schema';
+						}
+						/** end old schema */
+
+						/**
+						 * this schema will be the new migration
+						 */
+						try {
+							$migration = $this->_di->make("Of\Database\Migration\Migrate");
+
+							/** init() return a table name that was just intalled or updated */
+							$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+							$result['schema_table_installed_or_update'] = $tableNames;
+
+							$this->_extensionEntity->setDatas([
+								'vendor' => $vendor,
+								'extension' => $module,
+								'version' => $moduleConfig['version'],
+								'status' => \Of\Std\Status::ENABLED
+							])->__save();
+							
+							$installedModule[] = $result;
+							
+							$_GET['module_install_result'][] = [
+								'message' => $vendor.'_' .$module.': Installed successully.',
+							];
+						} catch(\Exception $e){
+							$result['error_messages'][] = $e->getMessage();
+							$_GET['module_install_result'][] = [
+								'message' => $module . ': ' . $e->getMessage()
+							];
+						}
+					}
 				} else {
 					$_GET['module_install_result'][] = [
 						'message' => $module . ': Config.php file does not exist.'
@@ -271,12 +271,20 @@ class Module {
 				$fullName = $v . '_' . $m;
 				$result['error'] = 0;
 				try {
-					/** 
-					 * this old schema type will going to be depricated on the future release 
-					 * encourage the dev to use the new type of schema instead
-					 */
-					$upgradeSchema = $this->_di->make($v.'\\'.$m.'\\Schema\\Upgrade');
-					$upgradeSchema->setAdapter()->upgradeSchema($savedModule->getData('version'), $config['version']);
+
+					if(file_exists(Constants::EXT_DIR.DS.$v.DS.$m.DS.'Schema'.DS.'Upgrade.php')){
+						/** 
+						 * this old schema type will going to be depricated on the future release 
+						 * encourage the dev to use the new type of schema instead
+						 */
+						$upgradeSchema = $this->_di->make($v.'\\'.$m.'\\Schema\\Upgrade');
+						$upgradeSchema->setAdapter()->upgradeSchema($savedModule->getData('version'), $config['version']);
+						
+						$result['message'][] = [
+							'type' => 'danger',
+							'message' => 'The usage of the old upgrade schema is deprecated and will be removed on a future release around 2023. please use the new JSON type schema'
+						];
+					}
 
 					/**
 					 * this schema will be the new migration

@@ -178,29 +178,43 @@ class Columns {
             $this->setAttributes($column, $_file);
             $this->setComment($column, $_file);
             
+			$collate = '';
+			if(array_key_exists('collation', $column)){
+				$collate = " COLLATE " . $column['collation'] . " ";
+			}
 
-            $column = "`".$this->name."` " . $this->type;
+            $columnString = "`".$this->name."` " . $this->type;
             if($this->length){
-				$column .= "(".$this->length.")";
+				$columnString .= "(".$this->length.")";
 			}
+
             if($this->attributes){
-				$column .= " ".$this->attributes." ";
+				$columnString .= " ".$this->attributes." ";
 			}
+
+			$columnString .= $collate;
+
             if($this->nullable){
-				$column .= " NULL ";
+				$columnString .= " NULL ";
 			} else {
-				$column .= " NOT NULL ";
+				$columnString .= " NOT NULL ";
 			}
+
             if($this->default){
-				$column .= " DEFAULT ".$this->default." ";
+				$columnString .= " DEFAULT ".$this->default." ";
 			}
+
             if($this->comment){
-				$column .= " COMMENT '".$this->comment."' ";
+				$columnString .= " COMMENT '".$this->comment."' ";
 			}
-            if($prevColumn){
-                $column .= ' AFTER `'.$prevColumn['name'].'` ';
+
+            if($prevColumn){ /** this part is used in upgrade module */
+                $columnString .= ' AFTER `'.$prevColumn['name'].'` ';
             }
-            $this->columns[] = $column;
+			else if(isset($column['after'])){
+				$columnString .= ' AFTER `'.$column['after'].'` ';
+			}
+            $this->columns[] = $columnString;
         }
     }
 

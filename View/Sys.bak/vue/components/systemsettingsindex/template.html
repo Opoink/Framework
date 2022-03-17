@@ -1,0 +1,335 @@
+<div class="p-15" v-if="systemsettingsindex.settingFetched">
+	<div class="col-md-12">
+		<div class="card">
+			<div class="row">
+				<div class="col-lg-3 border-right pR-0">
+					<div class="card-body border-bottom c-pointer" data-toggle="collapse" data-target="#sys_general_settings" aria-expanded="true" aria-controls="sys_general_settings">
+						General Setting
+					</div>
+					<div class="card-body border-bottom c-pointer" data-toggle="collapse" data-target="#sys_mailer_settings" aria-expanded="true" aria-controls="sys_mailer_settings">
+						Mailer
+					</div>
+					<div class="card-body border-bottom c-pointer" data-toggle="collapse" data-target="#sys_cache" aria-expanded="false" aria-controls="sys_cache">
+						Cache
+					</div>
+					<div class="card-body c-pointer" data-toggle="collapse" data-target="#sys_file_stream" aria-expanded="false" aria-controls="sys_file_stream">
+						File Stream Settings
+					</div>
+				</div>
+
+				<div id="accordion" class="col-lg-9">
+					<form v-on:submit.prevent="systemsettingsindex.onSubmit($event)">
+						<div id="sys_general_settings" class="collapse show" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-0">General Setting</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_accepted_domain_url">
+										Accepted Domains 
+										<small class="text-muted">
+											Separated by commas, leave it blank to accept all
+										</small>
+									</label>
+									<input 
+										class="form-control" id="sys_admin_url" 
+										name="domains" 
+										type="text" 
+										v-model="systemsettingsindex.settings.domains"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_admin_url">
+										Admin url 
+										<small class="text-muted">
+											{{_vue.url.getProtocol()}}//{{_vue.url.getHost()}}/admin{{systemsettingsindex.settings.admin}}
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_admin_url" 
+										name="admin" 
+										type="text" 
+										v-model="systemsettingsindex.settings.admin"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_system_url">
+										System url 
+										<small class="text-muted">
+											{{_vue.url.getProtocol()}}//{{_vue.url.getHost()}}/system{{systemsettingsindex.settings.system_url}}
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.system_url"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mode">
+										Mode
+									</label>
+									<select 
+										id="sys_mode" 
+										class="select2 form-control custom-select" 
+										name="mode" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mode"
+									>
+										<option value="production">Production</option>
+										<option value="developer">Developer</option>
+									</select>
+								</div>
+
+								<h5 class="card-title mB-0 mT-50">Auth</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mode">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.auth.key"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mode">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_system_url" 
+										name="system_url" 
+										type="text" 
+										v-model="systemsettingsindex.settings.auth.secret"
+									>
+								</div>
+										
+										
+								<h5 class="card-title mB-0 mT-50">Google re-Captcha</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_g_recaptcha">
+										Enable
+									</label>
+									<select 
+										id="sys_g_recaptcha" 
+										class="select2 form-control custom-select" 
+										name="sys_g_recaptcha" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.sys_g_recaptcha"
+									>
+										<option value="0">No</option>
+										<option value="1">Yes</option>
+									</select>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="g_recaptcha_key">
+										Key
+									</label>
+									<input 
+										class="form-control" 
+										id="g_recaptcha_key" 
+										name="g_recaptcha_key" 
+										type="text" 
+										v-model="systemsettingsindex.settings.g_recaptcha_key"
+									>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="g_recaptcha_secret">
+										Secret
+									</label>
+									<input 
+										class="form-control" 
+										id="g_recaptcha_secret" 
+										name="g_recaptcha_secret" 
+										type="text" 
+										v-model="systemsettingsindex.settings.g_recaptcha_secret"
+									>
+								</div>
+							</div>
+						</div>
+
+						<div id="sys_mailer_settings" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-0">Mailer Settings</h5>
+								<hr>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_use_phpmailer">
+										Use PHPMailer
+									</label>
+									<select 
+										id="sys_mailer_use_phpmailer" 
+										class="select2 form-control custom-select" 
+										name="use_phpmailer" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mailer.use_phpmailer"
+									>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_debug">
+										Debug Enabled
+									</label>
+									<select 
+										id="sys_mailer_debug" 
+										class="select2 form-control custom-select" 
+										name="sys_mailer_debug" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mailer.debug"
+									>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_host">
+										Host
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_mailer_host" 
+										name="sys_mailer_host" 
+										type="text" 
+										v-model="systemsettingsindex.settings.mailer.host"
+									>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_auth">
+										Auth
+									</label>
+									<select 
+										id="sys_mailer_auth" 
+										class="select2 form-control custom-select" 
+										name="sys_mailer_auth" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mailer.auth"
+									>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_username">
+										Username
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_mailer_username" 
+										name="sys_mailer_username" 
+										type="text" 
+										v-model="systemsettingsindex.settings.mailer.username"
+									>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_password">
+										Password
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_mailer_password" 
+										name="sys_mailer_password" 
+										type="password" 
+										v-model="systemsettingsindex.settings.mailer.password"
+									>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_smpt_secure">
+										SMTP secure
+									</label>
+									<select 
+										id="sys_mailer_smpt_secure" 
+										class="select2 form-control custom-select" 
+										name="sys_mailer_smpt_secure" 
+										style="width: 100%; height:36px;"
+										v-model="systemsettingsindex.settings.mailer.smpt_secure"
+									>
+										<option value="1">Yes</option>
+										<option value="0">No</option>
+									</select>
+								</div>
+
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_mailer_port">
+										Port
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_mailer_port" 
+										name="sys_mailer_port" 
+										type="number" 
+										v-model="systemsettingsindex.settings.mailer.port"
+									>
+								</div>
+							</div>
+						</div>
+							
+						<div id="sys_cache" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-0">Cache Settings</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_cache_lifetime">
+										Cache max life time 
+										<small class="text-muted">
+											can be overide via xml attribute
+										</small>
+									</label>
+									<input 
+										class="form-control" 
+										id="sys_admin_url" 
+										name="cache[max-age]" 
+										type="text" 
+										v-model="systemsettingsindex.settings.cache['max-age']"
+									>
+								</div>
+							</div>
+						</div>
+							
+						<div id="sys_file_stream" class="collapse" data-parent="#accordion">
+							<div class="card-body">
+								<h5 class="card-title m-0">File Stream Settings</h5>
+								<hr>
+								<div class="form-group mT-20 col-md-12">
+									<p class="m-b-0">This will be the accepted file type, the controller can stream</p>
+									<p class="m-b-0">Example: {{_vue.url.getUrl('/images/your-image-name.', true)}}<span class="f-w-600">png</span></p>
+								</div>
+								<div class="form-group mT-20 col-md-6">
+									<label for="sys_cache_lifetime">
+										Images 
+										<small class="text-muted">
+											Comma separated
+										</small>
+									</label>
+									<textarea class="form-control" name="images" v-model="systemsettingsindex.settings.images"></textarea>
+								</div>
+							</div>
+						</div>
+						<div>
+							<div class="card-body">
+								<hr>
+								<div class="form-group m-0 col-md-12">
+									<button class="save btn btn-primary" name="saveSetting">Save Changes</button>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

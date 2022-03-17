@@ -5,7 +5,7 @@
 */
 namespace Of\Controller;
 
-class Error {
+class Error extends \Of\Controller\Sys\Sys {
 	protected $error = [
 		'_404' => 'Page Not Found',
 		'_500' => 'Internal Server Error',
@@ -20,12 +20,18 @@ class Error {
 	protected $_config;
 
 	public function __construct(
+		\Of\Session\SystemSession $SystemSession,
+		\Of\Session\FormSession $FormSession,
+		\Of\Http\Request $Request,
+		\Of\Http\Url $Url,
+		\Of\Std\Message $Message,
 		\Of\Config $Config
 	){
-		$this->_config = $Config;
+		$this->_config = $Config->getConfig();
+		parent::__construct($SystemSession, $FormSession, $Request, $Url, $Message);
 	}
 
-	public function run($code=404){
+	public function _run($code=404){
 		$title = '';
 		if(isset($this->error['_'.$code])){
 			$title = $this->error['_'.$code];

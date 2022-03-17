@@ -32,7 +32,6 @@ class SystemModuleIndex extends Sys {
 		if($modules){
 			$this->getModules();
 		} else {
-			$this->addInlineJs();
 			return $this->renderHtml();
 		}
 	}

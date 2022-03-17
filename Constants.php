@@ -18,5 +18,15 @@ class Constants {
 	
 	/* form key duration in sec */
 	const FORM_KEY_DURATION = 30;
+
+	const BASE_SYS_URL = 'system';
+
+	
+	const EXT_DIR = ROOT.DS.'App'.DS.'Ext';
+
+	/** 
+	 * the below constansts are the DIR inside the module
+	 */
+	const MODULE_DB_TABLES_DIR = DS.'Schema'.DS.'tables';
 }
 ?>

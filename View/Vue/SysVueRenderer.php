@@ -12,7 +12,12 @@ class SysVueRenderer {
 	const REWRITEVUECOMPONENTJS = true;
 	const COMPONENT_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'components';
 	const SERVICE_DIR = ROOT . DS . 'vendor'.DS.'opoink'.DS.'framework'.DS.'View'.DS.'Sys'.DS.'vue'.DS.'services';
-	protected $components = [];
+
+	/**
+	 * string contains the component JS
+	 */
+	protected $components = '';
+
 	protected $services = [];
 	protected $_fileWriter;
 
@@ -21,13 +26,17 @@ class SysVueRenderer {
 	protected $targetFilename = '';
 	protected $targetFilenameExt = '';
 
+	protected $_config;
+
 	public function __construct(
-		\Of\File\Writer $Writer
+		\Of\File\Writer $Writer,
+		\Of\Config $Config
 	){
 		$this->_fileWriter = $Writer;
 		$this->targetDir = ROOT . DS . 'Var' . DS . 'Sys' . DS . 'Js';
 		$this->targetFilename = 'sysvuecomponents';
 		$this->targetFilenameExt = 'js';
+		$this->_config = $Config;
 	}
 
 	/**
@@ -48,9 +57,8 @@ class SysVueRenderer {
 	}
 
 	protected function getComponentsHelper(){
-		$this->getSirvices();
-
 		$components = scandir(self::COMPONENT_DIR);
+
 		foreach ($components as $key => $componentName) {
 			if($componentName == '.' || $componentName == '..'){
 				continue;
@@ -60,48 +68,19 @@ class SysVueRenderer {
 	}
 
 	/**
-	 * get all services that is used by the components
-	 */
-	public function getSirvices(){
-		$services = scandir(self::SERVICE_DIR);
-		foreach ($services as $key => $service) {
-			if($service == '.' || $service == '..'){
-				continue;
-			}
-			$s = explode('.', $service);
-			$lastKey = count($s) - 1;
-			if(isset($s[$lastKey])){
-				unset($s[$lastKey]);
-			}
-			$serviceName = implode('.', $s);
-
-			$target = self::SERVICE_DIR .'/' . $service;
-
-			$this->services[$serviceName] = file_get_contents($target);
-		}
-	}
-
-	/**
 	 * set the component
 	 * @param $componentName the name of the component is the name of 
 	 * DIR inside framework/View/Sys/vue/components
 	 */
 	public function setComponent($componentName){
-		$this->setComponentHelper($componentName);
-	}
 
-	protected function setComponentHelper($componentName){
-		$component = $this->getFile($componentName, 'component.js');
+		$component = $this->getFile($componentName, $componentName . '-component.js');
 		$template = $this->getTemplate($componentName);
+		$datajs = $this->getFile($componentName, $componentName . '-data.js');
 
 		if($component && $template){
 			$component = str_replace("{{template}}", $template, $component);
-			$this->components[$componentName] = [
-				'name' => $componentName,
-				'component' => $component,
-				// 'global_data' => $componentName.": ".$this->getFile($componentName, 'data.js')
-				'global_data' => $this->getFile($componentName, 'data.js')
-			];
+			$this->components .= $component;
 		}
 	}
 
@@ -111,7 +90,7 @@ class SysVueRenderer {
 	 * else return null
 	 */
 	protected function getFile($component, $fileName){
-		$target = self::COMPONENT_DIR . '/'.$component.'/'.$fileName;
+		$target = self::COMPONENT_DIR . DS . $component . DS . $fileName;
 		if(file_exists($target)){
 			return file_get_contents($target);
 		}
@@ -122,11 +101,36 @@ class SysVueRenderer {
 	 * and return the minified html content
 	 */
 	protected function getTemplate($component){
-		$tpl = $this->getFile($component, 'template.html');
+		$tpl = $this->getFile($component, $component . '-template.html');
 		if($tpl){
 			return $this->minifyTemplate($tpl);
 		}
+		else {
+			return 'Template not found';
+		}
 	}
+
+	/**
+	 * get all services that is used by the components
+	 */
+	// public function getSirvices(){
+	// 	$services = scandir(self::SERVICE_DIR);
+	// 	foreach ($services as $key => $service) {
+	// 		if($service == '.' || $service == '..'){
+	// 			continue;
+	// 		}
+	// 		$s = explode('.', $service);
+	// 		$lastKey = count($s) - 1;
+	// 		if(isset($s[$lastKey])){
+	// 			unset($s[$lastKey]);
+	// 		}
+	// 		$serviceName = implode('.', $s);
+
+	// 		$target = self::SERVICE_DIR .'/' . $service;
+
+	// 		$this->services[$serviceName] = file_get_contents($target);
+	// 	}
+	// }
 
 	/**
 	 * nimify the template remove all unnecessary whitespaces and remove comments
@@ -156,62 +160,71 @@ class SysVueRenderer {
 	 * and return minified js content
 	 */
 	public function toJs(){
-		$target = $this->targetDir . DS . $this->targetFilename . '.' . $this->targetFilenameExt;
-
-		if(!self::REWRITEVUECOMPONENTJS){
-			if(file_exists($target)){
-				return file_get_contents($target);
-			}
+		$main = '';
+		$main .= 'var sysUrl = "'.\Of\Constants::BASE_SYS_URL.$this->_config->getConfig('system_url').'";';
+		$mainTarget = dirname(self::COMPONENT_DIR) . DS . 'main.js';
+		if(file_exists($mainTarget)){
+			$main .= file_get_contents($mainTarget);
 		}
-		$minifier = new Minify\JS();
+		return $main . ' ' . $this->components;
 
-		$Vue = '';
-		$data = [];
 
-		foreach ($this->services as $key => $service) {
-			$Vue .= $service . ' ' . PHP_EOL;
-			$data[] = $key . ': new ' . $key . '()';
-		}
+		// $target = $this->targetDir . DS . $this->targetFilename . '.' . $this->targetFilenameExt;
 
-		foreach ($this->components as $key => $component) {
-			$minifier->add($component['component']);
-			$Vue .= $component['global_data'] . ' ' . PHP_EOL;
-			$data[] = $component['name'] . ': new ' . $component['name'] . '()';
-		}
-		$data = implode(',', $data);
+		// if(!self::REWRITEVUECOMPONENTJS){
+		// 	if(file_exists($target)){
+		// 		return file_get_contents($target);
+		// 	}
+		// }
+		// $minifier = new Minify\JS();
 
-		$Vue .= "var _vue = new Vue({
-			el: '#root',
-			data: {
-				".$data."
-			},
-			beforeMount(){
-			},
-			mounted(){
-				let vCheck = setInterval(f => {
-					if(_vue){
-						let page = this.router.init();
-						if(typeof this[page] != 'undefined'){
-							if(typeof this[page].init === 'function') {
-								this[page].init();
-							}
-						}
-						clearInterval(vCheck);
-					}
-				}, 100)
-			}
-		})";
-		$minifier->add($Vue);
+		// $Vue = '';
+		// $data = [];
 
-		$js = $minifier->minify();
+		// foreach ($this->services as $key => $service) {
+		// 	$Vue .= $service . ' ' . PHP_EOL;
+		// 	$data[] = $key . ': new ' . $key . '()';
+		// }
 
-		$this->_fileWriter->setDirPath($this->targetDir)
-		->setData($js)
-		->setFilename($this->targetFilename)
-		->setFileextension($this->targetFilenameExt)
-		->write();
+		// foreach ($this->components as $key => $component) {
+		// 	$minifier->add($component['component']);
+		// 	$Vue .= $component['global_data'] . ' ' . PHP_EOL;
+		// 	$data[] = $component['name'] . ': new ' . $component['name'] . '()';
+		// }
+		// $data = implode(',', $data);
 
-		return $js;
+		// $Vue .= "var _vue = new Vue({
+		// 	el: '#root',
+		// 	data: {
+		// 		".$data."
+		// 	},
+		// 	beforeMount(){
+		// 	},
+		// 	mounted(){
+		// 		let vCheck = setInterval(f => {
+		// 			if(_vue){
+		// 				let page = this.router.init();
+		// 				if(typeof this[page] != 'undefined'){
+		// 					if(typeof this[page].init === 'function') {
+		// 						this[page].init();
+		// 					}
+		// 				}
+		// 				clearInterval(vCheck);
+		// 			}
+		// 		}, 100)
+		// 	}
+		// })";
+		// $minifier->add($Vue);
+
+		// $js = $minifier->minify();
+
+		// $this->_fileWriter->setDirPath($this->targetDir)
+		// ->setData($js)
+		// ->setFilename($this->targetFilename)
+		// ->setFileextension($this->targetFilenameExt)
+		// ->write();
+
+		// return $js;
 	}
 }
 ?>

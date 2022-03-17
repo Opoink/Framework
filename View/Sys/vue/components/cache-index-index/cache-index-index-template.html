@@ -1,0 +1,195 @@
+<div class="index-index-index">
+	<sidenav-component></sidenav-component>
+	<div class="container-wrapper">
+		<mainheader-component></mainheader-component>
+
+		<div class="p-15">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card">
+						<div class="card-body">
+							<p class="m-0 fs-14">Cache system is always ignored in developer's mode. e.i is less compiler, it is only compiled and streamed, this may take a light to heavy server load consumption, depending on how many less files do you have in your modules, but we found this very helpful during the development mode.</p>
+
+
+							<table class="table mT-50">
+								<thead class="thead-light">
+									<tr>
+										<th style="width: 10px;">
+											<label class="customcheckbox mB-0">
+												<input 
+													class="multiCheboxSelect" 
+													type="checkbox" 
+													data-list="cache_services_checkbox"
+													v-model="vue.selectAllVall"
+													v-on:change="vue.selectAll()"
+												>
+												<span class="checkmark"></span>
+											</label>
+										</th>
+										<th scope="col" style="width: 250px;">Name</th>
+										<th scope="col">Description</th>
+										<th scope="col">Status</th>
+									</tr>
+								</thead>
+								<tbody class="customtable" v:if="vue.cache">
+									<tr>
+										<td>
+											<label class="customcheckbox">
+												<input 
+													class="cache_services_checkbox" 
+													type="checkbox" 
+													value="less" 
+													v-model="vue.cache_services.less"
+												>
+												<span class="checkmark"></span>
+											</label>
+										</td>
+										<td class="fs-14">LESS/SCSS</td>
+										<td class="fs-14">Clear all cached less files in /Var/Less directory</td>
+										<td>
+											<span v-if="vue.cache.less">
+												<span v-if="vue.cache.less.status == 'updated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-success">
+													{{vue.cache.less.status}}
+												</span>
+												<span v-if="vue.cache.less.status == 'outdated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+													{{vue.cache.less.status}}
+												</span>
+											</span>
+											<span v-if="!vue.cache.less" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+												outdated
+											</span>
+										</td>
+									</tr>
+
+									<tr>
+										<td>
+											<label class="customcheckbox">
+												<input 
+													class="cache_services_checkbox" 
+													type="checkbox" 
+													value="deployed_files" 
+													v-model="vue.cache_services.deployed_files"
+												>
+												<span class="checkmark"></span>
+											</label>
+										</td>
+										<td class="fs-14">Deployed Files</td>
+										<td class="fs-14">This are the files inside /public/deploy{deployment_time} this will also remove the directory itself</td>
+										<td>
+											<span v-if="vue.cache.deployed_files">
+												<span v-if="vue.cache.deployed_files.status == 'updated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-success">
+													{{vue.cache.deployed_files.status}}
+												</span>
+												<span v-if="vue.cache.deployed_files.status == 'outdated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+													{{vue.cache.deployed_files.status}}
+												</span>
+											</span>
+											<span v-if="!vue.cache.deployed_files" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+												outdated
+											</span>
+										</td>
+									</tr>
+
+									<tr>
+										<td>
+											<label class="customcheckbox">
+												<input 
+													class="cache_services_checkbox" 
+													type="checkbox" 
+													value="xml"
+													v-model="vue.cache_services.xml"
+												>
+												<span class="checkmark"></span>
+											</label>
+										</td>
+										<td class="fs-14">XML</td>
+										<td class="fs-14">This is the compiled XML/HTML file from your XML layout, will clear all directories and files in /Var/Layout</td>
+										<td>
+											<span v-if="vue.cache.xml">
+												<span v-if="vue.cache.xml.status == 'updated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-success">
+													{{vue.cache.xml.status}}
+												</span>
+												<span v-if="vue.cache.xml.status == 'outdated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+													{{vue.cache.xml.status}}
+												</span>
+											</span>
+											<span v-if="!vue.cache.xml" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+												outdated
+											</span>
+										</td>
+									</tr>
+
+									<tr>
+										<td>
+											<label class="customcheckbox">
+												<input 
+													class="cache_services_checkbox" 
+													type="checkbox" 
+													value="database"
+													v-model="vue.cache_services.database"
+												>
+												<span class="checkmark"></span>
+											</label>
+										</td>
+										<td class="fs-14">Database</td>
+										<td class="fs-14">The cached data from database, will clear all directories and files in /Var/db</td>
+										<td>
+											<span v-if="vue.cache.database">
+												<span v-if="vue.cache.database.status == 'updated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-success">
+													{{vue.cache.database.status}}
+												</span>
+												<span v-if="vue.cache.database.status == 'outdated'" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+													{{vue.cache.database.status}}
+												</span>
+											</span>
+											<span  v-if="!vue.cache.database" class="fs-14 fw-400 text-capitalize badge rounded-pill bg-danger">
+												outdated
+											</span>
+										</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="6">
+											<p class="fs-14">With selected services:</p>
+											<button 
+												type="button" 
+												class="btn btn-primary modalDialodConfirm" 
+												name="purge" 
+												value="1"
+												v-on:click='vue.openModalConfirm()'
+											>Purge</button>
+										</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<mainfooter-component></mainfooter-component>
+	</div>
+
+
+
+	<div class="modal fade" id="purge-chache-confirm" tabindex="-1" role="dialog" aria-labelledby="purgeChacheLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="purgeChacheLabel">Purge Cache</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="fw-400">Are you sure you want to purge cache of the selected item/s?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" v-on:click="vue.purge()">Purge</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
