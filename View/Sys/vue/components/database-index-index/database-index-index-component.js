@@ -179,6 +179,33 @@ class databaseIndexIndex {
 		this.formField.old_name = this.selectedTableField.name;
 	}
 
+	saveAllFields(e){
+		e.preventDefault();
+
+		let jsonData = {
+			module: this.selectedModule,
+			tablename: this.selectedTableName,
+			install_table: true
+		}
+		this.request.getFormKey().then(formkey => {
+			jsonData['form_key'] = formkey;
+
+			let url = '/' + this.url.getRoute() + '/database/savefield';
+			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+				if(!result.error && result.result){	
+					this.selectedTableFields = result.result;
+					this.getModuleTables();
+
+					this.toast.add('Field successfully saved.', 'Sucess');
+					this.loader.reset();
+				} else if(result.error && !result.result){
+					this.toast.add(result.error.responseText, 'Error');
+					this.loader.reset();
+				}
+			});
+		});
+	}
+
 	saveField(e){
 		e.preventDefault();
 

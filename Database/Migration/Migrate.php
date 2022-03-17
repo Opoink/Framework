@@ -109,7 +109,7 @@ class Migrate {
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema
      */
-    protected function createTable($tableName, $fields, $_file, $targetDir){
+    protected function createTable($tableName, $fields, $_file, $targetDir, $saveData=true){
 
         $databaseName = $this->_connection->getConfig('database');
         $tableName = $this->_connection->getTablename($tableName);
@@ -134,17 +134,18 @@ class Migrate {
                 }
 				
 				$collate = "COLLATE='utf8_general_ci'";
-				$charset = 'CHARSET=utf8';
+				$charset = 'DEFAULT CHARSET=utf8';
 				if(isset($fields['collate']) && !empty($fields['collate'])){
 					$collate = "COLLATE='".$fields['collate']."'";
 					$charset = explode('_', $fields['collate']);
-					$charset = 'CHARSET='.$charset[0];
+					$charset = 'DEFAULT CHARSET='.$charset[0];
 				}
+				
 				$engine = 'ENGINE=InnoDB';
 				if(isset($fields['engine']) && !empty($fields['engine'])){
 					$engine = "ENGINE='".$fields['engine']."'";
 				}
-				$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." DEFAULT ".$charset." ".$collate.";";
+				$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
 
 				try {
 					$connection = $this->_connection->getConnection()->getConnection();
@@ -193,7 +194,10 @@ class Migrate {
                 }
             }
         }
-        $this->saveData($tableName, $targetDir);
+
+		if($saveData){
+			$this->saveData($tableName, $targetDir);
+		}
         return $tableName;
     }
 

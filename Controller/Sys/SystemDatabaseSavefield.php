@@ -41,25 +41,32 @@ class SystemDatabaseSavefield extends Sys {
 				if(count($_module) == 2){
 					list($vendor, $module) = $_module;
 
-					$fields = $this->_request->getParam('fields');
-					if(is_array($fields)){
-						$this->_moduleAvailableTables->setConfig($this->_config);
-						try {	
-							$this->_moduleAvailableTables->saveFieldsByVendorModuleTablename($vendor, $module, $tablename, $fields, $save_and_install);
-						} catch (\Exception $e) {
-							$this->returnError('406', $e->getMessage());
-						}
+					$this->_moduleAvailableTables->setConfig($this->_config);
 
-						$fields = $this->_moduleAvailableTables->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
-						if($fields){
-							$this->jsonEncode($fields);
-						}
-						else {
-							$this->returnError('406', 'Invalid JSON format, or the file not exist.');
-						}
+					$install_table = $this->_request->getParam('install_table');
+					if($install_table){ /** the request is to install the table */
+						$this->_moduleAvailableTables->_createTable($vendor, $module, $tablename);
 					}
 					else {
-						$this->returnError('406', 'Fields should be an array');
+						$fields = $this->_request->getParam('fields');
+						if(is_array($fields)){
+							try {	
+								$this->_moduleAvailableTables->saveFieldsByVendorModuleTablename($vendor, $module, $tablename, $fields, $save_and_install);
+							} catch (\Exception $e) {
+								$this->returnError('406', $e->getMessage());
+							}
+						}
+						else {
+							$this->returnError('406', 'Fields should be an array');
+						}
+					}
+
+					$fields = $this->_moduleAvailableTables->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
+					if($fields){
+						$this->jsonEncode($fields);
+					}
+					else {
+						$this->returnError('406', 'Invalid JSON format, or the file not exist.');
 					}
 				}
 				else {

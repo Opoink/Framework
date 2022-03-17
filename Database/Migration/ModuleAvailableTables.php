@@ -202,18 +202,20 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 						$cols = implode(', ', $_columns->getColumns());
 						
 						/** in this part the table is not exist so we have to create it */
+						
 						$collate = "COLLATE='utf8_general_ci'";
-						$charset = 'CHARSET=utf8';
+						$charset = 'DEFAULT CHARSET=utf8';
 						if(isset($tableContent['collate']) && !empty($tableContent['collate'])){
 							$collate = "COLLATE='".$tableContent['collate']."'";
 							$charset = explode('_', $tableContent['collate']);
-							$charset = 'CHARSET='.$charset[0];
+							$charset = 'DEFAULT CHARSET='.$charset[0];
 						}
+
 						$engine = 'ENGINE=InnoDB';
 						if(isset($tableContent['engine']) && !empty($tableContent['engine'])){
 							$engine = "ENGINE='".$tableContent['engine']."'";
 						}
-						$sql = "CREATE TABLE IF NOT EXISTS `".$_tableName."` (".$cols.$primaryKey.")".$engine." DEFAULT ".$charset." ".$collate.";";
+						$sql = "CREATE TABLE IF NOT EXISTS `".$_tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
 
 						try {
 							$connection = $this->_connection->getConnection()->getConnection();
@@ -503,6 +505,22 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			}
 		}
 		return $tableContentFields;
+	}
+
+	/**
+	 * create table
+	 */
+	public function _createTable($vendor, $module, $tablename) {
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tablename.'.json';
+
+		if(file_exists($targetFile) && is_file($targetFile)){
+			$tableContent = file_get_contents($targetFile);
+			$tableContent = json_decode($tableContent, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				$this->createTable($tablename, $tableContent, $targetFile, dirname($targetFile), false);
+			}
+		}
 	}
 }
 ?>

@@ -89,6 +89,9 @@
 
 							<div class="row" v-if="vue.selectedTableFields">
 								<div class="col-12">
+									<button class="btn btn btn-primary btn-sm mR-10" title="Edit" data-bs-toggle="modal" data-bs-target="#saveDatabaseTableFieldsModal">
+										Install All Fields
+									</button>
 									<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
 										Add New Field
 									</button>
@@ -388,6 +391,32 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" v-on:click="vue.resetNewTableForm()">Cancel</button>
 						<button class="btn btn-primary">Save Table</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	
+	
+	<!-- modal to new database table -->
+	<div class="modal fade" id="saveDatabaseTableFieldsModal" tabindex="-1" role="dialog" aria-labelledby="saveDatabaseTableFieldsModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="saveDatabaseTableFieldsModalLabel">
+						Install Table Fields
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form v-on:submit="vue.saveAllFields($event)">
+					<div class="modal-body">
+						<p class="mB-0">Are you sure you want to install all fields?</p>
+						<p class="mB-0">This will install all field(s) that are not installed in the database.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary">Save Table Fields</button>
 					</div>
 				</form>
 			</div>
