@@ -1,0 +1,9 @@
+<div class="common-database-data-structure-component" v-if="vue">
+	<table class="table">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col" v-for="field in vue.selectedTableFields.fields">{{field.name}}</th>
+			</tr>
+		</thead>
+	</table>
+</div>

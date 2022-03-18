@@ -62,6 +62,8 @@ class databaseIndexIndex {
 		action: ''
 	}
 
+	viewMode = 'table-structure'; /** table-structure || data-structure */
+
 	constructor(){
 		this.request = window['opoink_system']['_request'];
 		this.url = window['opoink_system']['_url'];
