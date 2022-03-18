@@ -57,6 +57,11 @@ class databaseIndexIndex {
 		storage_engine: 'InnoDB'
 	}
 
+	dropTableForm = {
+		tablename: '',
+		action: ''
+	}
+
 	constructor(){
 		this.request = window['opoink_system']['_request'];
 		this.url = window['opoink_system']['_url'];
@@ -70,6 +75,7 @@ class databaseIndexIndex {
 		this.resetForm();
 		this.resetDropFields();
 		this.resetNewTableForm();
+		this.resetDropTableForm();
 
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
@@ -110,6 +116,13 @@ class databaseIndexIndex {
 		}
 	}
 
+	resetDropTableForm(){
+		this.dropTableForm = {
+			tablename: '',
+			action: ''
+		}
+	}
+
 	/**
 	 * this method will call an API
 	 * the result all table from the instable modules
@@ -135,8 +148,6 @@ class databaseIndexIndex {
 		this.selectedTableName = tablename;
 		this.selectedTableValue = tableValue;
 		this.selectedModule = module;
-
-		console.log('this.selectedTableValue this.selectedTableValue', this.selectedTableValue);
 
 		let url = '/' + this.url.getRoute() + '/database?module=' + module + '&tablename=' + tablename;
 		this.request.makeRequest(url, '', 'GET', true)
@@ -336,6 +347,50 @@ class databaseIndexIndex {
 				this.loader.reset();
 			});
 		});
+	}
+
+	dropTable(e){
+		e.preventDefault();
+
+		this.dropTableForm.tablename = this.selectedTableName;
+		let jsonData = {
+			module: this.selectedModule,
+			table: this.dropTableForm
+		}
+		
+		this.loader.setLoader(true, 'Dropping your database table.')
+		this.request.getFormKey().then(formkey => {
+			jsonData['form_key'] = formkey;
+
+			let url = '/' + this.url.getRoute() + '/database/droptable';
+			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+				if(!result.error && result.result){
+					this.getModuleTables();
+					if(this.dropTableForm.action == 'droptable-only'){
+						this.setTableRows(this.selectedModule, this.selectedTableName, this.selectedTableValue);
+						this.selectedTableValue.is_installed = false;
+					}
+					else if(this.dropTableForm.action == 'delete-json-only'){
+						this.selectedTableName = null;
+						this.selectedTableValue = null;
+						this.selectedModule = null;
+						this.selectedTableValue.is_installed = false;
+					}
+					else if(this.dropTableForm.action == 'droptable-and-delete-json'){
+						this.selectedTableName = null;
+						this.selectedTableValue = null;
+						this.selectedModule = null;
+						this.selectedTableValue.is_installed = false;
+					}
+					$('#dropDatabaseTableModal').modal('hide');
+				}
+				else {
+					this.toast.add(result.error.responseText, 'Error');
+				}
+				this.loader.reset();
+			});
+		});
+		console.log('dropTable dropTable', jsonData);
 	}
 }
 

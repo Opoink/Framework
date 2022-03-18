@@ -187,6 +187,23 @@ class Migrate {
 		}
 	}
 
+	/**
+	 * this will try to drop table
+	 * @param $tableName string
+	 * return true || throw an error
+	 */
+	protected function dropTableFromDatabase($tableName){
+		$tableName = trim($tableName);
+		$sql = "DROP TABLE `".$tableName."`;";		
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$connection->exec($sql);
+			return true;
+		} catch (\PDOException $pe) {
+			throw new \Exception("Cannot drop table ".$tableName.": " . $pe->getMessage() . " : " . $sql, 500);
+		}
+	}
+
     /**
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema

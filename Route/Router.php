@@ -216,6 +216,7 @@ class Router {
 			$sysRoute.'_database_savefield' => 'Of\\Controller\\Sys\\SystemDatabaseSavefield',
 			$sysRoute.'_database_dropfield' => 'Of\\Controller\\Sys\\SystemDatabaseDropfield',
 			$sysRoute.'_database_newtablejsonschema' => 'Of\\Controller\\Sys\\SystemDatabaseNewTableJsonSchema',
+			$sysRoute.'_database_droptable' => 'Of\\Controller\\Sys\\SystemDatabaseDroptable',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

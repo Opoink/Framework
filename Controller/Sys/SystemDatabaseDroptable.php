@@ -6,7 +6,7 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseDropfield extends Sys {
+class SystemDatabaseDroptable extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
@@ -28,9 +28,9 @@ class SystemDatabaseDropfield extends Sys {
 		$this->requireLogin();
 
 		if($this->validateFormKey()){
-			$tablename = $this->_request->getParam('tablename');
+			$tablename = $this->_request->getParam('table/tablename');
 			$_module = $this->_request->getParam('module');
-			$save_and_install = $this->_request->getParam('save_and_install');
+			$action = $this->_request->getParam('table/action');
 
 			if(!$tablename){
 				$this->returnError('406', 'The table name is required');
@@ -41,36 +41,11 @@ class SystemDatabaseDropfield extends Sys {
 				if(count($_module) == 2){
 					list($vendor, $module) = $_module;
 
-					$fields = $this->_request->getParam('fields');
-					if(is_array($fields)){
-						$allResult = [
-							"database_drop" => [],
-							"json_remove" => []
-						];
-
-						$this->_moduleAvailableTables->setConfig($this->_config);
-						try {	
-							$drop_check = $this->_request->getParam('drop_check');
-							if($drop_check){
-								$allResult["database_drop"] = $this->_moduleAvailableTables->dropFieldsFromoDatabase($tablename, $fields);
-							}
-						} catch (\Exception $e) {
-							$this->returnError('500', $e->getMessage());
-						}
-
-						try {	
-							$remove_on_json = $this->_request->getParam('remove_on_json');
-							if($remove_on_json){
-								$allResult["json_remove"] = $this->_moduleAvailableTables->removeFieldsFromJsonFile($vendor, $module, $tablename, $fields);
-							}
-						} catch (\Exception $e) {
-							$this->returnError('500', $e->getMessage());
-						}
-
-						$this->jsonEncode($allResult);
-					}
-					else {
-						$this->returnError('406', 'Fields should be an array');
+					try {
+						$result = $this->_moduleAvailableTables->dropTable($vendor, $module, $tablename, $action);
+						$this->jsonEncode($result);
+					} catch (\Exception $e) {
+						$this->returnError($e->getCode(), $e->getMessage());
 					}
 				}
 				else {

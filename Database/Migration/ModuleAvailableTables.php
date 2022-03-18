@@ -9,6 +9,10 @@ use \Of\Constants;
 
 class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
+	const DROP_TABLE_ONLY = 'droptable-only';
+	const DELETE_JSON_ONLY = 'delete-json-only';
+	const DROP_AND_DELETE_JSON = 'droptable-and-delete-json';
+
 	protected $_writer;
 
 	public function __construct(
@@ -262,7 +266,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	 * @param $tablename string
 	 * @param $fields array
 	 */
-	public function removeFieldsFromoJsonFile($vendor, $module, $tablename, $fields){
+	public function removeFieldsFromJsonFile($vendor, $module, $tablename, $fields){
 		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tablename.'.json';
 
 		$success = [];
@@ -383,9 +387,6 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 	protected function setFieldValue($newValue){
 		$_value = [];
-
-		// $newValue['name'] = str_replace(' ', '_', $newValue['name']);
-		// $newValue['name'] = preg_replace("/[^a-zA-Z0-9_]+/", "", $newValue['name']);
 		$newValue['name'] = $this->cleanName($newValue['name']);
 
 		foreach ($newValue as $key => $value) {
@@ -465,6 +466,46 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			if(json_last_error() == JSON_ERROR_NONE){
 				$this->createTable($tablename, $tableContent, $targetFile, dirname($targetFile), false);
 			}
+		}
+	}
+
+	public function dropTable($vendor, $module, $tableName, $action){
+		$tableName = $this->_connection->getTablename($tableName);
+        $isExist = $this->fetchTableName($tableName);
+		if($isExist){
+			$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tableName.'.json';
+			if($action == self::DROP_TABLE_ONLY){
+				$this->dropTableFromDatabase($tableName);
+				return [
+					'message' => 'Database table successfully dropped'
+				];
+			}
+			else if($action == self::DELETE_JSON_ONLY){
+				if(file_exists($targetFile)){
+					unlink($targetFile);
+					return [
+						'message' => 'Database table JSON file successfully deleted'
+					];
+				}
+			}
+			else if($action == self::DROP_AND_DELETE_JSON){
+				$this->dropTableFromDatabase($tableName);
+				$message = 'Database table successfully dropped';
+				if(file_exists($targetFile)){
+					unlink($targetFile);
+					$message .= ' and database table JSON file successfully deleted';
+				}
+				return [
+					'message' => $message
+				];
+			}
+			else {
+				throw new \Exception("We do not recognize the action requested", 406);
+			}
+
+		}
+		else {
+			throw new \Exception("Database table ".$tableName." does not exist", 406);
 		}
 	}
 }
