@@ -9,6 +9,11 @@
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-2 col-md-2">
+							<div class="mb-3 d-flex align-items-center">
+								<button class="btn btn btn-outline-primary btn-sm mR-5" href="javascript:void(0)" v-on:click="vue.getModuleTables()" title="reload tables">
+									<i class="fas fa-sync"></i>
+								</button>
+							</div>
 							<h5>Tables</h5>
 							<div class="tablenames">
 								<ul class="no-bullets p-0">
@@ -94,10 +99,13 @@
 											Install All Fields
 										</button>
 									</template>
-									<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
+									<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add New Field" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
 										Add New Field
 									</button>
-									<button class="btn btn btn-outline-danger btn-sm mR-10" title="Edit" data-bs-toggle="modal" data-bs-target="#dropDatabaseTableModal">
+									<button class="btn btn btn-outline-primary btn-sm mR-10" title="Install Data">
+										Install Data
+									</button>
+									<button class="btn btn btn-outline-danger btn-sm mR-10" title="Drop Table" data-bs-toggle="modal" data-bs-target="#dropDatabaseTableModal" v-on:click="vue.resetDropTableForm()">
 										Drop Table
 									</button>
 								</div>

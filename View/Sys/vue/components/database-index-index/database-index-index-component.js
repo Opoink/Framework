@@ -79,7 +79,7 @@ class databaseIndexIndex {
 
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
-			this.mainHeader.pageTitle = 'Opoink Modules';
+			this.mainHeader.pageTitle = 'Module Database';
 			this.loader = window['_vue']['loader-component'];
 			this.toast = window['_vue']['toast-component'];
 			this.getModuleTables();
@@ -373,15 +373,14 @@ class databaseIndexIndex {
 					else if(this.dropTableForm.action == 'delete-json-only'){
 						this.selectedTableName = null;
 						this.selectedTableValue = null;
-						this.selectedModule = null;
-						this.selectedTableValue.is_installed = false;
+						this.selectedTableFields = null;
 					}
 					else if(this.dropTableForm.action == 'droptable-and-delete-json'){
 						this.selectedTableName = null;
 						this.selectedTableValue = null;
-						this.selectedModule = null;
-						this.selectedTableValue.is_installed = false;
+						this.selectedTableFields = null;
 					}
+					this.resetDropTableForm();
 					$('#dropDatabaseTableModal').modal('hide');
 				}
 				else {

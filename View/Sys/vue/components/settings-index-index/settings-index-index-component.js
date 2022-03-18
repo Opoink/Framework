@@ -27,7 +27,7 @@ class settingsIndexIndex {
 	init(){
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
-			this.mainHeader.pageTitle = 'Opoink Settings';
+			this.mainHeader.pageTitle = 'Settings';
 			this.loader = window['_vue']['loader-component'];
 
 			this.getSettings();

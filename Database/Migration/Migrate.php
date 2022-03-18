@@ -194,13 +194,20 @@ class Migrate {
 	 */
 	protected function dropTableFromDatabase($tableName){
 		$tableName = trim($tableName);
-		$sql = "DROP TABLE `".$tableName."`;";		
-		try {
-			$connection = $this->_connection->getConnection()->getConnection();
-			$connection->exec($sql);
+		$tableName = $this->_connection->getTablename($tableName);
+        $isExist = $this->fetchTableName($tableName);
+		if($isExist){
+			$sql = "DROP TABLE `".$tableName."`;";		
+			try {
+				$connection = $this->_connection->getConnection()->getConnection();
+				$connection->exec($sql);
+				return true;
+			} catch (\PDOException $pe) {
+				throw new \Exception("Cannot drop table ".$tableName.": " . $pe->getMessage() . " : " . $sql, 500);
+			}
+		}
+		else {
 			return true;
-		} catch (\PDOException $pe) {
-			throw new \Exception("Cannot drop table ".$tableName.": " . $pe->getMessage() . " : " . $sql, 500);
 		}
 	}
 
