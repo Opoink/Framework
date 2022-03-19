@@ -115,6 +115,19 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 				}
 
+				$installDataTarget = dirname($targetFile) . DS . $tablename.'_data.json';
+				$tableContent['installation_data'] = null;
+
+				if(file_exists($installDataTarget)){
+					$installDataContent = file_get_contents($installDataTarget);
+					$installDataContent = json_decode($installDataContent, true);
+
+					if(json_last_error() == JSON_ERROR_NONE){
+						$tableContent['installation_data'] = $installDataContent;
+					}
+				}
+
+
 				return $tableContent;
 			}
 		}
