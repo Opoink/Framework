@@ -13,6 +13,7 @@ class Migrate {
     protected $moduleName;
     protected $_config;
     protected $_di;
+    protected $_password;
 
     /**
      * instance of \Of\Database\Connection
@@ -22,10 +23,12 @@ class Migrate {
     
     public function __construct(
         \Of\Database\Connection $Connection,
-        \Of\Database\Entity $Entity
+        \Of\Database\Entity $Entity,
+		\Of\Std\Password $Password
     ){
         $this->_connection = $Connection;
         $this->_entity = $Entity;
+        $this->_password = $Password;
     }
 
     public function setDi($di) {
@@ -60,7 +63,7 @@ class Migrate {
     /**
      * initialize the migration for the current vendor_module
      */
-    public function init(){
+    public function init($isSaveData=false){
         $targetDir = ROOT . DS . 'App' . DS . 'Ext' . DS . $this->vendorName . DS . $this->moduleName . DS . 'Schema' . DS . 'tables';
 
         $installedTableNames = [];
@@ -68,6 +71,9 @@ class Migrate {
             $files = $this->getDirFiles($targetDir);
             if($files){
                 foreach ($files as $key => $file) {
+					if($this->checkIfFileIsData($file)){
+						continue;
+					}
                     $_file = $targetDir.DS.$file;
                     if(file_exists($_file)){
                         $tableName = $this->getTableNameFromFileName($_file);
@@ -77,7 +83,7 @@ class Migrate {
 
                         $fields = json_decode(file_get_contents($_file), true);
                         if(json_last_error() == JSON_ERROR_NONE){ /** to make sure that the json file was no error */
-                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir);
+                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir, $isSaveData);
                         } else {
                             throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 406);
                         }
@@ -338,26 +344,53 @@ class Migrate {
 
             foreach ($_data as $key => $data) {
                 try {
-                    $saveSrc = null;
-                    foreach ($data as $key => $value) {
-                        if(!is_string($value)){
-                            if($key == '_migration_data_save_'){
-                                $saveSrc = $value;
-                            }
-                        }
-                    }
-
-                    if($saveSrc){
-                        $src = $this->_di->get($saveSrc['source']);
-                        $method = $value['method'];
-                        $src->$method($data);
-                    }
+					if(isset($data['_migration_data_save_'])){
+						/**
+						 * TODO: change how this use the entity to save data
+						 * without changing JSON file schema
+						 */
+						$saveSrc = null;
+						foreach ($data as $_key => $_value) {
+							if(!is_string($value)){
+								if($_key == '_migration_data_save_'){
+									$saveSrc = $value;
+								}
+							}
+						}
+						if($saveSrc){
+							$src = $this->_di->get($saveSrc['source']);
+							$method = $value['method'];
+							$src->$method($data);
+						}
+					}
+					else {
+						$data = $this->buildDataForSaving($data);
+						$connection = $this->_connection->getConnection();
+						$connection->insert($tableName, $data);
+					}
                 } catch (\Exception $e) {
                     /** do error message here */
                 }
             }
         }
     }
+
+	/**
+	 * build the data came from JSON file
+	 */
+	public function buildDataForSaving($data){
+		$d = [];
+		foreach ($data as $fieldName => $value) {
+			if(isset($value['option'])){
+				$opt = $value['option'];
+				if(isset($opt['is_hashed'])){
+					$value['value'] = $this->_password->setPassword($value['value'])->getHash();
+				}
+			}
+			$d[$fieldName] = $value['value'];
+		}
+		return $d;
+	}
 
     /**
      * return the files inside dir
@@ -393,6 +426,24 @@ class Migrate {
 
         $connection = $this->_connection->getConnection()->getConnection();
         $connection->exec($query);
+	}
+
+	/**
+	 * check if the table name that was scanned in DIR
+	 * is for for data or for table name
+	 */
+	public function checkIfFileIsData($tableName){
+		$tableName = explode('.', $tableName);
+		if(count($tableName) >= 2){
+			unset($tableName[count($tableName) - 1]);
+		}
+		$tableName = explode('_', $tableName[0]);
+		if(count($tableName) >= 2){
+			if($tableName[count($tableName) - 1] == 'data'){
+				return true;
+			}
+		}
+		return false;
 	}
 }
 ?>

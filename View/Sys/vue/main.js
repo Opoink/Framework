@@ -190,15 +190,15 @@ class request {
 			if(typeof _param[1] != 'undefined'){
 				val = _param[1];
 			}
-			// key = key.split(']');
-			// key = key.join('');
+			key = key.split(']');
+			key = key.join('');
 
 			/**
 			 * credits to 
 			 * Alexander Higgins 
 			 * at https://stackoverflow.com/questions/44916365/how-to-create-a-nested-object-json-of-a-form-input-values-based-on-the-input-n
 			 */
-			let nameParts  = key.split('.');
+			let nameParts  = key.split('[');
 			let prefix = '';
 			let stack = jsonData;
 			for (let index = 0; index < nameParts.length - 1; index++) {

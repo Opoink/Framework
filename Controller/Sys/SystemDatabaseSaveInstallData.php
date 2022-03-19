@@ -27,39 +27,31 @@ class SystemDatabaseSaveInstallData extends Sys {
 		$this->requireInstalled();
 		$this->requireLogin();
 		
-		var_dump($this->_request->getParam());
-		die;
 		if($this->validateFormKey()){
-			var_dump($this->_request->getParam());
-			die;
 
-			// $tablename = $this->_request->getParam('table/tablename');
-			// $_module = $this->_request->getParam('module');
-			// $action = $this->_request->getParam('table/action');
+			$tablename = $this->_request->getParam('tablename');
+			$_module = $this->_request->getParam('module');
 
-			// if(!$tablename){
-			// 	$this->returnError('406', 'The table name is required');
-			// }
+			if(!$tablename){
+				$this->returnError('406', 'The table name is required');
+			}
 
-			// if($_module){
-			// 	$_module = explode('_', $_module);
-			// 	if(count($_module) == 2){
-			// 		list($vendor, $module) = $_module;
+			if($_module){
+				$_module = explode('_', $_module);
+				if(count($_module) == 2){
+					list($vendor, $module) = $_module;
 
-			// 		try {
-			// 			$result = $this->_moduleAvailableTables->dropTable($vendor, $module, $tablename, $action);
-			// 			$this->jsonEncode($result);
-			// 		} catch (\Exception $e) {
-			// 			$this->returnError($e->getCode(), $e->getMessage());
-			// 		}
-			// 	}
-			// 	else {
-			// 		$this->returnError('406', 'Invalid vendor, module format. Should be vendorname_modulename');
-			// 	}
-			// }
-			// else {
-			// 	$this->returnError('406', 'The module name is required');
-			// }
+					$fields = $this->_request->getParam('fields');
+					$data = $this->_moduleAvailableTables->createInstallData($vendor, $module, $tablename, $fields);
+					$this->jsonEncode($data);
+				}
+				else {
+					$this->returnError('406', 'Invalid vendor, module format. Should be vendorname_modulename');
+				}
+			}
+			else {
+				$this->returnError('406', 'The module name is required');
+			}
 		}
 		else {
 			header("HTTP/1.0 400 Bad Request");

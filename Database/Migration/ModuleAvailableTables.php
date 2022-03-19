@@ -18,9 +18,10 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	public function __construct(
 		\Of\Database\Connection $Connection,
 		\Of\Database\Entity $Entity,
+		\Of\Std\Password $Password,
 		\Of\File\Writer $Writer
 	){
-		parent::__construct($Connection, $Entity);
+		parent::__construct($Connection, $Entity, $Password);
 		$this->_writer = $Writer;
 	}
 
@@ -45,9 +46,10 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 				if(is_dir($tableDir)){
 					$files = scandir($tableDir);
 					foreach ($files as $key => $table) {
-						if($table == '.' || $table == '..'){
+						if($table == '.' || $table == '..' || $this->checkIfFileIsData($table)){
 							continue;
 						}
+
 						$targetFile = $tableDir . DS . $table;
 						try {
 							$tableContent = file_get_contents($targetFile);
@@ -500,6 +502,44 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 		else {
 			throw new \Exception("We do not recognize the action requested", 406);
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public function createInstallData($vendor, $module, $tableName, $fields, $saveToDatabase=false){
+		$tableName = $this->cleanName($tableName);
+		$fileName = $tableName.'_data';
+		
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$fileName.'.json';
+		
+		$dataContent = [];
+		if(file_exists($targetFile)){
+			$dataContent = file_get_contents($targetFile);
+			$dataContent = json_decode($dataContent, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				$dataContent = $dataContent;
+			}
+		}
+
+		foreach ($fields as $key => $field) {
+			if(isset($field['value']) && empty($field['value'])){
+				unset($fields[$key]);
+			}
+		}
+
+		$dataContent[] = $fields;
+
+		$dataContent = json_encode($dataContent, JSON_PRETTY_PRINT);
+
+		$this->_writer->setDirPath(dirname($targetFile))
+		->setData($dataContent)
+		->setFilename($fileName)
+		->setFileextension('json')
+		->write();
+
+		return $dataContent;
 	}
 }
 ?>

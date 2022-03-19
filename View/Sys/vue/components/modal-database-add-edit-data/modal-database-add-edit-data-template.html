@@ -17,10 +17,10 @@
 						<div class="form-group row" v-for="field in databaseIndexIndexComponent.selectedTableFields.fields">
 							<label v-bind:for='"install-data"+field.name' class="col-sm-4 col-form-label text-end text-sm-end">{{field.name}}</label>
 							<div class="col-sm-8">
-								<input type="text" class="form-control" v-bind:id='"install-data"+field.name' v-bind:name="field.name + '.field_value'" v-bind:placeholder="field.name" autocomplete="0">
+								<input type="text" class="form-control" v-bind:id='"install-data"+field.name' v-bind:name="field.name + '[value]'" v-bind:placeholder="field.name" autocomplete="0">
 								<div class="form-group">
 									<div class="form-check">
-										<input class="form-check-input" type="checkbox" v-bind:name="field.name + '.option.is_hashed'" v-bind:id='"install-data-hash"+field.name' value="1" />
+										<input class="form-check-input" type="checkbox" v-bind:name="field.name + '[option][is_hashed]'" v-bind:id='"install-data-hash"+field.name' value="1" />
 										<label class="form-check-label" v-bind:for='"install-data-hash"+field.name'>
 											Hash this field.
 										</label>
