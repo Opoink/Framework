@@ -6,4 +6,18 @@
 			</tr>
 		</thead>
 	</table>
+	<div class="row">
+		<div class="col-12" v-if="vue.selectedTableFields">
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add New Data" data-bs-toggle="modal" data-bs-target="#modalDatabaseAddEditData">
+				Add New Data
+			</button>
+		</div>
+	</div> 
+	<small class="text-muted">
+		Note:
+		<br />
+		The data you see here doesn't mean it is saved on the database. Well, it can be in the database or not in the database.
+		<br />
+		This data will be saved in the database during the module installation, or if you click the save button on this page.
+	</small>
 </div>
