@@ -5,6 +5,10 @@ if(typeof window['_vue'] == 'undefined'){
 class modalDatabaseAddEditDataComponent {
 
 	request = null;
+	url = null;
+	loader = null;
+	toast = null;
+
 	databaseIndexIndexComponent = null;
 	installDataSaveToDatabase = false
 
@@ -20,7 +24,7 @@ class modalDatabaseAddEditDataComponent {
 		setTimeout(f => {
 			this.loader = window['_vue']['loader-component'];
 			this.toast = window['_vue']['toast-component'];
-		}, 500);
+		}, 100);
 	}
 
 	resetFormFields(){

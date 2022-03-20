@@ -1,0 +1,49 @@
+<div class="modal-database-delete-data-component">
+
+	<!-- modal to new database table -->
+	<div class="modal fade" id="modalDatabaseDeleteInstallData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseDeleteInstallDataLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalDatabaseDeleteInstallDataLabel">
+						Add New Installation Data
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetFormFields()"></button>
+				</div>
+				<form v-on:submit="vue.deleteInstallData($event)">
+					<div class="modal-body">
+						<!-- TODO: fix bug when there is an empty field, same thing happen on add/edit modal -->
+						<div>
+							<p class="mb-0" v-for="(data, index) in vue.selectedData">
+								{{index}}: {{data.value}}
+							</p>
+						</div>
+
+						<div class="form-group">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" id='install-data-remove-to-database' v-model="vue.formField.remove_in_database" />
+								<label class="form-check-label" for='install-data-remove-to-database'>
+									Remove data from the database
+								</label>
+							</div>
+							<small class="text-muted">
+								If checked, we'll try to remove data if the primary id exist.
+							</small>
+						</div>
+
+						<!-- <small class="text-muted">
+							The purpose of "Install Data" is that whenever you install this module on your new/another project the data you add here will automatically be added to your new/another project's database.
+							<br />
+							An empty field will not gonna be added to the JSON file.
+						</small> -->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" v-on:click="vue.resetFormFields()">Cancel</button>
+						<button class="btn btn-primary">Delete Installation Data</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+</div>

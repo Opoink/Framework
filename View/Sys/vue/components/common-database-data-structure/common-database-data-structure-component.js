@@ -6,7 +6,8 @@ Vue.component('common-database-data-structure-component', {
 	data: function(){
 		return {
 			vue: null,
-			modalDatabaseAddEditDataComponent: null
+			modalDatabaseAddEditDataComponent: null,
+			modalDatabaseDeleteDataComponent: null
 		}
 	},
 	mounted: function(){
@@ -18,6 +19,7 @@ Vue.component('common-database-data-structure-component', {
 			 */
 			this.vue = window['_vue']['database-index-index-component'];
 			this.modalDatabaseAddEditDataComponent = window['_vue']['modal-database-add-edit-data-component'];
+			this.modalDatabaseDeleteDataComponent = window['_vue']['modal-database-delete-data-component'];
 		}, 100);
 	},
 	template: `{{template}}`
