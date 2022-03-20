@@ -520,7 +520,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	/**
 	 * 
 	 */
-	public function createInstallData($vendor, $module, $tableName, $fields, $saveToDatabase=false){
+	public function createInstallData($vendor, $module, $tableName, $fields, $saveToDatabase=false, $target_field_index='no'){
 		$tableName = $this->cleanName($tableName);
 		$fileName = $tableName.'_data';
 		
@@ -542,12 +542,22 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			}
 		}
 
-		$dataContent[] = $fields;
+		if($target_field_index == 'no'){
+			$dataContent[] = $fields;
+		}
+		else {
+			$i = (int)$target_field_index;
+			$dataContent[$i] = $fields;
+		}
 
-		$dataContent = json_encode($dataContent, JSON_PRETTY_PRINT);
+		if($saveToDatabase){
+			$this->saveInstallationdata($fields, $tableName);
+		}
+
+		$_dataContent = json_encode($dataContent, JSON_PRETTY_PRINT);
 
 		$this->_writer->setDirPath(dirname($targetFile))
-		->setData($dataContent)
+		->setData($_dataContent)
 		->setFilename($fileName)
 		->setFileextension('json')
 		->write();

@@ -42,7 +42,9 @@ class SystemDatabaseSaveInstallData extends Sys {
 					list($vendor, $module) = $_module;
 
 					$fields = $this->_request->getParam('fields');
-					$data = $this->_moduleAvailableTables->createInstallData($vendor, $module, $tablename, $fields);
+					$target_field_index = $this->_request->getParam('target_field_index');
+					$save_to_database = $this->_request->getParam('save_to_database');
+					$data = $this->_moduleAvailableTables->createInstallData($vendor, $module, $tablename, $fields, $save_to_database, $target_field_index);
 					$this->jsonEncode($data);
 				}
 				else {

@@ -333,8 +333,8 @@ class Migrate {
      */
     private function saveData($tableName, $targetDir){
         $prefix = $this->_connection->getConfig('table_prefix');
-        $dataFilename = str_replace($prefix, '', $tableName);
-        $dataFilename .= '_data.json';
+        $tableName = str_replace($prefix, '', $tableName);
+        $dataFilename = $tableName . '_data.json';
 
         $dataJSONFile = $targetDir.DS.$dataFilename;
 
@@ -364,9 +364,10 @@ class Migrate {
 						}
 					}
 					else {
-						$data = $this->buildDataForSaving($data);
-						$connection = $this->_connection->getConnection();
-						$connection->insert($tableName, $data);
+						$this->saveInstallationdata($data, $tableName);
+						// $data = $this->buildDataForSaving($data);
+						// $connection = $this->_connection->getConnection();
+						// $connection->insert($tableName, $data);
 					}
                 } catch (\Exception $e) {
                     /** do error message here */
@@ -383,7 +384,7 @@ class Migrate {
 		foreach ($data as $fieldName => $value) {
 			if(isset($value['option'])){
 				$opt = $value['option'];
-				if(isset($opt['is_hashed'])){
+				if(isset($opt['is_hashed']) && $opt['is_hashed'] == true){
 					$value['value'] = $this->_password->setPassword($value['value'])->getHash();
 				}
 			}
@@ -444,6 +445,55 @@ class Migrate {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * this will check if the installation data was already exisitng in the 
+	 * database or not
+	 * this will simply query all column with value from JSON file
+	 */
+	public function saveInstallationdata($data, $tableName){
+		$_data = $this->buildDataForSaving($data);
+		$tn = $this->_connection->getTablename($tableName);
+
+		$primaryKey = null;
+		foreach ($data as $key => $value) {
+			if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
+				if(isset($value['option']['primary']) && $value['option']['primary'] == true){
+					$primaryKey = [
+						'name' => $key,
+						'value' => $value['value']
+					];
+				}
+			}
+		}
+
+		$connection = $this->_connection->getConnection();
+
+		$isExist = [];
+		if(is_array($primaryKey)){
+			$di = new \Of\Std\Di();
+			$select = $di->get('\Of\Database\Sql\Select');
+			$select->select()->from($tn);
+			$select->where($primaryKey['name'])->eq($primaryKey['value']);
+
+			$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
+		}
+
+		try {
+			if(count($isExist) > 0){
+				/** data exist */
+				$di = new \Of\Std\Di();
+				$select = $di->get('\Of\Database\Sql\Select');
+				$connection->update($select, [$primaryKey['name'] => $primaryKey['value']], $_data, $tn);
+			}
+			else {
+				/** not found */
+				$connection->insert($tn, $_data);
+			}
+		} catch (\PDOException $pe) {
+			return false;
+		}
 	}
 }
 ?>
