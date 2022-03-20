@@ -12,7 +12,7 @@ class indexIndexIndex {
 	init(){
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
-			this.mainHeader.pageTitle = 'Opoink Dashboard';
+			this.mainHeader.pageTitle = 'Dashboard';
 		}, 500);
 	}
 }

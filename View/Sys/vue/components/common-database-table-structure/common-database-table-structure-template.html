@@ -1,0 +1,71 @@
+<div class="common-database-table-structure-component" v-if="vue">
+	<table class="table">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col">Name</th>
+				<th scope="col">Type</th>
+				<th scope="col">Collation</th>
+				<th scope="col">Attributes</th>
+				<th scope="col">Null</th>
+				<th scope="col">Default</th>
+				<th scope="col">Installed</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		<tbody class="customtable" v-if="vue.selectedTableFields">
+			<tr v-for="field in vue.selectedTableFields.fields">
+				<td>
+					<span v-if="field.name">{{field.name}}</span><span v-if="field.primary" class="mL-5 text-warning"><i class="fas fa-key"></i></span>
+				</td>
+				<td>
+					<span v-if="field.type">{{field.type}}</span> <span v-if="field.length">({{field.length}})</span>
+				</td>
+				<td>
+					<span v-if="field.collation">{{field.collation}}</span>
+				</td>
+				<td>
+					<span v-if="field.attributes">{{field.attributes}}</span>
+				</td>
+				<td>
+					<span v-if="field.nullable">Yes</span>
+					<span v-else-if="!field.nullable">No</span>
+				</td>
+				<td>
+					<span v-if="field.default === null">NULL</span>
+					<span v-else>{{field.default}}</span>
+				</td>
+				<td>
+					<span class="badge rounded-pill bg-success" v-if="field.is_installed"><i class="fas fa-check"></i></span>
+					<span class="badge rounded-pill bg-danger" v-else><i class="fas fa-times"></i></span>
+				</td>
+				<td>
+					<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(field)">
+						<i class="fas fa-pencil-alt"></i>
+					</button>
+					<button class="btn btn btn btn-outline-danger btn-sm" title="Drop" data-bs-toggle="modal" data-bs-target="#databaseDropFieldModal" v-on:click="vue.setField(field)">
+						<i class="fas fa-trash-alt"></i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="row mB-15">
+		<div class="col-12" v-if="vue.selectedTableFields">
+			<template v-if="vue.selectedTableValue && !vue.selectedTableValue.is_installed">
+				<button class="btn btn btn-primary btn-sm mR-10" title="Edit" data-bs-toggle="modal" data-bs-target="#saveDatabaseTableFieldsModal">
+					Install All Fields
+				</button>
+			</template>
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add New Field" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
+				Add New Field
+			</button>
+			<button class="btn btn btn-outline-danger btn-sm mR-10" title="Drop Table" data-bs-toggle="modal" data-bs-target="#dropDatabaseTableModal" v-on:click="vue.resetDropTableForm()">
+				Drop Table
+			</button>
+		</div>
+	</div> 
+	<small class="text-muted" v-if="vue.selectedModule && vue.selectedTableName">
+		You can manually edit the file at {{vue.selectedModule}}/Schema/tables/{{vue.selectedTableName}}.json
+	</small>
+</div>

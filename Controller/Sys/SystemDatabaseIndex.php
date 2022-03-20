@@ -31,6 +31,7 @@ class SystemDatabaseIndex extends Sys {
 		$_module = $this->_request->getParam('module');
 		$tablename = $this->_request->getParam('tablename');
 
+		
 		if($alltables == 1){
 			$allTables = $this->_moduleAvailableTables->setConfig($this->_config)->getAllInstalledAvailableStable();
 			$this->jsonEncode($allTables);

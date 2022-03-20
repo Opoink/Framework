@@ -174,6 +174,53 @@ class request {
 	};
 
 	/**
+	 * deserialize nested form field serielized by jquery
+	 * @param {*} $str 
+	 * return JSON object
+	 */
+	stringToJson(str){
+		str = decodeURIComponent(str);
+		let params = str.split('&');
+
+		let jsonData = {};
+		params.forEach(param => {
+			let _param = param.split('=');
+			let key = _param[0];
+			let val = '';
+			if(typeof _param[1] != 'undefined'){
+				val = _param[1];
+			}
+			key = key.split(']');
+			key = key.join('');
+
+			/**
+			 * credits to 
+			 * Alexander Higgins 
+			 * at https://stackoverflow.com/questions/44916365/how-to-create-a-nested-object-json-of-a-form-input-values-based-on-the-input-n
+			 */
+			let nameParts  = key.split('[');
+			let prefix = '';
+			let stack = jsonData;
+			for (let index = 0; index < nameParts.length - 1; index++) {
+				prefix = nameParts[index];
+
+				if (!stack[prefix]) {
+					stack[prefix] = {};
+				}
+				stack = stack[prefix];
+			}
+			prefix = nameParts[nameParts.length - 1];
+			if (stack[prefix]) {
+				let newVal = stack[prefix] + ',' + val;
+			  stack[prefix] += newVal;
+			} else {
+			  stack[prefix] = val;
+			}
+		});
+		return jsonData;
+	}
+
+	/**
 	 * set the url param for the request
 	 * @url
 	 * @jsonData

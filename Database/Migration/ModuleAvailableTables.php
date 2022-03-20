@@ -9,14 +9,19 @@ use \Of\Constants;
 
 class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
+	const DROP_TABLE_ONLY = 'droptable-only';
+	const DELETE_JSON_ONLY = 'delete-json-only';
+	const DROP_AND_DELETE_JSON = 'droptable-and-delete-json';
+
 	protected $_writer;
 
 	public function __construct(
 		\Of\Database\Connection $Connection,
 		\Of\Database\Entity $Entity,
+		\Of\Std\Password $Password,
 		\Of\File\Writer $Writer
 	){
-		parent::__construct($Connection, $Entity);
+		parent::__construct($Connection, $Entity, $Password);
 		$this->_writer = $Writer;
 	}
 
@@ -41,9 +46,10 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 				if(is_dir($tableDir)){
 					$files = scandir($tableDir);
 					foreach ($files as $key => $table) {
-						if($table == '.' || $table == '..'){
+						if($table == '.' || $table == '..' || $this->checkIfFileIsData($table)){
 							continue;
 						}
+
 						$targetFile = $tableDir . DS . $table;
 						try {
 							$tableContent = file_get_contents($targetFile);
@@ -108,6 +114,19 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					}
 
 				}
+
+				$installDataTarget = dirname($targetFile) . DS . $tablename.'_data.json';
+				$tableContent['installation_data'] = null;
+
+				if(file_exists($installDataTarget)){
+					$installDataContent = file_get_contents($installDataTarget);
+					$installDataContent = json_decode($installDataContent, true);
+
+					if(json_last_error() == JSON_ERROR_NONE){
+						$tableContent['installation_data'] = $installDataContent;
+					}
+				}
+
 
 				return $tableContent;
 			}
@@ -189,68 +208,11 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					$_tableName = $this->_connection->getTablename($tablename);
         			$isExist = $this->fetchTableName($_tableName);
 					if(!$isExist){
-						$_columns = new Columns();
-
-						$primaryKey = '';
-						foreach ($fieldsToSave as $keyColumn => $valueColumn) {
-							$_columns->addColumn($valueColumn, $targetFile);
-
-							if (array_key_exists('primary', $valueColumn) && $valueColumn['primary'] == true) {
-								$primaryKey = ' , PRIMARY KEY (`'.$valueColumn['name'].'`) ';
-							}
-						}
-						$cols = implode(', ', $_columns->getColumns());
-						
-						/** in this part the table is not exist so we have to create it */
-						$collate = "COLLATE='utf8_general_ci'";
-						$charset = 'CHARSET=utf8';
-						if(isset($tableContent['collate']) && !empty($tableContent['collate'])){
-							$collate = "COLLATE='".$tableContent['collate']."'";
-							$charset = explode('_', $tableContent['collate']);
-							$charset = 'CHARSET='.$charset[0];
-						}
-						$engine = 'ENGINE=InnoDB';
-						if(isset($tableContent['engine']) && !empty($tableContent['engine'])){
-							$engine = "ENGINE='".$tableContent['engine']."'";
-						}
-						$sql = "CREATE TABLE IF NOT EXISTS `".$_tableName."` (".$cols.$primaryKey.")".$engine." DEFAULT ".$charset." ".$collate.";";
-
-						try {
-							$connection = $this->_connection->getConnection()->getConnection();
-							$connection->exec($sql);
-						} catch (\PDOException $pe) {
-							throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
-						}
+						$this->createDatabaseTableWithColumns($_tableName, $fieldsToSave);
 					}
 					else {
 						foreach ($fieldsToSave as $key => $column) {
-							$name = $column['name'];
-							if(isset($column['old_name'])){
-								$name = $column['old_name'];
-							}
-
-							$isColumnExist = $this->fetchColumnName($_tableName, $name);
-
-							$_columns = new Columns();
-							$_columns->addColumn($column, $targetFile);
-							$cols = implode(', ', $_columns->getColumns());
-
-							$sql = '';
-							if(!$isColumnExist){
-								$sql .= "ALTER TABLE `".$_tableName."` ";
-								$sql .= "ADD " . $cols . ";";
-							}
-							else {
-								$sql .= "ALTER TABLE `".$_tableName."` ";
-								$sql .= "CHANGE `".$name."` " . $cols . ";";
-							}
-
-							try {
-								$connection = $this->_connection->getConnection()->getConnection();
-								$connection->exec($sql);
-							} catch (\PDOException $pe) {
-								throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
-							}
+							$this->saveColumnIntoTable($column, $_tableName, $targetFile);
 						}
 					}
 				}
@@ -319,7 +281,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	 * @param $tablename string
 	 * @param $fields array
 	 */
-	public function removeFieldsFromoJsonFile($vendor, $module, $tablename, $fields){
+	public function removeFieldsFromJsonFile($vendor, $module, $tablename, $fields){
 		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tablename.'.json';
 
 		$success = [];
@@ -440,10 +402,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 	protected function setFieldValue($newValue){
 		$_value = [];
-
-		// $newValue['name'] = str_replace(' ', '_', $newValue['name']);
-		// $newValue['name'] = preg_replace("/[^a-zA-Z0-9_]+/", "", $newValue['name']);
-		$this->cleanName($newValue['name']);
+		$newValue['name'] = $this->cleanName($newValue['name']);
 
 		foreach ($newValue as $key => $value) {
 			if($key == 'default'){
@@ -501,8 +460,99 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			if(isset($tableContentFields[$_prevKey])){
 				$field['after'] = $tableContentFields[$_prevKey]['name'];
 			}
+			if(isset($field['old_name'])){
+				unset($field['old_name']);
+			}
 		}
 		return $tableContentFields;
+	}
+
+	/**
+	 * this is called on \Of\Controller\Sys\SystemDatabaseSavefield
+	 * this is in page //domain.com/system<suffix>/database
+	 */
+	public function _createTable($vendor, $module, $tablename) {
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tablename.'.json';
+
+		if(file_exists($targetFile) && is_file($targetFile)){
+			$tableContent = file_get_contents($targetFile);
+			$tableContent = json_decode($tableContent, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				$this->createTable($tablename, $tableContent, $targetFile, dirname($targetFile), false);
+			}
+		}
+	}
+
+	public function dropTable($vendor, $module, $tableName, $action){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tableName.'.json';
+
+		if($action == self::DROP_TABLE_ONLY){
+			$this->dropTableFromDatabase($tableName);
+			return [
+				'message' => 'Database table successfully dropped'
+			];
+		}
+		else if($action == self::DELETE_JSON_ONLY){
+			if(file_exists($targetFile)){
+				unlink($targetFile);
+				return [
+					'message' => 'Database table JSON file successfully deleted'
+				];
+			}
+		}
+		else if($action == self::DROP_AND_DELETE_JSON){
+			$this->dropTableFromDatabase($tableName);
+			$message = 'Database table successfully dropped';
+			if(file_exists($targetFile)){
+				unlink($targetFile);
+				$message .= ' and database table JSON file successfully deleted';
+			}
+			return [
+				'message' => $message
+			];
+		}
+		else {
+			throw new \Exception("We do not recognize the action requested", 406);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public function createInstallData($vendor, $module, $tableName, $fields, $saveToDatabase=false){
+		$tableName = $this->cleanName($tableName);
+		$fileName = $tableName.'_data';
+		
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$fileName.'.json';
+		
+		$dataContent = [];
+		if(file_exists($targetFile)){
+			$dataContent = file_get_contents($targetFile);
+			$dataContent = json_decode($dataContent, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				$dataContent = $dataContent;
+			}
+		}
+
+		foreach ($fields as $key => $field) {
+			if(isset($field['value']) && empty($field['value'])){
+				unset($fields[$key]);
+			}
+		}
+
+		$dataContent[] = $fields;
+
+		$dataContent = json_encode($dataContent, JSON_PRETTY_PRINT);
+
+		$this->_writer->setDirPath(dirname($targetFile))
+		->setData($dataContent)
+		->setFilename($fileName)
+		->setFileextension('json')
+		->write();
+
+		return $dataContent;
 	}
 }
 ?>

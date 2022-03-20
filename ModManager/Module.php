@@ -179,7 +179,7 @@ class Module {
 							$migration = $this->_di->make("Of\Database\Migration\Migrate");
 
 							/** init() return a table name that was just intalled or updated */
-							$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init();
+							$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($vendor)->setModuleName($module)->init(true);
 							$result['schema_table_installed_or_update'] = $tableNames;
 
 							$this->_extensionEntity->setDatas([
@@ -293,7 +293,7 @@ class Module {
 						$migration = $this->_di->make("Of\Database\Migration\Migrate");
 
 						/** init() return a table name that was just intalled or updated */
-						$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($v)->setModuleName($m)->init();
+						$tableNames = $migration->setDi($this->_di)->setConfig($this->_config)->setVendorName($v)->setModuleName($m)->init(false);
 						$result['schema_table_installed_or_update'] = $tableNames;
 
 						$result['message'][] = [

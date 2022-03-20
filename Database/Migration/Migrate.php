@@ -13,6 +13,7 @@ class Migrate {
     protected $moduleName;
     protected $_config;
     protected $_di;
+    protected $_password;
 
     /**
      * instance of \Of\Database\Connection
@@ -22,10 +23,12 @@ class Migrate {
     
     public function __construct(
         \Of\Database\Connection $Connection,
-        \Of\Database\Entity $Entity
+        \Of\Database\Entity $Entity,
+		\Of\Std\Password $Password
     ){
         $this->_connection = $Connection;
         $this->_entity = $Entity;
+        $this->_password = $Password;
     }
 
     public function setDi($di) {
@@ -60,7 +63,7 @@ class Migrate {
     /**
      * initialize the migration for the current vendor_module
      */
-    public function init(){
+    public function init($isSaveData=false){
         $targetDir = ROOT . DS . 'App' . DS . 'Ext' . DS . $this->vendorName . DS . $this->moduleName . DS . 'Schema' . DS . 'tables';
 
         $installedTableNames = [];
@@ -68,6 +71,9 @@ class Migrate {
             $files = $this->getDirFiles($targetDir);
             if($files){
                 foreach ($files as $key => $file) {
+					if($this->checkIfFileIsData($file)){
+						continue;
+					}
                     $_file = $targetDir.DS.$file;
                     if(file_exists($_file)){
                         $tableName = $this->getTableNameFromFileName($_file);
@@ -77,7 +83,7 @@ class Migrate {
 
                         $fields = json_decode(file_get_contents($_file), true);
                         if(json_last_error() == JSON_ERROR_NONE){ /** to make sure that the json file was no error */
-                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir);
+                            $installedTableNames[] = $this->createTable($tableName, $fields, $_file, $targetDir, $isSaveData);
                         } else {
                             throw new \Exception("Invalid JSON schema: " . json_last_error_msg() . ' --- ' . $_file, 406);
                         }
@@ -105,11 +111,117 @@ class Migrate {
         return $name;
     }
 
+	/**
+	 * this will create database table including all column 
+	 * in the JSON file
+	 */
+	protected function createDatabaseTableWithColumns($tableName, $columns, $filePath){
+		$_columns = new Columns();
+
+		$primaryKey = '';
+		foreach ($columns as $keyColumn => $valueColumn) {
+			/** 
+			 * since this is new table creation must not be here 
+			 * so we have to unset after if it is declared in the JSON file
+			 */
+			if(isset($valueColumn['after'])){
+				unset($valueColumn['after']);
+			}
+			$_columns->addColumn($valueColumn, $filePath);
+
+			if (array_key_exists('primary', $valueColumn) && $valueColumn['primary'] == true) {
+				$primaryKey = ' , PRIMARY KEY (`'.$valueColumn['name'].'`) ';
+			}
+		}
+		$cols = implode(', ', $_columns->getColumns());
+		
+		$collate = "COLLATE='utf8_general_ci'";
+		$charset = 'DEFAULT CHARSET=utf8';
+
+		if(isset($tableContent['collate']) && !empty($tableContent['collate'])){
+			$collate = "COLLATE='".$tableContent['collate']."'";
+			$charset = explode('_', $tableContent['collate']);
+			$charset = 'DEFAULT CHARSET='.$charset[0];
+		}
+
+		$engine = 'ENGINE=InnoDB';
+		if(isset($tableContent['engine']) && !empty($tableContent['engine'])){
+			$engine = "ENGINE='".$tableContent['engine']."'";
+		}
+		$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." ".$charset." ".$collate.";";
+
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$connection->exec($sql);
+			return true;
+		} catch (\PDOException $pe) {
+			throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
+		}
+	}
+
+	/**
+	 * save the column into an existing table
+	 * @param $column array the column info
+	 * @param $tableName string
+	 * @param $filePath string the absolute path of JSON file
+	 */
+	public function saveColumnIntoTable($column, $tableName, $filePath, $prevColumn=null){
+		$name = $column['name'];
+		if(isset($column['old_name'])){
+			$name = $column['old_name'];
+		}
+
+		$isColumnExist = $this->fetchColumnName($tableName, $name);
+
+		$_columns = new Columns();
+		$_columns->addColumn($column, $filePath, $prevColumn);
+		$cols = implode(', ', $_columns->getColumns());
+
+		$sql = '';
+		if(!$isColumnExist){
+			$sql .= "ALTER TABLE `".$tableName."` ADD " . $cols . ";";
+		}
+		else {
+			$sql .= "ALTER TABLE `".$tableName."` CHANGE `".$name."` " . $cols . ";";
+		}
+
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$connection->exec($sql);
+		} catch (\PDOException $pe) {
+			throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
+		}
+	}
+
+	/**
+	 * this will try to drop table
+	 * @param $tableName string
+	 * return true || throw an error
+	 */
+	protected function dropTableFromDatabase($tableName){
+		$tableName = trim($tableName);
+		$tableName = $this->_connection->getTablename($tableName);
+        $isExist = $this->fetchTableName($tableName);
+		if($isExist){
+			$sql = "DROP TABLE `".$tableName."`;";		
+			try {
+				$connection = $this->_connection->getConnection()->getConnection();
+				$connection->exec($sql);
+				return true;
+			} catch (\PDOException $pe) {
+				throw new \Exception("Cannot drop table ".$tableName.": " . $pe->getMessage() . " : " . $sql, 500);
+			}
+		}
+		else {
+			return true;
+		}
+	}
+
     /**
      * create the table but to ensure the it is not already installed 
      * we will check it inside the information schema
      */
-    protected function createTable($tableName, $fields, $_file, $targetDir){
+    protected function createTable($tableName, $fields, $_file, $targetDir, $saveData=true){
 
         $databaseName = $this->_connection->getConfig('database');
         $tableName = $this->_connection->getTablename($tableName);
@@ -122,37 +234,7 @@ class Migrate {
         }
         if(!$isExist) {
             if(count($columns)){
-                $_columns = new Columns();
-                foreach ($columns as $keyColumn => $valueColumn) {
-                    $_columns->addColumn($valueColumn, $_file);
-                }
-                $cols = implode(', ', $_columns->getColumns());
-
-                $primaryKey = '';
-                if (array_key_exists('primary_key', $fields)) {
-                    $primaryKey = ' , PRIMARY KEY (`'.$fields['primary_key'].'`) ';
-                }
-				
-				$collate = "COLLATE='utf8_general_ci'";
-				$charset = 'CHARSET=utf8';
-				if(isset($fields['collate']) && !empty($fields['collate'])){
-					$collate = "COLLATE='".$fields['collate']."'";
-					$charset = explode('_', $fields['collate']);
-					$charset = 'CHARSET='.$charset[0];
-				}
-				$engine = 'ENGINE=InnoDB';
-				if(isset($fields['engine']) && !empty($fields['engine'])){
-					$engine = "ENGINE='".$fields['engine']."'";
-				}
-				$sql = "CREATE TABLE IF NOT EXISTS `".$tableName."` (".$cols.$primaryKey.")".$engine." DEFAULT ".$charset." ".$collate.";";
-
-				try {
-					$connection = $this->_connection->getConnection()->getConnection();
-					$connection->exec($sql);
-				} catch (\PDOException $pe) {
-					throw new \Exception("Failed to create a new table: " . $pe->getMessage() . " : " . $sql);
-				}
-
+				$this->createDatabaseTableWithColumns($tableName, $columns, $_file);
                 $_GET['module_install_result'][] = [
                     'message' => $tableName.': Database created.',
                 ];
@@ -168,19 +250,21 @@ class Migrate {
                 if(isset($column['name'])){
                     $isColumnExist = $this->fetchColumnName($tableName, $column['name']);
                     if(!$isColumnExist){
-                        $_columns = new Columns();
-                        $_columns->addColumn($column, $_file, $prevColumn);
-                        $cols = implode(', ', $_columns->getColumns());
+						$this->saveColumnIntoTable($column, $tableName, $_file, $prevColumn);
 
-                        $sql = "ALTER TABLE `".$tableName."` ";
-                        $sql .= "ADD " . $cols . ";";
+                        // $_columns = new Columns();
+                        // $_columns->addColumn($column, $_file, $prevColumn);
+                        // $cols = implode(', ', $_columns->getColumns());
 
-                        try {
-                            $connection = $this->_connection->getConnection()->getConnection();
-                            $connection->exec($sql);
-                        } catch (\PDOException $pe) {
-                            throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
-                        }
+                        // $sql = "ALTER TABLE `".$tableName."` ";
+                        // $sql .= "ADD " . $cols . ";";
+
+                        // try {
+                        //     $connection = $this->_connection->getConnection()->getConnection();
+                        //     $connection->exec($sql);
+                        // } catch (\PDOException $pe) {
+                        //     throw new \Exception("Could not add new column ".$column['name'].": " . $pe->getMessage() . " : " . $sql);
+                        // }
 
                         $_GET['module_install_result'][] = [
                             'message' => $column['name'].': added into '.$tableName.' .',
@@ -193,7 +277,10 @@ class Migrate {
                 }
             }
         }
-        $this->saveData($tableName, $targetDir);
+
+		if($saveData){
+			$this->saveData($tableName, $targetDir);
+		}
         return $tableName;
     }
 
@@ -257,26 +344,53 @@ class Migrate {
 
             foreach ($_data as $key => $data) {
                 try {
-                    $saveSrc = null;
-                    foreach ($data as $key => $value) {
-                        if(!is_string($value)){
-                            if($key == '_migration_data_save_'){
-                                $saveSrc = $value;
-                            }
-                        }
-                    }
-
-                    if($saveSrc){
-                        $src = $this->_di->get($saveSrc['source']);
-                        $method = $value['method'];
-                        $src->$method($data);
-                    }
+					if(isset($data['_migration_data_save_'])){
+						/**
+						 * TODO: change how this use the entity to save data
+						 * without changing JSON file schema
+						 */
+						$saveSrc = null;
+						foreach ($data as $_key => $_value) {
+							if(!is_string($value)){
+								if($_key == '_migration_data_save_'){
+									$saveSrc = $value;
+								}
+							}
+						}
+						if($saveSrc){
+							$src = $this->_di->get($saveSrc['source']);
+							$method = $value['method'];
+							$src->$method($data);
+						}
+					}
+					else {
+						$data = $this->buildDataForSaving($data);
+						$connection = $this->_connection->getConnection();
+						$connection->insert($tableName, $data);
+					}
                 } catch (\Exception $e) {
                     /** do error message here */
                 }
             }
         }
     }
+
+	/**
+	 * build the data came from JSON file
+	 */
+	public function buildDataForSaving($data){
+		$d = [];
+		foreach ($data as $fieldName => $value) {
+			if(isset($value['option'])){
+				$opt = $value['option'];
+				if(isset($opt['is_hashed'])){
+					$value['value'] = $this->_password->setPassword($value['value'])->getHash();
+				}
+			}
+			$d[$fieldName] = $value['value'];
+		}
+		return $d;
+	}
 
     /**
      * return the files inside dir
@@ -312,6 +426,24 @@ class Migrate {
 
         $connection = $this->_connection->getConnection()->getConnection();
         $connection->exec($query);
+	}
+
+	/**
+	 * check if the table name that was scanned in DIR
+	 * is for for data or for table name
+	 */
+	public function checkIfFileIsData($tableName){
+		$tableName = explode('.', $tableName);
+		if(count($tableName) >= 2){
+			unset($tableName[count($tableName) - 1]);
+		}
+		$tableName = explode('_', $tableName[0]);
+		if(count($tableName) >= 2){
+			if($tableName[count($tableName) - 1] == 'data'){
+				return true;
+			}
+		}
+		return false;
 	}
 }
 ?>

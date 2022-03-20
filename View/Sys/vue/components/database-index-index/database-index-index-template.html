@@ -9,91 +9,28 @@
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-2 col-md-2">
-							<h5>Tables</h5>
-							<div class="tablenames">
-								<ul class="no-bullets p-0">
-									<li v-for="(tables, module) in vue.alltables">
-										<p class="mb-0 c-pointer" data-bs-toggle="collapse" v-bind:data-bs-target="'#' + module + '_tables'" aria-expanded="false" v-bind:aria-controls="module + '_tables'">
-											{{module}}
-										</p>
-										<ul class="no-bullets collapse elbow" v-bind:id="module + '_tables'" data-bs-parent="#accordion">
-											<li class="c-pointer" data-bs-toggle="modal" data-bs-target="#newDatabaseTableModal" v-on:click="vue.selectedModule = module">
-												<p class="mb-0">New Table</p>
-											</li>
-											<li class="c-pointer" v-for="(tableValue, tablename) in tables">
-												<p class="mb-0" v-on:click="vue.setTableRows(module, tablename, tableValue)">
-													<span class="fs-12 badge rounded-pill bg-success" v-if="tableValue.is_installed">
-														{{tablename}}
-													</span>
-													<span class="fs-12 badge rounded-pill bg-danger" v-if="!tableValue.is_installed">
-														{{tablename}}
-													</span>
-												</p>
-											</li>
-										</ul>
-									</li>
-								</ul>
-							</div>
+							<common-database-tables-component></common-database-tables-component>
 						</div>
 						<div class="col-sm-10 col-md-10">
-							<table class="table">
-								<thead class="thead-light">
-									<tr>
-										<th scope="col">Name</th>
-										<th scope="col">Type</th>
-										<th scope="col">Collation</th>
-										<th scope="col">Attributes</th>
-										<th scope="col">Null</th>
-										<th scope="col">Default</th>
-										<th scope="col">Installed</th>
-										<th scope="col">Action</th>
-									</tr>
-								</thead>
-								<tbody class="customtable" v-if="vue.selectedTableFields">
-									<tr v-for="field in vue.selectedTableFields.fields">
-										<td>
-											<span v-if="field.name">{{field.name}}</span>
-										</td>
-										<td>
-											<span v-if="field.type">{{field.type}}</span> <span v-if="field.length">({{field.length}})</span>
-										</td>
-										<td>
-											<span v-if="field.collation">{{field.collation}}</span>
-										</td>
-										<td>
-											<span v-if="field.attributes">{{field.attributes}}</span>
-										</td>
-										<td>
-											<span v-if="field.nullable">Yes</span>
-											<span v-else-if="!field.nullable">No</span>
-										</td>
-										<td>
-											<span v-if="field.default === null">NULL</span>
-											<span v-else>{{field.default}}</span>
-										</td>
-										<td>
-											<span class="badge rounded-pill bg-success" v-if="field.is_installed"><i class="fas fa-check"></i></span>
-											<span class="badge rounded-pill bg-danger" v-else><i class="fas fa-times"></i></span>
-										</td>
-										<td>
-											<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(field)">
-												<i class="fas fa-pencil-alt"></i>
-											</button>
-											<button class="btn btn btn btn-outline-danger btn-sm" title="Drop" data-bs-toggle="modal" data-bs-target="#databaseDropFieldModal" v-on:click="vue.setField(field)">
-												<i class="fas fa-trash-alt"></i>
-											</button>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-
-							<div class="row" v-if="vue.selectedTableFields">
+							<div class="row">
 								<div class="col-12">
-									<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" data-bs-toggle="modal" data-bs-target="#databaseSaveFieldModal" v-on:click="vue.setField(null)">
-										Add New Field
-									</button>
+									<ul class="nav nav-tabs">
+										<li class="nav-item">
+											<a class="nav-link" v-bind:class="{active : vue.viewMode == 'table-structure'}" href="javascript:void(0)" v-on:click="vue.viewMode = 'table-structure'">
+												Table Structure
+											</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link" v-bind:class="{active : vue.viewMode == 'data-structure'}" href="javascript:void(0)" v-on:click="vue.viewMode = 'data-structure'">
+												Install Data
+											</a>
+										</li>
+									</ul>
 								</div>
 							</div>
+
+							<common-database-table-structure-component v-if="vue.viewMode == 'table-structure'"></common-database-table-structure-component>
+							<common-database-data-structure-component v-if="vue.viewMode == 'data-structure'"></common-database-data-structure-component>
 						</div>
 					</div>
 				</div>
@@ -277,7 +214,7 @@
 								</div>
 								<small class="form-text text-danger">
 									Note: If checked, Opoink will try to save the column into the database. 
-									If this column was already installed and changed, then the column will be altered. 
+									If this column was already installed, then the column will be altered. 
 									You may lose or break your database. 
 									We suggest inserting a new column instead.
 								</small>
@@ -302,7 +239,7 @@
 					<h5 class="modal-title" id="databaseDropFieldModalLabel">
 						Drop: {{vue.selectedTableField.name}}
 					</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetForm()"></button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetDropFields()"></button>
 				</div>
 				<form v-on:submit="vue.dropField($event)" v-if="vue.selectedTableField">
 					<div class="modal-body">
@@ -329,7 +266,7 @@
 					</div>
 					<div class="modal-footer">
 						<button class="btn btn-outline-secondary">Drop {{vue.selectedTableField.name}}</button>
-						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetForm()">Cancel</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetDropFields()">Cancel</button>
 					</div>
 				</form>
 			</div>
@@ -393,5 +330,88 @@
 			</div>
 		</div>
 	</div>
+
+	
+	
+	<!-- modal to new database table -->
+	<div class="modal fade" id="saveDatabaseTableFieldsModal" tabindex="-1" role="dialog" aria-labelledby="saveDatabaseTableFieldsModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="saveDatabaseTableFieldsModalLabel">
+						Install Table Fields
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form v-on:submit="vue.saveAllFields($event)">
+					<div class="modal-body">
+						<p class="mB-0">Are you sure you want to install all fields?</p>
+						<p class="mB-0">This will install all field(s) that are not installed in the database.</p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+						<button class="btn btn-primary">Save Table Fields</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	
+	
+	<!-- modal to new database table -->
+	<div class="modal fade" id="dropDatabaseTableModal" tabindex="-1" role="dialog" aria-labelledby="dropDatabaseTableModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="dropDatabaseTableModalLabel">
+						Drop Table
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetDropTableForm()"></button>
+				</div>
+				<form v-on:submit="vue.dropTable($event)">
+					<div class="modal-body">
+						<p class="mB-15">Are you sure you want to drop table?</p>
+
+						
+						<!-- <template v-if="vue.selectedTableValue && vue.selectedTableValue.is_installed"> -->
+						<div class="form-group" v-if="vue.selectedTableValue && vue.selectedTableValue.is_installed">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="drop_database_table" id="droptable-only" value="droptable-only" v-model="vue.dropTableForm.action" />
+								<label class="form-check-label" for="droptable-only">
+									Drop-Table
+								</label>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="drop_database_table" id="delete-json-only" value="delete-json-only" v-model="vue.dropTableForm.action" />
+								<label class="form-check-label" for="delete-json-only">
+									Delete JSON file
+								</label>
+							</div>
+						</div>
+
+						<div class="form-group" v-if="vue.selectedTableValue && vue.selectedTableValue.is_installed">
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="drop_database_table" id="droptable-and-delete-json" value="droptable-and-delete-json" v-model="vue.dropTableForm.action" />
+								<label class="form-check-label" for="droptable-and-delete-json">
+									Drop-Table and delete JSON file
+								</label>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-outline-danger">Drop Table</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetDropTableForm()">Cancel</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	
+	<modal-database-add-edit-data-component :databaseIndexIndexComponent="vue"></modal-database-add-edit-data-component>
 </div>
 

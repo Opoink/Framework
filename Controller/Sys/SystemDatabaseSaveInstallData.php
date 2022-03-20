@@ -6,7 +6,7 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseDropfield extends Sys {
+class SystemDatabaseSaveInstallData extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
@@ -26,11 +26,11 @@ class SystemDatabaseDropfield extends Sys {
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-
+		
 		if($this->validateFormKey()){
+
 			$tablename = $this->_request->getParam('tablename');
 			$_module = $this->_request->getParam('module');
-			$save_and_install = $this->_request->getParam('save_and_install');
 
 			if(!$tablename){
 				$this->returnError('406', 'The table name is required');
@@ -42,36 +42,8 @@ class SystemDatabaseDropfield extends Sys {
 					list($vendor, $module) = $_module;
 
 					$fields = $this->_request->getParam('fields');
-					if(is_array($fields)){
-						$allResult = [
-							"database_drop" => [],
-							"json_remove" => []
-						];
-
-						$this->_moduleAvailableTables->setConfig($this->_config);
-						try {	
-							$drop_check = $this->_request->getParam('drop_check');
-							if($drop_check){
-								$allResult["database_drop"] = $this->_moduleAvailableTables->dropFieldsFromoDatabase($tablename, $fields);
-							}
-						} catch (\Exception $e) {
-							$this->returnError('500', $e->getMessage());
-						}
-
-						try {	
-							$remove_on_json = $this->_request->getParam('remove_on_json');
-							if($remove_on_json){
-								$allResult["json_remove"] = $this->_moduleAvailableTables->removeFieldsFromJsonFile($vendor, $module, $tablename, $fields);
-							}
-						} catch (\Exception $e) {
-							$this->returnError('500', $e->getMessage());
-						}
-
-						$this->jsonEncode($allResult);
-					}
-					else {
-						$this->returnError('406', 'Fields should be an array');
-					}
+					$data = $this->_moduleAvailableTables->createInstallData($vendor, $module, $tablename, $fields);
+					$this->jsonEncode($data);
 				}
 				else {
 					$this->returnError('406', 'Invalid vendor, module format. Should be vendorname_modulename');

@@ -54,8 +54,15 @@ class databaseIndexIndex {
 		tablename: '',
 		primary_key: '',
 		collation: 'utf8_general_ci',
-		storage_engine: ''
+		storage_engine: 'InnoDB'
 	}
+
+	dropTableForm = {
+		tablename: '',
+		action: ''
+	}
+
+	viewMode = 'table-structure'; /** table-structure || data-structure */
 
 	constructor(){
 		this.request = window['opoink_system']['_request'];
@@ -67,9 +74,14 @@ class databaseIndexIndex {
 		this.selectedTableName = null;
 		this.selectedTableValue = null;
 
+		this.resetForm();
+		this.resetDropFields();
+		this.resetNewTableForm();
+		this.resetDropTableForm();
+
 		setTimeout(f => {
 			this.mainHeader = window['_vue']['mainheader-component'];
-			this.mainHeader.pageTitle = 'Opoink Modules';
+			this.mainHeader.pageTitle = 'Module Database';
 			this.loader = window['_vue']['loader-component'];
 			this.toast = window['_vue']['toast-component'];
 			this.getModuleTables();
@@ -92,12 +104,24 @@ class databaseIndexIndex {
 		}
 	}
 
+	resetDropFields(){
+		this.formFieldDropCheck = false;
+		this.formFieldRemoveOnJson = false;
+	}
+
 	resetNewTableForm(){
-		newTableForm = {
+		this.newTableForm = {
 			tablename: '',
 			primary_key: '',
 			collation: 'utf8_general_ci',
-			storage_engine: ''
+			storage_engine: 'InnoDB'
+		}
+	}
+
+	resetDropTableForm(){
+		this.dropTableForm = {
+			tablename: '',
+			action: ''
 		}
 	}
 
@@ -124,9 +148,8 @@ class databaseIndexIndex {
 	 */
 	setTableRows(module, tablename, tableValue=null){
 		this.selectedTableName = tablename;
-		this.selectedTableValue = tablename;
+		this.selectedTableValue = tableValue;
 		this.selectedModule = module;
-		this.selectedTableValue = null;
 
 		let url = '/' + this.url.getRoute() + '/database?module=' + module + '&tablename=' + tablename;
 		this.request.makeRequest(url, '', 'GET', true)
@@ -165,7 +188,6 @@ class databaseIndexIndex {
 					else {
 						this.formField.default = 'USER_DEFINED';
 						this.formFieldDefaultValue = this.selectedTableField.default;
-						console.log('formField formField formField', this.formFieldDefaultValue, this.selectedTableField.default);
 					}
 				}
 			}
@@ -178,6 +200,36 @@ class databaseIndexIndex {
 		});
 
 		this.formField.old_name = this.selectedTableField.name;
+	}
+
+	saveAllFields(e){
+		e.preventDefault();
+		if(!this.selectedTableValue.is_installed){
+			let jsonData = {
+				module: this.selectedModule,
+				tablename: this.selectedTableName,
+				install_table: true
+			}
+			this.request.getFormKey().then(formkey => {
+				jsonData['form_key'] = formkey;
+
+				let url = '/' + this.url.getRoute() + '/database/savefield';
+				this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+					if(!result.error && result.result){	
+						this.selectedTableFields = result.result;
+						this.getModuleTables();
+						this.toast.add('Field successfully saved.', 'Sucess');
+						this.loader.reset();
+						this.selectedTableValue.is_installed = true;
+
+						$('#saveDatabaseTableFieldsModal').modal('hide');
+					} else if(result.error && !result.result){
+						this.toast.add(result.error.responseText, 'Error');
+						this.loader.reset();
+					}
+				});
+			});
+		}
 	}
 
 	saveField(e){
@@ -210,6 +262,7 @@ class databaseIndexIndex {
 
 					this.toast.add('Field successfully saved.', 'Sucess');
 					this.loader.reset();
+					$('#databaseSaveFieldModal').modal('hide');
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
 					this.loader.reset();
@@ -257,8 +310,9 @@ class databaseIndexIndex {
 						});
 					}
 					
-					this.setTableRows(this.selectedModule, this.selectedTableName);
+					this.setTableRows(this.selectedModule, this.selectedTableName, this.selectedTableValue);
 					this.loader.reset();
+					$('#databaseDropFieldModal').modal('hide');
 
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
@@ -295,6 +349,49 @@ class databaseIndexIndex {
 				this.loader.reset();
 			});
 		});
+	}
+
+	dropTable(e){
+		e.preventDefault();
+
+		this.dropTableForm.tablename = this.selectedTableName;
+		let jsonData = {
+			module: this.selectedModule,
+			table: this.dropTableForm
+		}
+		
+		this.loader.setLoader(true, 'Dropping your database table.')
+		this.request.getFormKey().then(formkey => {
+			jsonData['form_key'] = formkey;
+
+			let url = '/' + this.url.getRoute() + '/database/droptable';
+			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+				if(!result.error && result.result){
+					this.getModuleTables();
+					if(this.dropTableForm.action == 'droptable-only'){
+						this.setTableRows(this.selectedModule, this.selectedTableName, this.selectedTableValue);
+						this.selectedTableValue.is_installed = false;
+					}
+					else if(this.dropTableForm.action == 'delete-json-only'){
+						this.selectedTableName = null;
+						this.selectedTableValue = null;
+						this.selectedTableFields = null;
+					}
+					else if(this.dropTableForm.action == 'droptable-and-delete-json'){
+						this.selectedTableName = null;
+						this.selectedTableValue = null;
+						this.selectedTableFields = null;
+					}
+					this.resetDropTableForm();
+					$('#dropDatabaseTableModal').modal('hide');
+				}
+				else {
+					this.toast.add(result.error.responseText, 'Error');
+				}
+				this.loader.reset();
+			});
+		});
+		console.log('dropTable dropTable', jsonData);
 	}
 }
 
