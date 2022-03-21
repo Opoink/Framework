@@ -26,6 +26,7 @@ let indexIndexIndexComponent = Vue.component('index-index-index-component', {
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'Dashboard';
 		let data = window['_vue']['index-index-index-component'];
 		data.init();
 		next();

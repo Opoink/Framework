@@ -319,6 +319,7 @@ let moduleIndexIndexComponent = Vue.component('module-index-index-component', {
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'Modules';
 		let data = window['_vue']['module-index-index-component'];
 		data.init();
 		next();

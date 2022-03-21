@@ -31,6 +31,11 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	 */
 	public function getAllInstalledAvailableStable(){
 		$extDir = Constants::EXT_DIR.DS;
+
+		if( !isset($this->_config['modules'])){
+			return [];
+		}
+
 		$vendors = $this->_config['modules'];
 
 		$allTables = []; 
@@ -208,7 +213,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					$_tableName = $this->_connection->getTablename($tablename);
         			$isExist = $this->fetchTableName($_tableName);
 					if(!$isExist){
-						$this->createDatabaseTableWithColumns($_tableName, $fieldsToSave);
+						$this->createDatabaseTableWithColumns($_tableName, $fieldsToSave, $targetFile);
 					}
 					else {
 						foreach ($fieldsToSave as $key => $column) {
@@ -234,7 +239,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	 * @param $tablename string
 	 * @param $fields array
 	 */
-	public function dropFieldsFromoDatabase($tablename, $fields){
+	public function dropFieldsFromDatabase($tablename, $fields){
 		$_tableName = $this->_connection->getTablename($tablename);
 		$isExist = $this->fetchTableName($_tableName);
 
@@ -486,6 +491,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 	public function dropTable($vendor, $module, $tableName, $action){
 		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$tableName.'.json';
+		$targetFileData = dirname($targetFile).DS.$tableName.'_data.json';
 
 		if($action == self::DROP_TABLE_ONLY){
 			$this->dropTableFromDatabase($tableName);
@@ -500,6 +506,9 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					'message' => 'Database table JSON file successfully deleted'
 				];
 			}
+			if(file_exists($targetFileData)){
+				unlink($targetFileData);
+			}
 		}
 		else if($action == self::DROP_AND_DELETE_JSON){
 			$this->dropTableFromDatabase($tableName);
@@ -507,6 +516,9 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 			if(file_exists($targetFile)){
 				unlink($targetFile);
 				$message .= ' and database table JSON file successfully deleted';
+			}
+			if(file_exists($targetFileData)){
+				unlink($targetFileData);
 			}
 			return [
 				'message' => $message

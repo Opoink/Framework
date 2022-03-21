@@ -52,7 +52,7 @@ class SystemDatabaseDropfield extends Sys {
 						try {	
 							$drop_check = $this->_request->getParam('drop_check');
 							if($drop_check){
-								$allResult["database_drop"] = $this->_moduleAvailableTables->dropFieldsFromoDatabase($tablename, $fields);
+								$allResult["database_drop"] = $this->_moduleAvailableTables->dropFieldsFromDatabase($tablename, $fields);
 							}
 						} catch (\Exception $e) {
 							$this->returnError('500', $e->getMessage());
