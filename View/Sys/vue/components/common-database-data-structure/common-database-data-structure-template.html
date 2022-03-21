@@ -3,22 +3,31 @@
 		<thead class="thead-light">
 			<tr>
 				<th scope="col" v-for="field in vue.selectedTableFields.fields">{{field.name}}</th>
+				<th class="W-100" scope="col">Action</th>
 			</tr>
 		</thead>
 		<tbody class="customtable" v-if="vue.selectedTableFields.installation_data">
-			<tr v-for="data in vue.selectedTableFields.installation_data">
+			<tr v-for="(data, index) in vue.selectedTableFields.installation_data">
 				<td v-for="field in vue.selectedTableFields.fields">
 					<template v-if="data[field.name]">
 						<span>{{data[field.name]['value']}}</span>
 						<span class="mL-5 badge rounded-pill bg-info" v-if="data[field.name]['option']?.is_hashed">Hashed</span>
 					</template>
 				</td>
+				<td>
+					<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" v-on:click="modalDatabaseAddEditDataComponent.setEditFormField(data, index)">
+						<i class="fas fa-pencil-alt"></i>
+					</button>
+					<button class="btn btn btn btn-outline-danger btn-sm" title="Drop" v-on:click="modalDatabaseDeleteDataComponent.setEditFormField(data, index)">
+						<i class="fas fa-trash-alt"></i>
+					</button>
+				</td>
 			</tr>
 		</tbody>
 	</table>
 	<div class="row mB-15">
 		<div class="col-12" v-if="vue.selectedTableFields">
-			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add New Data" data-bs-toggle="modal" data-bs-target="#modalDatabaseAddEditData">
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add New Data" v-on:click="modalDatabaseAddEditDataComponent.setFormField()">
 				Add New Data
 			</button>
 		</div>

@@ -6,7 +6,7 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseSaveInstallData extends Sys {
+class SystemDatabaseDeleteInstallData extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
@@ -43,10 +43,10 @@ class SystemDatabaseSaveInstallData extends Sys {
 
 					$fields = $this->_request->getParam('fields');
 					$target_field_index = $this->_request->getParam('target_field_index');
-					$save_to_database = $this->_request->getParam('save_to_database');
+					$remove_in_database = $this->_request->getParam('remove_in_database');
 
 					try {
-						$data = $this->_moduleAvailableTables->createInstallData($vendor, $module, $tablename, $fields, $save_to_database, $target_field_index);
+						$data = $this->_moduleAvailableTables->deleteInstallData($vendor, $module, $tablename, $fields, $remove_in_database, $target_field_index);
 						$this->jsonEncode($data);
 					} catch (\Exception $e) {
 						$this->returnError($e->getCode(), $e->getMessage());

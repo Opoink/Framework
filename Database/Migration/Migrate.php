@@ -333,8 +333,8 @@ class Migrate {
      */
     private function saveData($tableName, $targetDir){
         $prefix = $this->_connection->getConfig('table_prefix');
-        $dataFilename = str_replace($prefix, '', $tableName);
-        $dataFilename .= '_data.json';
+        $tableName = str_replace($prefix, '', $tableName);
+        $dataFilename = $tableName . '_data.json';
 
         $dataJSONFile = $targetDir.DS.$dataFilename;
 
@@ -364,9 +364,10 @@ class Migrate {
 						}
 					}
 					else {
-						$data = $this->buildDataForSaving($data);
-						$connection = $this->_connection->getConnection();
-						$connection->insert($tableName, $data);
+						$this->saveInstallationdata($data, $tableName);
+						// $data = $this->buildDataForSaving($data);
+						// $connection = $this->_connection->getConnection();
+						// $connection->insert($tableName, $data);
 					}
                 } catch (\Exception $e) {
                     /** do error message here */
@@ -383,7 +384,7 @@ class Migrate {
 		foreach ($data as $fieldName => $value) {
 			if(isset($value['option'])){
 				$opt = $value['option'];
-				if(isset($opt['is_hashed'])){
+				if(isset($opt['is_hashed']) && $opt['is_hashed'] == true){
 					$value['value'] = $this->_password->setPassword($value['value'])->getHash();
 				}
 			}
@@ -444,6 +445,99 @@ class Migrate {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * return the rimary key of the data came from JSON file 
+	 * installtion data
+	 * @param $data came from JSON installtion data file
+	 * return null || array
+	 */
+	public function getPrimaryData($data){
+		$primaryKey = null;
+		foreach ($data as $key => $value) {
+			if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
+				if(isset($value['option']['primary']) && $value['option']['primary'] == true){
+					$primaryKey = [
+						'name' => $key,
+						'value' => $value['value']
+					];
+				}
+			}
+		}
+
+		return $primaryKey;
+	}
+
+	/**
+	 * check if the value of installation data was already in database or not
+	 * @param $primaryKey must be the return of the getPrimaryData($data) method
+	 * @param $tableName string
+	 * return array
+	 */
+	public function checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName){
+		$isExist = [];
+		if(is_array($primaryKey)){
+			$tableName = $this->_connection->getTablename($tableName);
+			$di = new \Of\Std\Di();
+			$select = $di->get('\Of\Database\Sql\Select');
+			$select->select()->from($tableName);
+			$select->where($primaryKey['name'])->eq($primaryKey['value']);
+
+			$connection = $this->_connection->getConnection();
+			$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
+		}
+		return $isExist;
+	}
+
+	/**
+	 * this will check if the installation data was already exisitng in the 
+	 * database or not
+	 * this will simply query all column with value from JSON file
+	 */
+	public function saveInstallationdata($data, $tableName){
+		$_data = $this->buildDataForSaving($data);
+		$tn = $this->_connection->getTablename($tableName);
+
+		$primaryKey = $this->getPrimaryData($data);
+		// foreach ($data as $key => $value) {
+		// 	if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
+		// 		if(isset($value['option']['primary']) && $value['option']['primary'] == true){
+		// 			$primaryKey = [
+		// 				'name' => $key,
+		// 				'value' => $value['value']
+		// 			];
+		// 		}
+		// 	}
+		// }
+
+		$isExist = $this->checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName);
+		$connection = $this->_connection->getConnection();
+		
+		// $isExist = [];
+		// if(is_array($primaryKey)){
+		// 	$di = new \Of\Std\Di();
+		// 	$select = $di->get('\Of\Database\Sql\Select');
+		// 	$select->select()->from($tn);
+		// 	$select->where($primaryKey['name'])->eq($primaryKey['value']);
+
+		// 	$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
+		// }
+
+		try {
+			if(count($isExist) > 0){
+				/** data exist */
+				$di = new \Of\Std\Di();
+				$select = $di->get('\Of\Database\Sql\Select');
+				$connection->update($select, [$primaryKey['name'] => $primaryKey['value']], $_data, $tn);
+			}
+			else {
+				/** not found */
+				$connection->insert($tn, $_data);
+			}
+		} catch (\PDOException $pe) {
+			throw new \Exception($pe->getMessage(), 500);
+		}
 	}
 }
 ?>
