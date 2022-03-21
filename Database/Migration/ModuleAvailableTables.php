@@ -564,5 +564,77 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 
 		return $dataContent;
 	}
+
+	/**
+	 * this will remove the installation data in JSON file
+	 * @param $vendor string
+	 * @param $module string
+	 * @param $tableName string
+	 * @param $fields array the, data that wil be removed
+	 * @param $target_field_index this is the object index key from JSON file
+	 * @param $remove_in_database boolean if true will try to remove in database as well
+	 */
+	public function deleteInstallData($vendor, $module, $tableName, $data, $remove_in_database, $target_field_index){
+		$tableName = $this->cleanName($tableName);
+
+		$message = [];
+		if($remove_in_database){
+			$primaryKey = $this->getPrimaryData($data);
+			$isExist = $this->checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName);
+			if(count($isExist) > 0){
+
+				$_tableName = $this->_connection->getTablename($tableName);
+				$_data = $this->buildDataForSaving($data);
+
+				
+				$di = new \Of\Std\Di();
+				$delete = $di->get('\Of\Database\Sql\DeleteStatement');
+				$delete->from($_tableName);
+				$delete->where($primaryKey['name'])->eq($primaryKey['value']);
+				
+				try {
+					$this->_connection->getConnection()->_delete($delete);
+					$message[] = 'Data successfully deleted in the database.';
+				} catch (\PDOException $pe) {
+					throw new \Exception($pe->getMessage(), 500);
+				}
+			}
+		}
+
+		$fileName = $tableName.'_data';
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_TABLES_DIR.DS.$fileName.'.json';
+
+		$dataContent = [];
+		if(file_exists($targetFile)){
+			$dataContent = file_get_contents($targetFile);
+			$dataContent = json_decode($dataContent, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				$dataContent = $dataContent;
+			}
+		}
+
+		if(isset($dataContent[$target_field_index])){
+			unset($dataContent[$target_field_index]);
+		}
+
+		if(count($dataContent) > 0){
+			sort($dataContent);
+	
+			$_dataContent = json_encode($dataContent, JSON_PRETTY_PRINT);
+			$this->_writer->setDirPath(dirname($targetFile))
+			->setData($_dataContent)
+			->setFilename($fileName)
+			->setFileextension('json')
+			->write();
+		}
+		else {
+			unlink($targetFile);
+		}
+
+		$message[] = 'Data successfully deleted in the JSON file.';
+
+		return $message;
+	}
 }
 ?>

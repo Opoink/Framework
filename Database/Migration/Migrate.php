@@ -448,14 +448,12 @@ class Migrate {
 	}
 
 	/**
-	 * this will check if the installation data was already exisitng in the 
-	 * database or not
-	 * this will simply query all column with value from JSON file
+	 * return the rimary key of the data came from JSON file 
+	 * installtion data
+	 * @param $data came from JSON installtion data file
+	 * return null || array
 	 */
-	public function saveInstallationdata($data, $tableName){
-		$_data = $this->buildDataForSaving($data);
-		$tn = $this->_connection->getTablename($tableName);
-
+	public function getPrimaryData($data){
 		$primaryKey = null;
 		foreach ($data as $key => $value) {
 			if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
@@ -468,17 +466,63 @@ class Migrate {
 			}
 		}
 
-		$connection = $this->_connection->getConnection();
+		return $primaryKey;
+	}
 
+	/**
+	 * check if the value of installation data was already in database or not
+	 * @param $primaryKey must be the return of the getPrimaryData($data) method
+	 * @param $tableName string
+	 * return array
+	 */
+	public function checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName){
 		$isExist = [];
 		if(is_array($primaryKey)){
+			$tableName = $this->_connection->getTablename($tableName);
 			$di = new \Of\Std\Di();
 			$select = $di->get('\Of\Database\Sql\Select');
-			$select->select()->from($tn);
+			$select->select()->from($tableName);
 			$select->where($primaryKey['name'])->eq($primaryKey['value']);
 
+			$connection = $this->_connection->getConnection();
 			$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
 		}
+		return $isExist;
+	}
+
+	/**
+	 * this will check if the installation data was already exisitng in the 
+	 * database or not
+	 * this will simply query all column with value from JSON file
+	 */
+	public function saveInstallationdata($data, $tableName){
+		$_data = $this->buildDataForSaving($data);
+		$tn = $this->_connection->getTablename($tableName);
+
+		$primaryKey = $this->getPrimaryData($data);
+		// foreach ($data as $key => $value) {
+		// 	if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
+		// 		if(isset($value['option']['primary']) && $value['option']['primary'] == true){
+		// 			$primaryKey = [
+		// 				'name' => $key,
+		// 				'value' => $value['value']
+		// 			];
+		// 		}
+		// 	}
+		// }
+
+		$isExist = $this->checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName);
+		$connection = $this->_connection->getConnection();
+		
+		// $isExist = [];
+		// if(is_array($primaryKey)){
+		// 	$di = new \Of\Std\Di();
+		// 	$select = $di->get('\Of\Database\Sql\Select');
+		// 	$select->select()->from($tn);
+		// 	$select->where($primaryKey['name'])->eq($primaryKey['value']);
+
+		// 	$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
+		// }
 
 		try {
 			if(count($isExist) > 0){
@@ -492,7 +536,7 @@ class Migrate {
 				$connection->insert($tn, $_data);
 			}
 		} catch (\PDOException $pe) {
-			return false;
+			throw new \Exception($pe->getMessage(), 500);
 		}
 	}
 }

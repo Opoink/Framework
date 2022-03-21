@@ -49,7 +49,6 @@ class modalDatabaseAddEditDataComponent {
 				}
 			};
 		});
-		console.log('setFormField setFormField', this.formFields);
 		setTimeout(() => {
 			$('#modalDatabaseAddEditData').modal('show');
 		}, 100);
@@ -58,23 +57,39 @@ class modalDatabaseAddEditDataComponent {
 	setEditFormField(data, index){
 		this.resetFormFields();
 		this.targetFieldIndex = index;
-		$.each(data, (key, val) => {
-			this.formFields[key] = {
-				value: val.value,
-				option: {
-					is_hashed: false,
-					primary: false
-				}
-			};
-			if(typeof val.option != 'undefined'){
-				if(typeof val.option.is_hashed != 'undefined'){
-					this.formFields[key]['option']['is_hashed'] = val.option.is_hashed;
-				}
-				if(typeof val.option.primary != 'undefined'){
-					this.formFields[key]['option']['primary'] = val.option.primary;
+
+		$.each(this.databaseIndexIndexComponent.selectedTableFields.fields, (key, val) => {
+			if(typeof data[val.name] != 'undefined'){
+				this.formFields[val.name] = data[val.name];
+			}
+			else {
+				this.formFields[val.name] = {
+					value: '',
+					option: {
+						is_hashed: false,
+						primary: false
+					}
 				}
 			}
 		});
+		
+		// $.each(data, (key, val) => {
+		// 	this.formFields[key] = {
+		// 		value: val.value,
+		// 		option: {
+		// 			is_hashed: false,
+		// 			primary: false
+		// 		}
+		// 	};
+		// 	if(typeof val.option != 'undefined'){
+		// 		if(typeof val.option.is_hashed != 'undefined'){
+		// 			this.formFields[key]['option']['is_hashed'] = val.option.is_hashed;
+		// 		}
+		// 		if(typeof val.option.primary != 'undefined'){
+		// 			this.formFields[key]['option']['primary'] = val.option.primary;
+		// 		}
+		// 	}
+		// });
 		setTimeout(() => {
 			$('#modalDatabaseAddEditData').modal('show');
 		}, 100);
@@ -84,7 +99,7 @@ class modalDatabaseAddEditDataComponent {
 	 * save the field into JSON files via API call
 	 * @param {*} e 
 	 */
-	saveInsallData(e){
+	saveInstallData(e){
 		e.preventDefault();
 
 

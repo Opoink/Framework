@@ -218,6 +218,7 @@ class Router {
 			$sysRoute.'_database_newtablejsonschema' => 'Of\\Controller\\Sys\\SystemDatabaseNewTableJsonSchema',
 			$sysRoute.'_database_droptable' => 'Of\\Controller\\Sys\\SystemDatabaseDroptable',
 			$sysRoute.'_database_saveinstalldata' => 'Of\\Controller\\Sys\\SystemDatabaseSaveInstallData',
+			$sysRoute.'_database_deleteinstalldata' => 'Of\\Controller\\Sys\\SystemDatabaseDeleteInstallData',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

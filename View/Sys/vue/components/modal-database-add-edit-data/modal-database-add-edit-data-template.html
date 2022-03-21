@@ -10,7 +10,7 @@
 					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetFormFields()"></button>
 				</div>
-				<form v-on:submit="vue.saveInsallData($event)">
+				<form v-on:submit="vue.saveInstallData($event)">
 					<div class="modal-body" v-if="databaseIndexIndexComponent.selectedTableFields">
 						
 						<div class="form-group" v-for="field in databaseIndexIndexComponent.selectedTableFields.fields">

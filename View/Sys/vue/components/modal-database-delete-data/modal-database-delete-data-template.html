@@ -13,7 +13,7 @@
 				<form v-on:submit="vue.deleteInstallData($event)">
 					<div class="modal-body">
 						<!-- TODO: fix bug when there is an empty field, same thing happen on add/edit modal -->
-						<div>
+						<div class="mb-3">
 							<p class="mb-0" v-for="(data, index) in vue.selectedData">
 								{{index}}: {{data.value}}
 							</p>
