@@ -66,6 +66,7 @@ let moduleCreateIndexComponent = Vue.component('module-create-index-component', 
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'Create Modules';
 		next();
 	},
 	template: `{{template}}`

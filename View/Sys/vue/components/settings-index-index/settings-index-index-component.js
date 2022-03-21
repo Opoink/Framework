@@ -107,6 +107,7 @@ let settingsIndexIndexComponent = Vue.component('settings-index-index-component'
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'System Settings';
 		let data = window['_vue']['settings-index-index-component'];
 		data.init();
 		next();

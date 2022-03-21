@@ -117,6 +117,7 @@ let cacheIndexIndexComponent = Vue.component('cache-index-index-component', {
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'System Cache';
 		let data = window['_vue']['cache-index-index-component'];
 		data.init();
 		next();

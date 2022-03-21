@@ -333,6 +333,8 @@ class databaseIndexIndex {
 			module: this.selectedModule,
 			database_table: this.newTableForm
 		}
+
+		this.loader.setLoader(true, 'Creating database table...');
 		this.request.getFormKey().then(formkey => {
 			jsonData['form_key'] = formkey;
 
@@ -360,7 +362,7 @@ class databaseIndexIndex {
 			table: this.dropTableForm
 		}
 		
-		this.loader.setLoader(true, 'Dropping your database table.')
+		this.loader.setLoader(true, 'Dropping your database table...');
 		this.request.getFormKey().then(formkey => {
 			jsonData['form_key'] = formkey;
 
@@ -391,7 +393,6 @@ class databaseIndexIndex {
 				this.loader.reset();
 			});
 		});
-		console.log('dropTable dropTable', jsonData);
 	}
 }
 
@@ -404,6 +405,7 @@ let databaseIndexIndexComponent = Vue.component('database-index-index-component'
 		}
 	},
 	beforeRouteEnter: function(to, from, next) {
+		document.title = 'Database';
 		let data = window['_vue']['database-index-index-component'];
 		data.init();
 		next();
