@@ -1,5 +1,5 @@
 Add new feature for database creation page in system UI
-- in the system UI, creation of the installation data
+- in the system UI, the creation of the installation data
 - fix the database migration on the install/upgrade module, it is now accepting the added field from JSON schema and for collation, storage engine, etc.
 - update \Of\Database\Migration\Columns to accept collation
 - add new system UI page database index
