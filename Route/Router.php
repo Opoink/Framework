@@ -219,6 +219,7 @@ class Router {
 			$sysRoute.'_database_droptable' => 'Of\\Controller\\Sys\\SystemDatabaseDroptable',
 			$sysRoute.'_database_saveinstalldata' => 'Of\\Controller\\Sys\\SystemDatabaseSaveInstallData',
 			$sysRoute.'_database_deleteinstalldata' => 'Of\\Controller\\Sys\\SystemDatabaseDeleteInstallData',
+			$sysRoute.'_database_saveconstraint' => 'Of\\Controller\\Sys\\SystemDatabaseSaveConstraint',
 		];
 		$this->config['controllers']['Systems_Controllers'] = $sysControllers;
 	}

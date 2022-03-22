@@ -5,6 +5,7 @@
 */
 namespace Of\Database\Migration;
 
+use \Of\Constants;
 use \Of\Database\Migration\Columns;
 
 class Migrate {
@@ -500,29 +501,9 @@ class Migrate {
 		$tn = $this->_connection->getTablename($tableName);
 
 		$primaryKey = $this->getPrimaryData($data);
-		// foreach ($data as $key => $value) {
-		// 	if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
-		// 		if(isset($value['option']['primary']) && $value['option']['primary'] == true){
-		// 			$primaryKey = [
-		// 				'name' => $key,
-		// 				'value' => $value['value']
-		// 			];
-		// 		}
-		// 	}
-		// }
 
 		$isExist = $this->checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName);
 		$connection = $this->_connection->getConnection();
-		
-		// $isExist = [];
-		// if(is_array($primaryKey)){
-		// 	$di = new \Of\Std\Di();
-		// 	$select = $di->get('\Of\Database\Sql\Select');
-		// 	$select->select()->from($tn);
-		// 	$select->where($primaryKey['name'])->eq($primaryKey['value']);
-
-		// 	$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
-		// }
 
 		try {
 			if(count($isExist) > 0){
@@ -538,6 +519,27 @@ class Migrate {
 		} catch (\PDOException $pe) {
 			throw new \Exception($pe->getMessage(), 500);
 		}
+	}
+
+	public function saveConstraintsInJSON($vendor, $module, $constraints){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+		
+		$result = [
+			'errors_message' => [],
+			'message' => [],
+		];
+
+		$constraints = json_encode($constraints, JSON_PRETTY_PRINT);
+
+		$this->_writer->setDirPath(dirname($targetFile))
+		->setData($constraints)
+		->setFilename('relationship')
+		->setFileextension('json')
+		->write();
+
+		$result['message'][] = 'Constraints successfully saved in ' . $vendor.'_'.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+
+		return $result;
 	}
 }
 ?>

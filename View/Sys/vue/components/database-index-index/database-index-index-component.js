@@ -62,7 +62,7 @@ class databaseIndexIndex {
 		action: ''
 	}
 
-	viewMode = 'table-structure'; /** table-structure || data-structure */
+	viewMode = 'table-structure'; /** table-structure || data-structure || relation-view */
 
 	constructor(){
 		this.request = window['opoink_system']['_request'];

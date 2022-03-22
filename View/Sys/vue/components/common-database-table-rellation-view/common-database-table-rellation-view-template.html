@@ -1,0 +1,112 @@
+<div class="common-database-table-relation-view-component" v-if="vue.databaseIndexIndex?.selectedTableName">
+	<table class="table">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col">Constraint Name <span class="text-danger">*</span></th>
+				<th scope="col">ON DELETE</th>
+				<th scope="col">ON UPDATE</th>
+				<th scope="col">Column <span class="text-danger">*</span></th>
+				<th scope="col">Reference Table <span class="text-danger">*</span></th>
+				<th scope="col">Reference Column <span class="text-danger">*</span></th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		<tbody class="customtable" v-if="vue.databaseIndexIndex">
+			<tr  v-for="form in vue.formsRelation">
+				<td>
+					<div class="form-group mb-0">
+						<input 
+							type="text" 
+							class="form-control" 
+							v-bind:placeholder="vue.databaseIndexIndex.selectedTableName + '_ibfk_1'" 
+							v-model="form.constraint_name"
+						/>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<select class="form-select" v-model="form.on_delete">
+							<option value="ON DELETE CASCADE">ON DELETE CASCADE</option>
+							<option value="ON DELETE SET_NULL">ON DELETE SET NULL</option>
+							<option value="ON DELETE NO_ACTION">ON DELETE NO ACTION</option>
+							<option value="ON DELETE RESTRICT">ON DELETE RESTRICT</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<select class="form-select" v-model="form.on_updated">
+							<option value="ON UPDATE CASCADE">ON UPDATE CASCADE</option>
+							<option value="ON UPDATE ON DELETE ">ON UPDATE SET NULL</option>
+							<option value="ON UPDATE NO_ACTION">ON UPDATE NO ACTION</option>
+							<option value="ON UPDATE RESTRICT">ON UPDATE RESTRICT</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0" v-if="vue.databaseIndexIndex?.selectedTableFields?.fields">
+						<select class="form-select" v-model="form.column">
+							<option value="">Please Select</option>
+							<option v-bind:value="field.name" v-for="field in vue.databaseIndexIndex.selectedTableFields.fields">
+								{{field.name}}
+							</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<input type="text" class="form-control" placeholder="Reference Table" v-model="form.reference_tablename">
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<input type="text" class="form-control" placeholder="Reference Column" v-model="form.reference_column">
+					</div>
+				</td>
+				<td>
+					<button class="btn btn-outline-danger btn-sm" title="Drop">
+						<i class="fas fa-trash-alt"></i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="row mB-15">
+		<div class="col-12">
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add Constraint" v-on:click="vue.addForm()">
+				Add Constraint
+			</button>
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Save Constraint" data-bs-toggle="modal" data-bs-target="#modalDatabaseSaveRelationConfirmData">
+				Save Constraint
+			</button>
+		</div>
+	</div>
+
+
+
+	<div class="modal fade" id="modalDatabaseSaveRelationConfirmData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseSaveRelationConfirmDataLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalDatabaseSaveRelationConfirmDataLabel">
+						Save Relation
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>
+						The constraint with an empty required field will be ignored. Do you want to continue?
+						<br />
+						<br />
+						This will also override the file at {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
+					<button class="btn btn-primary" v-on:click="vue.saveConstraint()">Save Relation</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

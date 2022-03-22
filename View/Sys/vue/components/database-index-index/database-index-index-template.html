@@ -25,12 +25,18 @@
 												Install Data
 											</a>
 										</li>
+										<li class="nav-item">
+											<a class="nav-link" v-bind:class="{active : vue.viewMode == 'relation-view'}" href="javascript:void(0)" v-on:click="vue.viewMode = 'relation-view'">
+												Relation View
+											</a>
+										</li>
 									</ul>
 								</div>
 							</div>
 
 							<common-database-table-structure-component v-if="vue.viewMode == 'table-structure'"></common-database-table-structure-component>
 							<common-database-data-structure-component v-if="vue.viewMode == 'data-structure'"></common-database-data-structure-component>
+							<common-database-table-relation-view-component v-if="vue.viewMode == 'relation-view'"></common-database-table-relation-view-component>
 						</div>
 					</div>
 				</div>
@@ -414,5 +420,6 @@
 	
 	<modal-database-add-edit-data-component :databaseIndexIndexComponent="vue"></modal-database-add-edit-data-component>
 	<modal-database-delete-data-component :databaseIndexIndexComponent="vue"></modal-database-delete-data-component>
+	<modal-database-relation-component></modal-database-relation-component>
 </div>
 
