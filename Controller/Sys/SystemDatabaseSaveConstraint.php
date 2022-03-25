@@ -31,7 +31,12 @@ class SystemDatabaseSaveConstraint extends Sys {
 
 			$constraints = $this->_request->getParam('constraints');
 			$_module = $this->_request->getParam('module');
+			$tablename = $this->_request->getParam('tablename');
+			$saveAndInstall = $this->_request->getParam('save_and_install');
 
+			if(!$tablename){
+				$this->returnError('406', 'The tablename is required');
+			}
 			if(count($constraints) <= 0){
 				$this->returnError('406', 'The constraints is required');
 			}
@@ -42,7 +47,7 @@ class SystemDatabaseSaveConstraint extends Sys {
 					list($vendor, $module) = $_module;
 
 					try {
-						$data = $this->_moduleAvailableTables->saveConstraintsInJSON($vendor, $module, $constraints);
+						$data = $this->_moduleAvailableTables->setConfig($this->_config)->saveConstraintsInJSON($vendor, $module, $tablename, $constraints, $saveAndInstall);
 						$this->jsonEncode($data);
 					} catch (\Exception $e) {
 						$this->returnError($e->getCode(), $e->getMessage());

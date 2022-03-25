@@ -11,8 +11,8 @@
 				<th scope="col">Action</th>
 			</tr>
 		</thead>
-		<tbody class="customtable" v-if="vue.databaseIndexIndex">
-			<tr  v-for="form in vue.formsRelation">
+		<tbody class="customtable" v-if="vue.databaseIndexIndex?.selectedTableFields?.table_relation">
+			<tr  v-for="form in vue.databaseIndexIndex.selectedTableFields.table_relation">
 				<td>
 					<div class="form-group mb-0">
 						<input 
@@ -28,7 +28,7 @@
 						<select class="form-select" v-model="form.on_delete">
 							<option value="ON DELETE CASCADE">ON DELETE CASCADE</option>
 							<option value="ON DELETE SET_NULL">ON DELETE SET NULL</option>
-							<option value="ON DELETE NO_ACTION">ON DELETE NO ACTION</option>
+							<option value="">ON DELETE NO ACTION</option>
 							<option value="ON DELETE RESTRICT">ON DELETE RESTRICT</option>
 						</select>
 					</div>
@@ -38,7 +38,7 @@
 						<select class="form-select" v-model="form.on_updated">
 							<option value="ON UPDATE CASCADE">ON UPDATE CASCADE</option>
 							<option value="ON UPDATE ON DELETE ">ON UPDATE SET NULL</option>
-							<option value="ON UPDATE NO_ACTION">ON UPDATE NO ACTION</option>
+							<option value="">ON UPDATE NO ACTION</option>
 							<option value="ON UPDATE RESTRICT">ON UPDATE RESTRICT</option>
 						</select>
 					</div>
@@ -101,6 +101,17 @@
 						<br />
 						This will also override the file at {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json
 					</p>
+
+					<div class="form-group">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="tabel-constraint-save-and-install" v-model="vue.save_and_install">
+							<label class="form-check-label" for="tabel-constraint-save-and-install">Save and install to database</label>
+						</div>
+						<small class="form-text">
+							If checked, we will save the constraint into the database, if the constraint name already exists, then the existing will be dropped, and then save a new constraint.
+						</small>
+					</div>
+
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>

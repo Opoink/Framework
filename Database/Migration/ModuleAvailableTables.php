@@ -139,6 +139,37 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 	}
 
 	/**
+	 * return table relations based on table name
+	 * @param $vendor string vendor name
+	 * @param $module string module name
+	 * @param $tablename string tablename name
+	 */
+	public function getTableRelation($vendor, $module, $tablename=null){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+
+		$jasonData = null;
+		if(file_exists($targetFile) && is_file($targetFile)){
+
+			$_jasonData = file_get_contents($targetFile);
+			$_jasonData = json_decode($_jasonData, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				if($tablename){
+					foreach ($_jasonData as $key => $value) {
+						if($value['tablename'] == $tablename){
+							$jasonData[] = $value;
+						}
+					}
+				}
+				else {
+					$jasonData = $_jasonData;
+				}
+			}
+		}
+		return $jasonData;
+	}
+
+	/**
 	 * save the database fields to json file
 	 * @param $vendor string vendor name
 	 * @param $module string module name

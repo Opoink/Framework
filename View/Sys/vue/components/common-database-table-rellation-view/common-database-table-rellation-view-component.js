@@ -9,7 +9,7 @@ class commonDatabaseTableRelationViewComponent {
 	loader = null;
 	toast = null;
 
-	formsRelation = [];
+	save_and_install = false;
 
 	databaseIndexIndex = null;
 
@@ -24,12 +24,32 @@ class commonDatabaseTableRelationViewComponent {
 	}
 
 	init(){
-		this.formsRelation = [];
-		this.addForm();
+		// this.setTableRelationToFormField();
+		// this.addForm();
+
+		// $('.common-database-tables-component .ptablename').on('click', f => {
+		// 	console.log('li.tablename');
+		// 	this.setTableRelationToFormField();
+		// });
 	}
 
+	// setTableRelationToFormField(){
+		// this.formsRelation = this.databaseIndexIndex.selectedTableFields.table_relation;
+		// if(typeof this.databaseIndexIndex.selectedTableFields.table_relation != 'undefined'){
+		// 	let tl = this.databaseIndexIndex.selectedTableFields.table_relation;
+		// 	if(tl){
+		// 		$.each(tl, (key, value) => {
+		// 			this.formsRelation.push(value);
+		// 		});
+		// 	}
+		// }
+	// }
+
 	addForm(){
-		this.formsRelation.push({
+		if(!this.databaseIndexIndex.selectedTableFields.table_relation){
+			this.databaseIndexIndex.selectedTableFields.table_relation = [];
+		}
+		this.databaseIndexIndex.selectedTableFields.table_relation.push({
 			tablename: this.databaseIndexIndex.selectedTableName,
 			constraint_name: '',
 			on_delete: 'ON DELETE RESTRICT',
@@ -44,10 +64,11 @@ class commonDatabaseTableRelationViewComponent {
 		let jsonData = {
 			module: this.databaseIndexIndex.selectedModule,
 			tablename: this.databaseIndexIndex.selectedTableName,
+			save_and_install: this.save_and_install,
 			constraints: []
 		}
 
-		$.each(this.formsRelation, (key, value) => {
+		$.each(this.databaseIndexIndex.selectedTableFields.table_relation, (key, value) => {
 			if(
 				value.constraint_name != '' && 
 				value.column != '' && 
@@ -65,13 +86,14 @@ class commonDatabaseTableRelationViewComponent {
 			let url = '/' + this.url.getRoute() + '/database/saveconstraint';
 			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
 				if(!result.error && result.result){
-					// $('#databaseDropFieldModal').modal('hide');
 					$.each(result.result.message, (key, value) => {
 						this.toast.add(value, 'Success');
 					});
 					$.each(result.result.errors_message, (key, value) => {
 						this.toast.add(value, 'Error');
 					});
+
+					$('#modalDatabaseSaveRelationConfirmData').modal('hide');
 
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
@@ -93,6 +115,9 @@ Vue.component('common-database-table-relation-view-component', {
 	mounted: function(){
 		this.vue.databaseIndexIndex = window['_vue']['database-index-index-component'];
 		this.vue.init();
+	},
+	beforeDestroy() {
+		// $('.common-database-tables-component .ptablename').unbind();
 	},
 	template: `{{template}}`
 });
