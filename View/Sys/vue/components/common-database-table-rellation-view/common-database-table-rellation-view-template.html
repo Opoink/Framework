@@ -26,20 +26,20 @@
 				<td>
 					<div class="form-group mb-0">
 						<select class="form-select" v-model="form.on_delete">
-							<option value="ON DELETE CASCADE">ON DELETE CASCADE</option>
-							<option value="ON DELETE SET_NULL">ON DELETE SET NULL</option>
-							<option value="">ON DELETE NO ACTION</option>
-							<option value="ON DELETE RESTRICT">ON DELETE RESTRICT</option>
+							<option value="ON DELETE CASCADE">CASCADE</option>
+							<option value="ON DELETE SET NULL">SET NULL</option>
+							<option value="ON DELETE NO ACTION">NO ACTION</option>
+							<option value="ON DELETE RESTRICT">RESTRICT</option>
 						</select>
 					</div>
 				</td>
 				<td>
 					<div class="form-group mb-0">
 						<select class="form-select" v-model="form.on_updated">
-							<option value="ON UPDATE CASCADE">ON UPDATE CASCADE</option>
-							<option value="ON UPDATE ON DELETE ">ON UPDATE SET NULL</option>
-							<option value="">ON UPDATE NO ACTION</option>
-							<option value="ON UPDATE RESTRICT">ON UPDATE RESTRICT</option>
+							<option value="ON UPDATE CASCADE">CASCADE</option>
+							<option value="ON UPDATE SET NULL">SET NULL</option>
+							<option value="ON UPDATE NO ACTION">NO ACTION</option>
+							<option value="ON UPDATE RESTRICT">RESTRICT</option>
 						</select>
 					</div>
 				</td>
@@ -64,7 +64,13 @@
 					</div>
 				</td>
 				<td>
-					<button class="btn btn-outline-danger btn-sm" title="Drop">
+					<button 
+						class="btn btn-outline-danger btn-sm" 
+						title="Drop" 
+						data-bs-toggle="modal" 
+						data-bs-target="#modalDatabaseDropRelationConfirmData" 
+						v-on:click="vue.setDropConstraintColumn(form)"
+					>
 						<i class="fas fa-trash-alt"></i>
 					</button>
 				</td>
@@ -72,7 +78,7 @@
 		</tbody>
 	</table>
 
-	<div class="row mB-15">
+	<div class="row mb-3">
 		<div class="col-12">
 			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add Constraint" v-on:click="vue.addForm()">
 				Add Constraint
@@ -81,9 +87,15 @@
 				Save Constraint
 			</button>
 		</div>
+
+		<small class="text-muted mb-3" v-if="vue.databaseIndexIndex.selectedModule">
+			Note:
+			<br />
+			You can only choose SET NULL if your column is nullable.
+			<br />
+			You can manually edit the file at {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json
+		</small>
 	</div>
-
-
 
 	<div class="modal fade" id="modalDatabaseSaveRelationConfirmData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseSaveRelationConfirmDataLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
@@ -94,7 +106,7 @@
 					</h5>
 					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-				<div class="modal-body">
+				<div class="modal-body" v-if="vue.databaseIndexIndex.selectedModule">
 					<p>
 						The constraint with an empty required field will be ignored. Do you want to continue?
 						<br />
@@ -117,6 +129,48 @@
 					<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</button>
 					<button class="btn btn-primary" v-on:click="vue.saveConstraint()">Save Relation</button>
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalDatabaseDropRelationConfirmData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseDropRelationConfirmDataLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<template v-if="vue.dropConstraintColumnForm.column">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalDatabaseDropRelationConfirmDataLabel">
+							Drop {{vue.dropConstraintColumnForm.column.constraint_name}} Constraint
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetDropConstraintColumnForm()"></button>
+					</div>
+					<div class="modal-body" v-if="vue.databaseIndexIndex.selectedModule">
+
+						<div class="form-group">
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="tabel-column-drop-constraint-check" v-model="vue.dropConstraintColumnForm.drop_in_database">
+								<label class="form-check-label" for="tabel-column-drop-constraint-check">Drop constraint</label>
+							</div>
+							<small class="form-text text-danger">
+								Note: If checked, Opoink will try to drop the constraint from the database.
+							</small>
+						</div>
+
+						<div class="form-group">
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="tabel-column-remove-json-constraint-check" v-model="vue.dropConstraintColumnForm.remove_in_json_file">
+								<label class="form-check-label" for="tabel-column-remove-json-constraint-check">Remove on JSON file</label>
+							</div>
+							<small class="form-text text-muted">
+								Remove this constraint on {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json file.
+							</small>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-outline-danger" v-on:click="vue.dropConstraint()">Drop Relation</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetDropConstraintColumnForm()">Cancel</button>
+					</div>
+				</template>
 			</div>
 		</div>
 	</div>

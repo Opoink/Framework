@@ -417,6 +417,7 @@ class Migrate {
 	public function checkConstraintIfAdded($tableName, $constraintName){
 		$isExist = false;
 
+		$checkConstraintQuery = "";
 		try {
 			// $checkConstraintQuery = "SHOW INDEXES IN `".$tableName."` WHERE `Key_name` = '".$constraintName."'";
 
@@ -472,11 +473,7 @@ class Migrate {
 		}
 		$query .= " REFERENCES ".$referenceTableName."(`".$referenceColumn."`) ";
 
-		if($onUpdate == 'ON DELETE NO_ACTION') { $onUpdate = ''; }
-		if($onDelete == 'ON UPDATE NO_ACTION') { $onUpdate = ''; }
-
 		$query .= ' ' . $onDelete . ' ' . $onUpdate . ';';
-
 		
 		$connection = $this->_connection->getConnection()->getConnection();
 		if($isExist){ /** drop the constraint first to update */
@@ -491,6 +488,8 @@ class Migrate {
 		try {
 			$result =  $connection->exec($query);
 		} catch (\PDOException $pe) {
+			var_dump($pe->getMessage());
+			die;
 			throw new \Exception($pe->getMessage());
 		}
 	}

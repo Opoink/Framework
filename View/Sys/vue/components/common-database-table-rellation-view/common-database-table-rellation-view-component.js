@@ -13,6 +13,12 @@ class commonDatabaseTableRelationViewComponent {
 
 	databaseIndexIndex = null;
 
+	dropConstraintColumnForm = {
+		column: null,
+		drop_in_database: false,
+		remove_in_json_file: false
+	};
+
 	constructor(){
 		this.request = window['opoink_system']['_request'];
 		this.url = window['opoink_system']['_url'];
@@ -24,26 +30,9 @@ class commonDatabaseTableRelationViewComponent {
 	}
 
 	init(){
-		// this.setTableRelationToFormField();
-		// this.addForm();
-
-		// $('.common-database-tables-component .ptablename').on('click', f => {
-		// 	console.log('li.tablename');
-		// 	this.setTableRelationToFormField();
-		// });
+		console.log('init init init init');
+		this.resetDropConstraintColumnForm();
 	}
-
-	// setTableRelationToFormField(){
-		// this.formsRelation = this.databaseIndexIndex.selectedTableFields.table_relation;
-		// if(typeof this.databaseIndexIndex.selectedTableFields.table_relation != 'undefined'){
-		// 	let tl = this.databaseIndexIndex.selectedTableFields.table_relation;
-		// 	if(tl){
-		// 		$.each(tl, (key, value) => {
-		// 			this.formsRelation.push(value);
-		// 		});
-		// 	}
-		// }
-	// }
 
 	addForm(){
 		if(!this.databaseIndexIndex.selectedTableFields.table_relation){
@@ -102,6 +91,50 @@ class commonDatabaseTableRelationViewComponent {
 			});
 		});
 	}
+
+	resetDropConstraintColumnForm(){
+		this.dropConstraintColumnForm = {
+			column: null,
+			drop_in_database: false,
+			remove_in_json_file: false
+		};
+	}
+	
+	/**
+	 * set the column to drop constraint
+	 */
+	setDropConstraintColumn(column){
+		this.resetDropConstraintColumnForm();
+		this.dropConstraintColumnForm['column'] = column;
+	}
+
+	dropConstraint(){
+		console.log('dropConstraint', this.dropConstraintColumnForm);
+
+		let jsonData = this.dropConstraintColumnForm;
+
+		this.loader.setLoader(true, 'Dropping database relation...');
+		this.request.getFormKey().then(formkey => {
+			jsonData['form_key'] = formkey;
+			let url = '/' + this.url.getRoute() + '/database/dropconstraint';
+			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
+				if(!result.error && result.result){
+					// $.each(result.result.message, (key, value) => {
+					// 	this.toast.add(value, 'Success');
+					// });
+					// $.each(result.result.errors_message, (key, value) => {
+					// 	this.toast.add(value, 'Error');
+					// });
+
+					// $('#modalDatabaseSaveRelationConfirmData').modal('hide');
+
+				} else if(result.error && !result.result){
+					this.toast.add(result.error.responseText, 'Error');
+				}
+				this.loader.reset();
+			});
+		});
+	}
 }
 
 window['_vue']['common-database-table-relation-view-component'] = new commonDatabaseTableRelationViewComponent();
@@ -117,6 +150,7 @@ Vue.component('common-database-table-relation-view-component', {
 		this.vue.init();
 	},
 	beforeDestroy() {
+		this.vue.init();
 		// $('.common-database-tables-component .ptablename').unbind();
 	},
 	template: `{{template}}`
