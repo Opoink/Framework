@@ -33,6 +33,7 @@ class Builder extends \Less_Parser {
 	*	$compiled = file_get_contents( '/var/www/writable_folder/'.$css_file_name );
 	*
 	*	more info https://github.com/oyejorge/less.php
+	*	https://github.com/wikimedia/less.php
 	*/
 	public function build($file) {
 		$requestUri = $_SERVER['REQUEST_URI'];

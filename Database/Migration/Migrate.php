@@ -668,6 +668,9 @@ class Migrate {
 		}
 
 		foreach ($constraints as $key => $constraint) {
+			if(isset($constraint['is_installed'])){
+				unset($constraint['is_installed']);
+			}
 			$jsonData[] = $constraint;
 			if($isSave){
 				$this->addForeignKey(

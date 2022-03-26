@@ -157,6 +157,8 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 				if($tablename){
 					foreach ($_jasonData as $key => $value) {
 						if($value['tablename'] == $tablename){
+							$_tablename = $this->_connection->getTablename($tablename);
+							$value['is_installed'] = $this->checkConstraintIfAdded($_tablename, $value['constraint_name']);
 							$jasonData[] = $value;
 						}
 					}

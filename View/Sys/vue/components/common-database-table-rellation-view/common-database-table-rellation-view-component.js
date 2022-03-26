@@ -81,7 +81,13 @@ class commonDatabaseTableRelationViewComponent {
 					$.each(result.result.errors_message, (key, value) => {
 						this.toast.add(value, 'Error');
 					});
-
+					
+					this.databaseIndexIndex.setTableRows(
+						this.databaseIndexIndex.selectedModule, 
+						this.databaseIndexIndex.selectedTableName, 
+						this.databaseIndexIndex.selectedTableValue
+					);
+					this.resetSaveAndInstall();
 					$('#modalDatabaseSaveRelationConfirmData').modal('hide');
 
 				} else if(result.error && !result.result){
@@ -90,6 +96,10 @@ class commonDatabaseTableRelationViewComponent {
 				this.loader.reset();
 			});
 		});
+	}
+
+	resetSaveAndInstall(){
+		this.save_and_install = false;
 	}
 
 	resetDropConstraintColumnForm(){
@@ -109,8 +119,6 @@ class commonDatabaseTableRelationViewComponent {
 	}
 
 	dropConstraint(){
-		console.log('dropConstraint', this.dropConstraintColumnForm);
-
 		let jsonData = this.dropConstraintColumnForm;
 		jsonData['module'] = this.databaseIndexIndex.selectedModule;
 
@@ -127,6 +135,11 @@ class commonDatabaseTableRelationViewComponent {
 						this.toast.add(value.message, 'Error');
 					});
 
+					this.databaseIndexIndex.setTableRows(
+						this.databaseIndexIndex.selectedModule, 
+						this.databaseIndexIndex.selectedTableName, 
+						this.databaseIndexIndex.selectedTableValue
+					);
 					this.resetDropConstraintColumnForm();
 					$('#modalDatabaseDropRelationConfirmData').modal('hide');
 
