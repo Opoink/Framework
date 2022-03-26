@@ -488,9 +488,69 @@ class Migrate {
 		try {
 			$result =  $connection->exec($query);
 		} catch (\PDOException $pe) {
-			var_dump($pe->getMessage());
-			die;
 			throw new \Exception($pe->getMessage());
+		}
+	}
+
+	/**
+	 * try to drop the table column constraint
+	 * this will only drop the table column foreign key with constraint name
+	 * @param $tableName string without table prefix
+	 * @param $constraintName string
+	 */
+	public function dropConstraint($tableName, $constraintName){
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$tableName = $this->_connection->getTablename($tableName);
+
+			$dropQuery = " ALTER TABLE `".$tableName."` DROP FOREIGN KEY `".$constraintName."`; ";
+			$connection->exec($dropQuery);
+
+			try {
+				$dropQuery = " ALTER TABLE `".$tableName."` DROP INDEX `".$constraintName."`; ";
+				$connection->exec($dropQuery);
+			} catch (\PDOException $pe) {
+				/** do nothing */
+			}
+			return true;
+		} catch (\PDOException $pe) {
+			throw new \Exception($pe->getMessage());
+		}
+	}
+
+	public function removeConstraintInJsonFile($vendor, $module, $tableName, $constraintName){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+
+		$jsonData = [];
+		if(file_exists($targetFile) && is_file($targetFile)){
+			$jsonData = file_get_contents($targetFile);
+			$jsonData = json_decode($jsonData, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				foreach ($jsonData as $key => $value) {
+					if($value['tablename'] == $tableName && $value['constraint_name'] == $constraintName){
+						unset($jsonData[$key]);
+					}
+				}
+			}
+		}
+
+		if(count($jsonData) > 0){
+			sort($jsonData);
+	
+			$_jsonData = json_encode($jsonData, JSON_PRETTY_PRINT);
+	
+			$this->_writer->setDirPath(dirname($targetFile))
+			->setData($_jsonData)
+			->setFilename('relationship')
+			->setFileextension('json')
+			->write();
+
+			return 'Constraint successfully removed in the relationship JSON file';
+		}
+		else {
+			unlink($targetFile);
+			return 'The relationship JSON file was successfully removed';
 		}
 	}
 

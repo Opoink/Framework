@@ -112,6 +112,7 @@ class commonDatabaseTableRelationViewComponent {
 		console.log('dropConstraint', this.dropConstraintColumnForm);
 
 		let jsonData = this.dropConstraintColumnForm;
+		jsonData['module'] = this.databaseIndexIndex.selectedModule;
 
 		this.loader.setLoader(true, 'Dropping database relation...');
 		this.request.getFormKey().then(formkey => {
@@ -119,14 +120,15 @@ class commonDatabaseTableRelationViewComponent {
 			let url = '/' + this.url.getRoute() + '/database/dropconstraint';
 			this.request.makeRequest(url, jsonData, 'POST', true).then(result => {
 				if(!result.error && result.result){
-					// $.each(result.result.message, (key, value) => {
-					// 	this.toast.add(value, 'Success');
-					// });
-					// $.each(result.result.errors_message, (key, value) => {
-					// 	this.toast.add(value, 'Error');
-					// });
+					$.each(result.result.message, (key, value) => {
+						this.toast.add(value, 'Success');
+					});
+					$.each(result.result.errors_message, (key, value) => {
+						this.toast.add(value.message, 'Error');
+					});
 
-					// $('#modalDatabaseSaveRelationConfirmData').modal('hide');
+					this.resetDropConstraintColumnForm();
+					$('#modalDatabaseDropRelationConfirmData').modal('hide');
 
 				} else if(result.error && !result.result){
 					this.toast.add(result.error.responseText, 'Error');
