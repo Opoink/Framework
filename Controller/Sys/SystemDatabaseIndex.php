@@ -43,6 +43,7 @@ class SystemDatabaseIndex extends Sys {
 
 				$fields = $this->_moduleAvailableTables->setConfig($this->_config)->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
 				if($fields){
+					$fields['table_relation'] = $this->_moduleAvailableTables->getTableRelation($vendor, $module, $tablename);
 					$this->jsonEncode($fields);
 				}
 				else {

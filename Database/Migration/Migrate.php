@@ -5,6 +5,7 @@
 */
 namespace Of\Database\Migration;
 
+use \Of\Constants;
 use \Of\Database\Migration\Columns;
 
 class Migrate {
@@ -409,6 +410,34 @@ class Migrate {
         }
     }
 
+	/**
+     * @param $tableName string
+     * @param $constraintName string
+	 */
+	public function checkConstraintIfAdded($tableName, $constraintName){
+		$isExist = false;
+
+		$checkConstraintQuery = "";
+		try {
+			// $checkConstraintQuery = "SHOW INDEXES IN `".$tableName."` WHERE `Key_name` = '".$constraintName."'";
+
+			$checkConstraintQuery = "
+			SELECT * FROM information_schema.key_column_usage
+			WHERE `CONSTRAINT_NAME` = '".$constraintName."'
+			AND `TABLE_SCHEMA` = '".$this->_connection->getConfig('database')."' 
+			AND `TABLE_NAME` = '".$tableName."'";
+
+			$checkConstraint = $this->_connection->getConnection()->fetchAll($checkConstraintQuery);
+
+			if(count($checkConstraint)){
+				$isExist = true;
+			}
+		} catch (\PDOException $pe) {
+			throw new \Exception($pe->getMessage());
+		}
+		return $isExist;
+	}
+
     /**
      * add foreignkey to the table
      * @param $tableName string
@@ -416,17 +445,113 @@ class Migrate {
      * @param $referenceTableName string
      * @param $referenceColumn string
      * @param $onDelete string
+     * @param $onUpdate string
+     * @param $constraintName string
+	 * 
+	 * reference https://www.mysqltutorial.org/mysql-foreign-key/
      */
-	public function addForeignKey($tableName, $column, $referenceTableName, $referenceColumn, $onDelete='ON DELETE CASCADE'){	
+	public function addForeignKey(
+		$tableName, 
+		$column, 
+		$referenceTableName, 
+		$referenceColumn, 
+		$onDelete='ON DELETE CASCADE', 
+		$onUpdate='', 
+		$constraintName=null
+	){	
         $tableName = $this->_connection->getTablename($tableName);
         $referenceTableName = $this->_connection->getTablename($referenceTableName);
 
+		$isExist = false;
 		$query = "ALTER TABLE `".$tableName."` ";
-		$query .= "ADD FOREIGN KEY (`".$column."`) REFERENCES ".$referenceTableName."(`".$referenceColumn."`) ";
-		$query .= ' '.$onDelete.';';
+		if($constraintName){
+			$isExist = $this->checkConstraintIfAdded($tableName, $constraintName); /** we nned to check if the name exist or not */
+			$query .= " ADD CONSTRAINT `".$constraintName."` FOREIGN KEY (`".$column."`) ";
+		}
+		else {
+			$query .= " ADD FOREIGN KEY (`".$column."`) ";
+		}
+		$query .= " REFERENCES ".$referenceTableName."(`".$referenceColumn."`) ";
 
-        $connection = $this->_connection->getConnection()->getConnection();
-        $connection->exec($query);
+		$query .= ' ' . $onDelete . ' ' . $onUpdate . ';';
+		
+		$connection = $this->_connection->getConnection()->getConnection();
+		if($isExist){ /** drop the constraint first to update */
+			try {
+				$dropQuery = "ALTER TABLE ".$tableName." DROP FOREIGN KEY ".$constraintName.";";
+				$result =  $connection->exec($dropQuery);
+			} catch (\PDOException $pe) {
+				throw new \Exception($pe->getMessage());
+			}
+		}
+
+		try {
+			$result =  $connection->exec($query);
+		} catch (\PDOException $pe) {
+			throw new \Exception($pe->getMessage());
+		}
+	}
+
+	/**
+	 * try to drop the table column constraint
+	 * this will only drop the table column foreign key with constraint name
+	 * @param $tableName string without table prefix
+	 * @param $constraintName string
+	 */
+	public function dropConstraint($tableName, $constraintName){
+		try {
+			$connection = $this->_connection->getConnection()->getConnection();
+			$tableName = $this->_connection->getTablename($tableName);
+
+			$dropQuery = " ALTER TABLE `".$tableName."` DROP FOREIGN KEY `".$constraintName."`; ";
+			$connection->exec($dropQuery);
+
+			try {
+				$dropQuery = " ALTER TABLE `".$tableName."` DROP INDEX `".$constraintName."`; ";
+				$connection->exec($dropQuery);
+			} catch (\PDOException $pe) {
+				/** do nothing */
+			}
+			return true;
+		} catch (\PDOException $pe) {
+			throw new \Exception($pe->getMessage());
+		}
+	}
+
+	public function removeConstraintInJsonFile($vendor, $module, $tableName, $constraintName){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+
+		$jsonData = [];
+		if(file_exists($targetFile) && is_file($targetFile)){
+			$jsonData = file_get_contents($targetFile);
+			$jsonData = json_decode($jsonData, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				foreach ($jsonData as $key => $value) {
+					if($value['tablename'] == $tableName && $value['constraint_name'] == $constraintName){
+						unset($jsonData[$key]);
+					}
+				}
+			}
+		}
+
+		if(count($jsonData) > 0){
+			sort($jsonData);
+	
+			$_jsonData = json_encode($jsonData, JSON_PRETTY_PRINT);
+	
+			$this->_writer->setDirPath(dirname($targetFile))
+			->setData($_jsonData)
+			->setFilename('relationship')
+			->setFileextension('json')
+			->write();
+
+			return 'Constraint successfully removed in the relationship JSON file';
+		}
+		else {
+			unlink($targetFile);
+			return 'The relationship JSON file was successfully removed';
+		}
 	}
 
 	/**
@@ -500,29 +625,9 @@ class Migrate {
 		$tn = $this->_connection->getTablename($tableName);
 
 		$primaryKey = $this->getPrimaryData($data);
-		// foreach ($data as $key => $value) {
-		// 	if(isset($value['value']) && !empty($value['value']) && isset($value['option'])){
-		// 		if(isset($value['option']['primary']) && $value['option']['primary'] == true){
-		// 			$primaryKey = [
-		// 				'name' => $key,
-		// 				'value' => $value['value']
-		// 			];
-		// 		}
-		// 	}
-		// }
 
 		$isExist = $this->checkIfJsonInstallationDataPrimaryKeyExist($primaryKey, $tableName);
 		$connection = $this->_connection->getConnection();
-		
-		// $isExist = [];
-		// if(is_array($primaryKey)){
-		// 	$di = new \Of\Std\Di();
-		// 	$select = $di->get('\Of\Database\Sql\Select');
-		// 	$select->select()->from($tn);
-		// 	$select->where($primaryKey['name'])->eq($primaryKey['value']);
-
-		// 	$isExist = $connection->fetchAll($select->getQuery(), $select->_whereStatement->unsecureValue);
-		// }
 
 		try {
 			if(count($isExist) > 0){
@@ -538,6 +643,67 @@ class Migrate {
 		} catch (\PDOException $pe) {
 			throw new \Exception($pe->getMessage(), 500);
 		}
+	}
+
+	public function saveConstraintsInJSON($vendor, $module, $tableName, $constraints, $isSave=false){
+		$targetFile = Constants::EXT_DIR.DS.$vendor.DS.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+		
+		$result = [
+			'errors_message' => [],
+			'message' => [],
+		];
+
+		$jsonData = [];
+		if(file_exists($targetFile) && is_file($targetFile)){
+			$jsonData = file_get_contents($targetFile);
+			$jsonData = json_decode($jsonData, true);
+
+			if(json_last_error() == JSON_ERROR_NONE){
+				foreach ($jsonData as $key => $value) {
+					if($value['tablename'] == $tableName){
+						unset($jsonData[$key]);
+					}
+				}
+			}
+		}
+
+		foreach ($constraints as $key => $constraint) {
+			if(isset($constraint['is_installed'])){
+				unset($constraint['is_installed']);
+			}
+			$jsonData[] = $constraint;
+			if($isSave){
+				$this->addForeignKey(
+					$constraint['tablename'], 
+					$constraint['column'], 
+					$constraint['reference_tablename'], 
+					$constraint['reference_column'], 
+					$constraint['on_delete'], 
+					$constraint['on_updated'], 
+					$constraint['constraint_name']
+				);
+
+				try {
+					$result['message'][] = $constraint['constraint_name'] . ' successfully installed into the database.';
+				} catch (\Exception $e) {
+					$result['errors_message'][] = $constraint['constraint_name'] . ' failed: ' . $e->getMessage();
+				}
+			}
+		}
+
+		sort($jsonData);
+
+		$_jsonData = json_encode($jsonData, JSON_PRETTY_PRINT);
+
+		$this->_writer->setDirPath(dirname($targetFile))
+		->setData($_jsonData)
+		->setFilename('relationship')
+		->setFileextension('json')
+		->write();
+
+		$result['message'][] = 'Constraints successfully saved in ' . $vendor.'_'.$module.Constants::MODULE_DB_SCHEMA_DIR.DS.'relationship.json';
+
+		return $result;
 	}
 }
 ?>

@@ -27,6 +27,7 @@ class Constants {
 	/** 
 	 * the below constansts are the DIR inside the module
 	 */
+	const MODULE_DB_SCHEMA_DIR = DS.'Schema';
 	const MODULE_DB_TABLES_DIR = DS.'Schema'.DS.'tables';
 }
 ?>

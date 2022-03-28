@@ -15,10 +15,10 @@
 					</template>
 				</td>
 				<td>
-					<button class="btn btn btn-outline-primary btn-sm mR-5" title="Edit" v-on:click="modalDatabaseAddEditDataComponent.setEditFormField(data, index)">
+					<button class="btn btn-outline-primary btn-sm mR-5" title="Edit" v-on:click="modalDatabaseAddEditDataComponent.setEditFormField(data, index)">
 						<i class="fas fa-pencil-alt"></i>
 					</button>
-					<button class="btn btn btn btn-outline-danger btn-sm" title="Drop" v-on:click="modalDatabaseDeleteDataComponent.setEditFormField(data, index)">
+					<button class="btn btn-outline-danger btn-sm" title="Drop" v-on:click="modalDatabaseDeleteDataComponent.setEditFormField(data, index)">
 						<i class="fas fa-trash-alt"></i>
 					</button>
 				</td>
@@ -32,7 +32,7 @@
 			</button>
 		</div>
 	</div> 
-	<small class="text-muted" class="text-muted" v-if="vue.selectedModule && vue.selectedTableName">
+	<small class="text-muted" v-if="vue.selectedModule && vue.selectedTableName">
 		Note:
 		<br />
 		The data you see here doesn't mean it is saved on the database. Well, it can be in the database or not in the database.

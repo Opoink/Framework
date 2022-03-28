@@ -10,6 +10,8 @@ Fix for PHP 8 or higher
 - changes to support PHP 8XX
 - Change phpdi version requirements
 - Change laminas version requirements
+- in Less parser line 5486 change the $rules param to be an optional param
+- add fixes in entity setCollection() method, returning empty array if there was no data found, it should return null
 
 Add support to look file in all installed modules, fix some error
 - change on how the \Of\Controller\Filecontroller getRealPath method is looking for the file. instead of looking for a specific Vendor_Module we will now scan in all installed modules. but this is only if the Vendor_Module is not defined. it is still recommended to use include vendor/module in your URL to prevent loading time issues. sample URL with https://yourdomain.com/public/deploy1646964026/<vendor>/<module>/css/fontawesome/webfonts/fa-regular-400.woff2

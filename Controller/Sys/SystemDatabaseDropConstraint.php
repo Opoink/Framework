@@ -6,10 +6,10 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseNewTableJsonSchema extends Sys {
+class SystemDatabaseDropConstraint extends Sys {
 
 	
-	protected $pageTitle = 'Opoink Database';
+	protected $pageTitle = 'Opoink Database Drop Constraint';
 
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,
@@ -26,27 +26,51 @@ class SystemDatabaseNewTableJsonSchema extends Sys {
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-
+		
 		if($this->validateFormKey()){
 			$_module = $this->_request->getParam('module');
-
 
 			if($_module){
 				$_module = explode('_', $_module);
 				if(count($_module) == 2){
 					list($vendor, $module) = $_module;
 
-					$tablename = $this->_request->getParam('database_table/tablename');
-					if(!$tablename){
-						$this->returnError('406', 'The table name is required');
-					}
-
-					$tableOptions = $this->_request->getParam('database_table');
-
 					$this->_moduleAvailableTables->setConfig($this->_config);
-					try {	
-						$alltables = $this->_moduleAvailableTables->createTableJsonSchema($vendor, $module, $tableOptions);
-						$this->jsonEncode($alltables);
+					try {
+						$removeInJsonFile = $this->_request->getParam('remove_in_json_file');
+						$dropInDatabase = $this->_request->getParam('drop_in_database');
+						$tableName = $this->_request->getParam('column/tablename');
+						$constraintName = $this->_request->getParam('column/constraint_name');
+
+						if(!$tableName){
+							$this->returnError('406', 'The tablename is required');
+						}
+						if(!$constraintName){
+							$this->returnError('406', 'The constraint name is required');
+						}
+
+						$result = [
+							'errors_message' => [],
+							'message' => [],
+						];
+
+						if($removeInJsonFile){
+							$result['message'][] = $this->_moduleAvailableTables->removeConstraintInJsonFile($vendor, $module, $tableName, $constraintName);
+						}
+
+						if($dropInDatabase){
+							try {
+								$this->_moduleAvailableTables->dropConstraint($tableName, $constraintName);
+								$result['message'][] = 'Constraint '.$constraintName.' successfully dropped';
+							} catch (\Exception $e) {
+								$result['errors_message'][] = [
+									'code' => $e->getCode(),
+									'message' => $e->getMessage()
+								];
+							}
+						}
+
+						$this->jsonEncode($result);
 					} catch (\Exception $e) {
 						$this->returnError($e->getCode(), $e->getMessage());
 					}

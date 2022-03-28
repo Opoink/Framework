@@ -6,7 +6,7 @@
 
 namespace Of\Controller\Sys;
 
-class SystemDatabaseSavefield extends Sys {
+class SystemDatabaseSaveConstraint extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
@@ -26,14 +26,19 @@ class SystemDatabaseSavefield extends Sys {
 	public function run(){
 		$this->requireInstalled();
 		$this->requireLogin();
-
+		
 		if($this->validateFormKey()){
-			$tablename = $this->_request->getParam('tablename');
+
+			$constraints = $this->_request->getParam('constraints');
 			$_module = $this->_request->getParam('module');
-			$save_and_install = $this->_request->getParam('save_and_install');
+			$tablename = $this->_request->getParam('tablename');
+			$saveAndInstall = $this->_request->getParam('save_and_install');
 
 			if(!$tablename){
-				$this->returnError('406', 'The table name is required');
+				$this->returnError('406', 'The tablename is required');
+			}
+			if(count($constraints) <= 0){
+				$this->returnError('406', 'The constraints is required');
 			}
 
 			if($_module){
@@ -41,32 +46,11 @@ class SystemDatabaseSavefield extends Sys {
 				if(count($_module) == 2){
 					list($vendor, $module) = $_module;
 
-					$this->_moduleAvailableTables->setConfig($this->_config);
-
-					$install_table = $this->_request->getParam('install_table');
-					if($install_table){ /** the request is to install the table */
-						$this->_moduleAvailableTables->_createTable($vendor, $module, $tablename);
-					}
-					else {
-						$fields = $this->_request->getParam('fields');
-						if(is_array($fields)){
-							try {	
-								$this->_moduleAvailableTables->saveFieldsByVendorModuleTablename($vendor, $module, $tablename, $fields, $save_and_install);
-							} catch (\Exception $e) {
-								$this->returnError('406', $e->getMessage());
-							}
-						}
-						else {
-							$this->returnError('406', 'Fields should be an array');
-						}
-					}
-
-					$fields = $this->_moduleAvailableTables->getFieldsByVendorModuleAndTableName($vendor, $module, $tablename);
-					if($fields){
-						$this->jsonEncode($fields);
-					}
-					else {
-						$this->returnError('406', 'Invalid JSON format, or the file not exist.');
+					try {
+						$data = $this->_moduleAvailableTables->setConfig($this->_config)->saveConstraintsInJSON($vendor, $module, $tablename, $constraints, $saveAndInstall);
+						$this->jsonEncode($data);
+					} catch (\Exception $e) {
+						$this->returnError($e->getCode(), $e->getMessage());
 					}
 				}
 				else {

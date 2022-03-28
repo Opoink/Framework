@@ -36,32 +36,37 @@ class SystemDbAddForeignkey extends Sys {
 					if(file_exists($targetFile)){
 						$data = file_get_contents($targetFile);
 						$data = json_decode($data, true);
-						if(json_last_error() == 'JSON_ERROR_NONE'){
+
+						if(json_last_error() == JSON_ERROR_NONE){
 							foreach($data as $val){
 								if(
 									isset($val['tablename']) && 
+									isset($val['constraint_name']) && 
+									isset($val['on_delete']) &&
+									isset($val['on_updated']) &&
 									isset($val['column']) && 
 									isset($val['reference_tablename']) && 
-									isset($val['reference_column']) && 
-									isset($val['on_delete'])
+									isset($val['reference_column'])
 								){
 									try {
 										$this->_migrate->addForeignKey(
-											$val['tablename'],
-											$val['column'],
-											$val['reference_tablename'],
-											$val['reference_column'],
-											$val['on_delete']
+											$val['tablename'], 
+											$val['column'], 
+											$val['reference_tablename'], 
+											$val['reference_column'], 
+											$val['on_delete'], 
+											$val['on_updated'], 
+											$val['constraint_name']
 										);
 									} catch (\Exception $e) {
-										$this->returnError('406', $e->getMessage() . ': ' . $targetFile);
+										$this->returnError($e->getCode(), $e->getMessage() . ': ' . $targetFile);
 									}
 								} else {
-									$this->returnError('406', 'Param tablename, column, reference_tablename, reference_column and on_delete is required on file ' . $targetFile);
+									$this->returnError('406', 'Param tablename, constraint_name, on_delete, on_updated, column, reference_tablename, and  reference_column are required on file ' . $targetFile);
 								}
 							}
 						} else {
-							$this->returnError('406', json_last_error_msg () . ': ' . $targetFile);
+							$this->returnError('406', json_last_error_msg () . ': asd ' . $targetFile);
 						}
 					}
 				}

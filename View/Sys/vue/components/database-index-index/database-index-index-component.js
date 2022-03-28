@@ -62,7 +62,7 @@ class databaseIndexIndex {
 		action: ''
 	}
 
-	viewMode = 'table-structure'; /** table-structure || data-structure */
+	viewMode = 'table-structure'; /** table-structure || data-structure || relation-view */
 
 	constructor(){
 		this.request = window['opoink_system']['_request'];
@@ -73,6 +73,7 @@ class databaseIndexIndex {
 		this.selectedTableFields = null;
 		this.selectedTableName = null;
 		this.selectedTableValue = null;
+		this.viewMode = 'table-structure';
 
 		this.resetForm();
 		this.resetDropFields();
@@ -155,7 +156,9 @@ class databaseIndexIndex {
 		this.request.makeRequest(url, '', 'GET', true)
 		.then(result => {
 			if(!result.error && result.result){
+				console.log('this.selectedTableFields this.selectedTableFields', result.result);
 				this.selectedTableFields = result.result;
+
 			} else if(result.error && !result.result){
 				this.toast.add(result.error.responseText, 'Error');
 			}

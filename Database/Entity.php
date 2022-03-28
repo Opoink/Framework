@@ -89,13 +89,18 @@ class Entity {
      * of current class instance
      */
     public function setCollection($data){
+
         $result = null;
         if(count($data) == 1){
             if(isset($data[0])){
                 $result = $this->_di->make(get_class($this));
                 $result->setData($data[0]);
             }
-        } else {
+        } 
+		else if(count($data) < 1){
+			$result = null;
+		}
+		else {
             $result = [];
             foreach($data as $d){
                 $newDataEntity = $this->_di->make(get_class($this));
@@ -103,6 +108,7 @@ class Entity {
                 $result[] = $newDataEntity;
             }
         }
+	
         return $result;
     }
 

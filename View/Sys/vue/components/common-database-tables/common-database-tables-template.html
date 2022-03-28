@@ -16,7 +16,7 @@
 						<p class="mb-0">New Table</p>
 					</li>
 					<li class="c-pointer" v-for="(tableValue, tablename) in tables">
-						<p class="mb-0" v-on:click="vue.setTableRows(module, tablename, tableValue)">
+						<p class="mb-0 ptablename" v-on:click="vue.setTableRows(module, tablename, tableValue)">
 							<span class="fs-12 badge rounded-pill bg-success" v-if="tableValue.is_installed">
 								{{tablename}}
 							</span>

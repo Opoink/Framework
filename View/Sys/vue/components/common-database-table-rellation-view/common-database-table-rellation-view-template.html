@@ -1,0 +1,182 @@
+<div class="common-database-table-relation-view-component" v-if="vue.databaseIndexIndex?.selectedTableName">
+	<table class="table">
+		<thead class="thead-light">
+			<tr>
+				<th scope="col">Constraint Name <span class="text-danger">*</span></th>
+				<th scope="col">ON DELETE</th>
+				<th scope="col">ON UPDATE</th>
+				<th scope="col">Column <span class="text-danger">*</span></th>
+				<th scope="col">Reference Table <span class="text-danger">*</span></th>
+				<th scope="col">Reference Column <span class="text-danger">*</span></th>
+				<th scope="col">Installed</th>
+				<th scope="col">Action</th>
+			</tr>
+		</thead>
+		<tbody class="customtable" v-if="vue.databaseIndexIndex?.selectedTableFields?.table_relation">
+			<tr  v-for="form in vue.databaseIndexIndex.selectedTableFields.table_relation">
+				<td>
+					<div class="form-group mb-0">
+						<input 
+							type="text" 
+							class="form-control" 
+							v-bind:placeholder="vue.databaseIndexIndex.selectedTableName + '_ibfk_1'" 
+							v-model="form.constraint_name"
+						/>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<select class="form-select" v-model="form.on_delete">
+							<option value="ON DELETE CASCADE">CASCADE</option>
+							<option value="ON DELETE SET NULL">SET NULL</option>
+							<option value="ON DELETE NO ACTION">NO ACTION</option>
+							<option value="ON DELETE RESTRICT">RESTRICT</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<select class="form-select" v-model="form.on_updated">
+							<option value="ON UPDATE CASCADE">CASCADE</option>
+							<option value="ON UPDATE SET NULL">SET NULL</option>
+							<option value="ON UPDATE NO ACTION">NO ACTION</option>
+							<option value="ON UPDATE RESTRICT">RESTRICT</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0" v-if="vue.databaseIndexIndex?.selectedTableFields?.fields">
+						<select class="form-select" v-model="form.column">
+							<option value="">Please Select</option>
+							<option v-bind:value="field.name" v-for="field in vue.databaseIndexIndex.selectedTableFields.fields">
+								{{field.name}}
+							</option>
+						</select>
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<input type="text" class="form-control" placeholder="Reference Table" v-model="form.reference_tablename">
+					</div>
+				</td>
+				<td>
+					<div class="form-group mb-0">
+						<input type="text" class="form-control" placeholder="Reference Column" v-model="form.reference_column">
+					</div>
+				</td>
+				<td>
+					<span class="badge rounded-pill bg-success" v-if="form.is_installed"><i class="fas fa-check"></i></span>
+					<span class="badge rounded-pill bg-danger" v-else><i class="fas fa-times"></i></span>
+				</td>
+				<td>
+					<button 
+						class="btn btn-outline-danger btn-sm" 
+						title="Drop" 
+						data-bs-toggle="modal" 
+						data-bs-target="#modalDatabaseDropRelationConfirmData" 
+						v-on:click="vue.setDropConstraintColumn(form)"
+					>
+						<i class="fas fa-trash-alt"></i>
+					</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="row mb-3">
+		<div class="col-12">
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Add Constraint" v-on:click="vue.addForm()">
+				Add Constraint
+			</button>
+			<button class="btn btn btn-outline-primary btn-sm mR-10" title="Save Constraint" data-bs-toggle="modal" data-bs-target="#modalDatabaseSaveRelationConfirmData">
+				Save Constraint
+			</button>
+		</div>
+
+		<small class="text-muted mb-3" v-if="vue.databaseIndexIndex.selectedModule">
+			Note:
+			<br />
+			You can only choose SET NULL if your column is nullable.
+			<br />
+			You can manually edit the file at {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json
+		</small>
+	</div>
+
+	<div class="modal fade" id="modalDatabaseSaveRelationConfirmData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseSaveRelationConfirmDataLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalDatabaseSaveRelationConfirmDataLabel">
+						Save Relation
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetSaveAndInstall()"></button>
+				</div>
+				<div class="modal-body" v-if="vue.databaseIndexIndex.selectedModule">
+					<p>
+						The constraint with an empty required field will be ignored. Do you want to continue?
+						<br />
+						<br />
+						This will also override the file at {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json
+					</p>
+
+					<div class="form-group">
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="tabel-constraint-save-and-install" v-model="vue.save_and_install">
+							<label class="form-check-label" for="tabel-constraint-save-and-install">Save and install to database</label>
+						</div>
+						<small class="form-text">
+							If checked, we will save the constraint into the database, if the constraint name already exists, then the existing will be dropped, and then save a new constraint.
+						</small>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" v-on:click="vue.resetSaveAndInstall()">Cancel</button>
+					<button class="btn btn-primary" v-on:click="vue.saveConstraint()">Save Relation</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="modalDatabaseDropRelationConfirmData" tabindex="-1" role="dialog" aria-labelledby="modalDatabaseDropRelationConfirmDataLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<template v-if="vue.dropConstraintColumnForm.column">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalDatabaseDropRelationConfirmDataLabel">
+							Drop {{vue.dropConstraintColumnForm.column.constraint_name}} Constraint
+						</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" v-on:click="vue.resetDropConstraintColumnForm()"></button>
+					</div>
+					<div class="modal-body" v-if="vue.databaseIndexIndex.selectedModule">
+
+						<div class="form-group">
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="tabel-column-drop-constraint-check" v-model="vue.dropConstraintColumnForm.drop_in_database">
+								<label class="form-check-label" for="tabel-column-drop-constraint-check">Drop constraint</label>
+							</div>
+							<small class="form-text text-danger">
+								Note: If checked, Opoink will try to drop the constraint from the database.
+							</small>
+						</div>
+
+						<div class="form-group">
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="tabel-column-remove-json-constraint-check" v-model="vue.dropConstraintColumnForm.remove_in_json_file">
+								<label class="form-check-label" for="tabel-column-remove-json-constraint-check">Remove on JSON file</label>
+							</div>
+							<small class="form-text text-muted">
+								Remove this constraint on {{vue.databaseIndexIndex.selectedModule}}/Schema/relationship.json file.
+							</small>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button class="btn btn-outline-danger" v-on:click="vue.dropConstraint()">Drop Relation</button>
+						<button type="button" class="btn btn-primary" data-bs-dismiss="modal" v-on:click="vue.resetDropConstraintColumnForm()">Cancel</button>
+					</div>
+				</template>
+			</div>
+		</div>
+	</div>
+</div>
