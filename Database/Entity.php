@@ -5,7 +5,7 @@
 */
 namespace Of\Database;
 
-class Entity {
+class Entity extends \Of\Std\DataObject {
 
     const COLUMNS = [];
 	
@@ -29,6 +29,7 @@ class Entity {
         $this->_connection = $Connection;
         $this->_di = new \Of\Std\Di();
         $this->_request = $Request;
+		parent::__construct([]);
     }
 
     /**
@@ -177,28 +178,38 @@ class Entity {
         return $data;
     }
 
-    public function setData($key, $val=null){
-        if(is_array($key)){
-            foreach($key as $k => $v){
-                $this->data[$k] = $v;
-            }
-        } else {
-            $this->data[$key] = $val;
-        }
-        return $this;
-    }
+	/** 
+	 * remove since 4/4/2022 
+	 * use the setData from DataObject instead
+	 */
+    // public function setData($key, $val=null){
+        // if(is_array($key)){
+        //     foreach($key as $k => $v){
+        //         $this->data[$k] = $v;
+        //     }
+        // } else {
+        //     $this->data[$key] = $val;
+        // }
+        // return $this;
+    // }
 
-    public function getData($key=null){
-        if(!$key){
-            return $this->data;
-        } else {
-            if(isset($this->data[$key])){
-                return $this->data[$key];
-            }
-        }
+	/** 
+	 * remove since 4/4/2022 
+	 * use the setData from DataObject instead
+	 * in this case we can now use get data by path 
+	 * recusrsively by getData(user/firstname/etc);
+	 */
+    // public function getData($key=null){
+        // if(!$key){
+        //     return $this->data;
+        // } else {
+        //     if(isset($this->data[$key])){
+        //         return $this->data[$key];
+        //     }
+        // }
 
-        return null;
-    }
+        // return null;
+    // }
 
     /**
      * remove an specific data by key
@@ -206,13 +217,14 @@ class Entity {
      * if not set iw will remove all set data
      */
     public function removeData($key=null){
-        if(!$key){
-            $this->data = [];
-        } else {
-			if(array_key_exists($key , $this->data)){
-				unset($this->data[$key]);
-			}
-        }
+		$this->unsetData($key); /** user DataObject unset intead */
+        // if(!$key){
+        //     $this->data = [];
+        // } else {
+		// 	if(array_key_exists($key , $this->data)){
+		// 		unset($this->data[$key]);
+		// 	}
+        // }
     }
 
     /**
