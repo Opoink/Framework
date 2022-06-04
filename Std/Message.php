@@ -39,9 +39,9 @@ class Message extends \Of\Session\Session {
 			foreach($this->getMessage() as $mesKey => $mesVal){
 				$type = $mesVal['type'];
 				$m .= "
-				<li class='general_notification_message alert alert-{$type}'>
-					<p class='m-0'>{$mesVal['message']}</p>
-					<button class='notificationMessageClose'>
+				<li class='general_notification_message alert alert-".$type." toast-msg-".$mesKey."'>
+					<div class='m-0'>{$mesVal['message']}</div>
+					<button class='notificationMessageClose' data-index='".$mesKey."'>
 						<i class='far fa-times-circle'></i>
 					</button>
 				</li>";

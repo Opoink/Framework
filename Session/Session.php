@@ -23,15 +23,16 @@ class Session {
 	}
 	
 	public function getData($key=null){
-		if($key){
-			if(isset($_SESSION[$key])){
-				return $_SESSION[$key];
-			} else {
-				return null;
-			}
-		} else {
-			return $_SESSION;
-		}
+		return opoinkGetArrayValue($key, $_SESSION);
+		// if($key){
+		// 	if(isset($_SESSION[$key])){
+		// 		return $_SESSION[$key];
+		// 	} else {
+		// 		return null;
+		// 	}
+		// } else {
+		// 	return $_SESSION;
+		// }
 	}
 	
 	public function unsetData($key){

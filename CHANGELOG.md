@@ -1,3 +1,11 @@
+Database Schema
+- Fix default value if the column is for timestamp
+
+Data
+- New data object class
+- extend Of\Database\Entity to \Of\Std\DataObject
+- extend Of\Session\Session to \Of\Std\DataObject
+
 Add new feature for database creation page in system UI
 - in the system UI, the creation of the installation data
 - fix the database migration on the install/upgrade module, it is now accepting the added field from JSON schema and for collation, storage engine, etc.

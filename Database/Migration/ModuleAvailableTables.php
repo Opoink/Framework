@@ -455,7 +455,7 @@ class ModuleAvailableTables extends \Of\Database\Migration\Migrate {
 					$_value['nullable'] = true;
 				}
 				else if($value == 'CURRENT_TIMESTAMP'){
-					$_value['CURRENT_TIMESTAMP'] = $value;
+					$_value['default'] = $value;
 				}
 			}
 			else if($key == 'default_value' || $key == 'old_name'){
