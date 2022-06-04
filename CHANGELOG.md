@@ -1,3 +1,6 @@
+Database Schema
+- Fix default value if the column is for timestamp
+
 Data
 - New data object class
 - extend Of\Database\Entity to \Of\Std\DataObject
