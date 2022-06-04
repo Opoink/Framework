@@ -88,13 +88,33 @@ class DataObject {
 	 * @param string $name
 	 * @return string
 	 */
-	protected function _underscore($name){
+	public function _underscore($name){
 		if (isset(self::$_underscoreCache[$name])) {
 			return self::$_underscoreCache[$name];
 		}
 		$result = strtolower(trim(preg_replace('/([A-Z]|[0-9]+)/', "_$1", $name), '_'));
 		self::$_underscoreCache[$name] = $result;
 		return $result;
+	}
+
+	/**
+	 * @param string $name
+	 * @param string $casing strtolower | strtoupper | ucwords | ucfirst
+	 * @return string
+	 */
+	public function camelCaseToSpace($name, $casing='strtolower'){
+		$name = $this->_underscore($name);
+		$name = str_replace('_', ' ', $name);
+		if($casing == 'ucwords'){
+			$name = ucwords($name);
+		}
+		else if($casing == 'strtoupper'){
+			$name = strtoupper($name);
+		}
+		else if($casing == 'ucfirst'){
+			$name = ucfirst($name);
+		}
+		return $name;
 	}
 
 	/**
