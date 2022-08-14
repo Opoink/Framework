@@ -27,7 +27,7 @@ class installIndexIndex {
 	form = {
 		database: {
 			host: 'localhost',
-			user: 'root',
+			user: '',
 			name: '',
 			password: '',
 			prefix: '',
@@ -99,11 +99,13 @@ class installIndexIndex {
 											this.request.makeRequest('/'+window.sysUrl+'/install/database?getdb=1', jsonData, 'POST')
 											.then(database => {
 												if(!database.error && database.result){
-													this.form.database.host = database.result.host;
-													this.form.database.user = database.result.username;
-													this.form.database.name = database.result.database;
-													this.form.database.password = database.result.password;
-													this.form.database.prefix = database.result.table_prefix;
+													if(!database.result.error){
+														this.form.database.host = database.result.host;
+														this.form.database.user = database.result.username;
+														this.form.database.name = database.result.database;
+														this.form.database.password = database.result.password;
+														this.form.database.prefix = database.result.table_prefix;
+													}
 												}
 
 												this.loader.isLoading = false;

@@ -8,7 +8,16 @@ namespace Of\Controller;
 use Of\Constants;
 
 class File extends Filecontroller {
+
+	/**
+	 * \Of\Config
+	 */
 	protected $_config;
+
+	/**
+	 * \Of\Http\Url
+	 */
+	protected $_url;
 
 	public function __construct(
 		\Of\Config $Config,

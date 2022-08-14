@@ -11,6 +11,11 @@ class SystemDatabaseIndex extends Sys {
 	
 	protected $pageTitle = 'Opoink Database';
 
+	/**
+	 * \Of\Database\Migration\ModuleAvailableTables
+	 */
+	protected $_moduleAvailableTables;
+
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,
 		\Of\Session\FormSession $FormSession,

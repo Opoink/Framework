@@ -36,6 +36,12 @@ class Xmltohtml {
 	protected $XMLpath;
 	
 	protected $mode;
+
+	/**
+	 * \Of\Http\Url
+	 */
+	protected $_url;
+	protected $_config;
 	
 	public function __construct(
 		\Of\Http\Url $Url,
