@@ -10,7 +10,7 @@ use Of\Std\Versioncompare;
 class SystemInstallRequirement extends Sys {
 	
 	protected $pageTitle = 'Requirement Opoink Framework';
-	protected $phpVersion = '7.1';
+	protected $phpVersion = '7.4';
 	protected $memLimit = 128;
 	
 	public function run(){
