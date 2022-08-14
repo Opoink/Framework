@@ -39,6 +39,10 @@ class Controller {
 		$this->_di = $di;
 		return $this;
 	}
+
+	public function getDi(){
+		return $this->_di;
+	}
 	
 	public function setConfig($config){
 		$this->config = $config;

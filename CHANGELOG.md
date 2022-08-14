@@ -1,3 +1,6 @@
+PHP 8.2 Deprecation
+- Fix Dynamic variable deprecated issue
+
 Database Schema
 - Fix default value if the column is for timestamp
 

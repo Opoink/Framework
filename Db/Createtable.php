@@ -88,6 +88,11 @@ class Createtable {
 	*	database adapter
 	*/
 	protected $_adapter;
+
+	/**
+	 * \Of\Std\Versioncompare
+	 */
+	protected $_versioncompare;
 	
 	public function __construct(
 		\Of\Std\Versioncompare $Versioncompare
