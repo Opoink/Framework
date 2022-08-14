@@ -10,6 +10,7 @@ class SystemDatabaseDroptable extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database';
+	protected $_moduleAvailableTables;
 
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,

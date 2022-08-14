@@ -10,6 +10,7 @@ class SystemDatabaseDropConstraint extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Database Drop Constraint';
+	protected $_moduleAvailableTables;
 
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,
