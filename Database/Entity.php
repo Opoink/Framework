@@ -321,6 +321,10 @@ class Entity extends \Of\Std\DataObject {
         $pagination = $this->getPagination();
         $pagination->set($page, $count, $limit);
 
+		if($pagination->currentPage() > $pagination->total_pages()){
+			$pagination->set($pagination->total_pages(), $count, $limit);
+		}
+
         $select->offset($pagination->offset())
         ->limit($limit);
 

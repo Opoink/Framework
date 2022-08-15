@@ -1,3 +1,6 @@
+Entity
+- \Of\Database\Entity::getFinalResponse() if the current page is greater than the total page then use total page as the current page
+
 PHP 8.2 Deprecation
 - Fix Dynamic variable deprecated issue
 
