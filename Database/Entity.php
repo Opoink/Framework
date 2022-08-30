@@ -321,6 +321,10 @@ class Entity extends \Of\Std\DataObject {
         $pagination = $this->getPagination();
         $pagination->set($page, $count, $limit);
 
+		if($pagination->currentPage() > $pagination->total_pages()){
+			$pagination->set($pagination->total_pages(), $count, $limit);
+		}
+
         $select->offset($pagination->offset())
         ->limit($limit);
 
@@ -335,13 +339,15 @@ class Entity extends \Of\Std\DataObject {
             'data' => []
         ];
 
-        if($this->isInstance($data)){
-            $o['data'][] = $data->getData();
-        } else {
-            foreach ($data as $key => $value) {
-                $o['data'][] = $value->getData();
-            }
-        }
+		if($data){
+			if($this->isInstance($data)){
+				$o['data'][] = $data->getData();
+			} else {
+				foreach ($data as $key => $value) {
+					$o['data'][] = $value->getData();
+				}
+			}
+		}
         return $o;
     }
 }

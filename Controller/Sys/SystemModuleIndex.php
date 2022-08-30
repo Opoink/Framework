@@ -10,7 +10,16 @@ class SystemModuleIndex extends Sys {
 
 	
 	protected $pageTitle = 'Opoink Module List';
+
+	/**
+	 * \Of\ModManager\Module
+	 */
 	protected $_modManager;
+
+	/**
+	 * array list of modules
+	 */
+	protected $modules;
 
 	public function __construct(
 		\Of\Session\SystemSession $SystemSession,
