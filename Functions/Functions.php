@@ -27,6 +27,10 @@ function opoink_renderError(){
             $mode = $config['mode'];
         }
     }
+
+	if (PHP_SAPI === 'cli') {
+		$mode = \Of\Constants::MODE_PROD;
+	}
     
     header("HTTP/1.0 500 Internal Server Errors");
 	if($mode === \Of\Constants::MODE_DEV){
@@ -39,7 +43,7 @@ function opoink_renderError(){
 		$dir = new \Of\File\Dirmanager();
 		$logDir = ROOT . DS . 'Var' .DS . 'logs';
 		$dir->createDir($logDir);
-        $message = "Type: " . get_class( $e ) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
+        $message = date('Y-m-d H:i:s') . " " . "Type: " . get_class( $e ) . "; Message: {$e->getMessage()}; File: {$e->getFile()}; Line: {$e->getLine()};";
         file_put_contents( $logDir . DS . "exceptions.log", $message . PHP_EOL, FILE_APPEND );
         echo "Error occurred, logs has more info.";
 	}

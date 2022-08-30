@@ -339,13 +339,15 @@ class Entity extends \Of\Std\DataObject {
             'data' => []
         ];
 
-        if($this->isInstance($data)){
-            $o['data'][] = $data->getData();
-        } else {
-            foreach ($data as $key => $value) {
-                $o['data'][] = $value->getData();
-            }
-        }
+		if($data){
+			if($this->isInstance($data)){
+				$o['data'][] = $data->getData();
+			} else {
+				foreach ($data as $key => $value) {
+					$o['data'][] = $value->getData();
+				}
+			}
+		}
         return $o;
     }
 }
