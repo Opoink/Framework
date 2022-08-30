@@ -1,5 +1,5 @@
 Global Functions
-- opoink_renderError() add condition to check if the request is comming from CLI then make the mode production to log the error instead of redering html
+- opoink_renderError() add a condition to check if the request is coming from CLI then make the mode production to log the error instead of rendering HTML
 
 Entity
 - \Of\Database\Entity::getFinalResponse() if the current page is greater than the total page then use total page as the current page
