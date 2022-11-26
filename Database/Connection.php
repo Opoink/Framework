@@ -38,14 +38,14 @@ class Connection {
      * @param $table_prefix is the prefix added during the installation
      */
     public function setConfig($driver=null, $username=null, $password=null, $database=null, $host=null, $table_prefix=null){
-        if($driver != null && $username != null && $password != null && $database != null && $host != null && $table_prefix != null){
+        if($driver != null && $username != null && $password != null && $database != null && $host != null){
             $this->config = [
                 'driver' => $driver,
                 'username' => $username,
                 'password' => $password,
                 'database' => $database,
                 'host' => $host,
-                'table_prefix' => $table_prefix,
+                'table_prefix' => empty($table_prefix) ? '' : $table_prefix,
             ];
         } else {
             $configFile = ROOT.DS.'etc'.DS.'database.php';
