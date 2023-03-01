@@ -74,10 +74,12 @@ class Lang {
 					return $this->languages[$language][$key];
 				}
 			} else {
-				return 'undefined text: ' . $key ;
+				// return 'undefined text: ' . $key ;
+				return $key ;
 			}
 		} else {
-			return 'undefined language: ' . $language . ' - ' . $key;
+			// return 'undefined language: ' . $language . ' - ' . $key;
+			return $key;
 		}
 	}
 }
