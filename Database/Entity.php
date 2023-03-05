@@ -167,7 +167,7 @@ class Entity extends \Of\Std\DataObject {
         }
 
         foreach ($params as $key => $value) {
-            if($value == null){
+            if($value === null){
                 $s->where($key)->isnull(true);
             } else {
                 $s->where($key)->eq($value);
